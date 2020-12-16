@@ -9,7 +9,7 @@ interface Option {
 
 interface CustomSelectProps extends FieldProps {
   options: OptionsType<Option>;
-  placeholder: string
+  placeholder: string;
 }
 
 const colourStyles = {
@@ -20,19 +20,19 @@ const colourStyles = {
     borderColor: '#eef0fb',
     '&:hover': { borderColor: '#6534ff' },
   }),
-  input: (styles: any) => ({ ...styles, height: 36 })
+  input: (styles: any) => ({ ...styles, height: 36 }),
 };
 
-const FormSelect = ({field, form, options, placeholder}: CustomSelectProps) => {
+const FormSelect = ({ field, form, options, placeholder }: CustomSelectProps) => {
   const onChange = (option: ValueType<Option | Option[]>) => {
-    form.setFieldValue(field.name, (option as Option).value );
+    form.setFieldValue(field.name, (option as Option).value);
   };
 
   const getValue = () => {
     if (options) {
-      return options.find(option => option.value === field.value);
+      return options.find((option) => option.value === field.value);
     } else {
-      return ('' as any);
+      return '' as any;
     }
   };
 
@@ -43,7 +43,7 @@ const FormSelect = ({field, form, options, placeholder}: CustomSelectProps) => {
       onChange={onChange}
       options={options}
       placeholder={placeholder}
-      className={"rselect"}
+      className={'rselect'}
       styles={colourStyles}
     />
   );

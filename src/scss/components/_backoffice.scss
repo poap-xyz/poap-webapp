@@ -819,15 +819,30 @@
 
 .secondary-filters {
   margin-bottom: 25px;
-  flex-direction: column;
 
-  select {
-    margin-left: 15px;
-    width: auto;
-    height: 30px;
-    padding: 0 20px;
-    background-image: none;
-    text-align: center;
+  @media (min-width: $bp-mw) {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  &--pagination {
+    select {
+      margin-left: 15px;
+      width: auto;
+      height: 30px;
+      padding: 0 20px;
+      background-image: none;
+      text-align: center;
+    }
+  }
+  &--links {
+    button {
+      line-height: 30px;
+      border: 0;
+      color: $color-primary;
+      cursor: pointer;
+    }
   }
 }
 
@@ -929,7 +944,6 @@
   }
 }
 
-
 .template_claim_loading {
   height: 100vh;
   width: 100vw;
@@ -1017,6 +1031,31 @@
     svg {
       position: relative;
       top: 3px;
+    }
+  }
+}
+
+.link-creation-container {
+  .select-container {
+    padding: 20px 0;
+    p {
+      max-width: none;
+    }
+  }
+
+  .horizontal-field {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 0;
+    .label-container {
+      padding: 15px 0;
+    }
+    .field-container {
+      input {
+        margin-left: 30px;
+        border: 2px solid $color-light-grey;
+        border-radius: 4px;
+      }
     }
   }
 }

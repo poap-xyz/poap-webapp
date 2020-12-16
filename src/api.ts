@@ -588,6 +588,18 @@ export async function qrCodesSelectionUpdate(
       });
 }
 
+export async function generateRandomCodes(event_id: number, amount: number, delegated_mint: boolean): Promise<void> {
+  return secureFetchNoResponse(`${API_BASE}/qr-code/generate`, {
+    method: 'POST',
+    body: JSON.stringify({
+      event_id,
+      amount,
+      delegated_mint,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export function getTransactions(
   limit: number,
   offset: number,

@@ -34,12 +34,14 @@ export const TemplatesFilters: FC<Props> = ({ setLimit, setName }) => {
         </div>
       </div>
       <div className={'secondary-filters'}>
-        Results per page:
-        <select onChange={handleLimitChange}>
-          <option value={10}>10</option>
-          <option value={100}>100</option>
-          <option value={1000}>1000</option>
-        </select>
+        <div className={'secondary-filters--pagination'}>
+          Results per page:
+          <select onChange={handleLimitChange}>
+            <option value={10}>10</option>
+            <option value={100}>100</option>
+            <option value={1000}>1000</option>
+          </select>
+        </div>
       </div>
     </>
   );
