@@ -1,0 +1,102 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@portis/web3": "^2.0.0-beta.57",
+    "@types/react-color": "^3.0.4",
+    "@walletconnect/web3-provider": "1.3.1",
+    "aos": "^2.3.4",
+    "auth0-js": "^9.11.2",
+    "classnames": "^2.2.6",
+    "date-fns": "^2.8.1",
+    "dlv": "^1.1.3",
+    "email-regex": "^4.0.0",
+    "ethers": "^4.0.33",
+    "firebase-tools": "^7.2.0",
+    "formik": "^1.5.8",
+    "node-sass": "^4.12.0",
+    "query-string": "^6.8.3",
+    "react": "^16.8.6",
+    "react-burger-menu": "^2.6.10",
+    "react-color": "^2.18.1",
+    "react-day-picker": "^7.4.0",
+    "react-dom": "^16.8.6",
+    "react-icons": "^3.11.0",
+    "react-lightweight-tooltip": "^1.0.0",
+    "react-modal": "^3.10.1",
+    "react-paginate": "^6.3.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.0.1",
+    "react-select": "^3.1.0",
+    "react-share": "^3.0.0",
+    "react-toast-notifications": "^2.4.0",
+    "typescript": "3.7.4",
+    "web3": "1.2.11",
+    "web3modal": "1.9.1",
+    "yup": "^0.27.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "yarn build && yarn firebase deploy"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:cypress/recommended",
+      "plugin:prettier/recommended"
+    ],
+    "plugins": [],
+    "rules": {
+      "react/prop-types": 0,
+      "prettier/prettier": "error",
+      "react/jsx-sort-props": 0,
+      "react/display-name": 0,
+      "no-console": "off",
+      "react/no-unescaped-entities": 0,
+      "no-control-regex": 0,
+      "react/jsx-boolean-value": "never"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@auth0/auth0-spa-js": "^1.1.1",
+    "@types/aos": "^3.0.1",
+    "@types/auth0-js": "^9.10.2",
+    "@types/classnames": "^2.2.9",
+    "@types/dlv": "^1.1.1",
+    "@types/jest": "24.0.15",
+    "@types/node": "12.6.8",
+    "@types/react": "16.9.11",
+    "@types/react-burger-menu": "^2.2.5",
+    "@types/react-dom": "16.8.5",
+    "@types/react-modal": "^3.10.0",
+    "@types/react-paginate": "^6.2.1",
+    "@types/react-router-dom": "^5.1.3",
+    "@types/react-select": "^3.0.12",
+    "@types/react-share": "^2.1.1",
+    "@types/react-toast-notifications": "^2.0.0",
+    "@types/yup": "^0.26.22",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-cypress": "^2.11.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-simple-import-sort": "^5.0.3",
+    "prettier": "^2.0.5"
+  }
+}

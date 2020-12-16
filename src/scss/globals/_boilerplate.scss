@@ -1,0 +1,231 @@
+/* ================================================================
+   Boilerplate - Base Styles
+   ================================================================ */
+
+html,
+button,
+input,
+select,
+textarea {
+  color: $color-base;
+}
+
+body {
+  font-family: $font-family;
+  background: $color-secondary;
+  font-size: 16px;
+}
+
+header,
+main {
+  float: left;
+  width: 100%;
+  clear: both;
+}
+
+#root .landing {
+  min-height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+::-moz-selection {
+  background: $color-primary;
+  color: $color-invert;
+  text-shadow: none;
+}
+
+::selection {
+  background: $color-primary;
+  color: $color-invert;
+  text-shadow: none;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+img {
+  vertical-align: middle;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+table {
+  margin: 1em 0;
+  border: 1px solid #ccc;
+}
+
+td {
+  padding: 0.2em 0.4em;
+  border: 1px solid #ccc;
+  background: hsl(0, 0%, 90%);
+}
+
+tr:nth-child(2n) td {
+  background: #fff;
+}
+
+/* ================================================================
+   Typography Styles
+   ================================================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: $color-primary;
+  font-weight: $fontWeight-bold;
+  margin: 0 0 $typography-margin-bottom;
+  font-family: $font-family-narrow;
+}
+
+h1 {
+  @include x-rem(font-size, 40px);
+}
+
+h2 {
+  @include x-rem(font-size, 20px);
+
+  @media (min-width: $bp-mw) {
+    @include x-rem(font-size, 35px);
+  }
+}
+
+h3 {
+  @include x-rem(font-size, 24px);
+
+  @media (min-width: $bp-m) {
+    @include x-rem(font-size, 30px);
+  }
+}
+
+a {
+  color: $color-primary;
+  text-decoration: none;
+  font-family: $font-family;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
+}
+
+p {
+  margin: 0 auto $typography-margin-bottom;
+  @include x-rem(font-size, 16px);
+  color: $color-base;
+  font-family: $font-family;
+  max-width: 350px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+ul,
+ol {
+  margin: 0 0 20px;
+  padding: 0 0 0 30px;
+
+  li {
+    @include x-rem(font-size, 16px);
+    color: $color-invert;
+    font-family: $font-family;
+    margin: 0 0 10px;
+  }
+}
+
+.btn {
+  display: block;
+  min-width: 320px;
+  margin: 0 auto 20px;
+  cursor: pointer;
+
+  margin-top: 20px;
+  padding: 12px 24px;
+
+  border-radius: 40px;
+
+  font-weight: $fontWeight-bold;
+  font-family: $font-family-narrow;
+  @include x-rem(font-size, 24px);
+  border: 0;
+  text-align: center;
+  color: $color-invert;
+  text-decoration: none;
+
+  background: $color-primary;
+  transition: all 0.2s ease-out;
+
+  -webkit-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+  -moz-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+  box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    background: #683dee;
+  }
+
+  &:active {
+    text-decoration: none;
+    background: #6534ff;
+  }
+  &:disabled {
+    text-decoration: none;
+    background: #ccc4f7;
+    color: #e6e7f7;
+  }
+
+  span {
+    float: left;
+    width: 100%;
+    margin: 0 0 3px 0;
+
+    &:last-child {
+      margin: 0;
+    }
+  }
+  .small-text {
+    @include x-rem(font-size, 16px);
+  }
+}
+
+.mobile {
+  @media (min-width: $bp-m) {
+    display: none;
+  }
+}
+
+.desktop {
+  display: none;
+  @media (min-width: $bp-m) {
+    display: block;
+  }
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.pointer {
+  cursor: pointer;
+}

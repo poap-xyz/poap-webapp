@@ -1,0 +1,36 @@
+/* ******************************************************
+   Main Import File
+        - Base Imports (Varialbes/Utilities/Base styles)
+        - Components (Navigation/Tools/Modules)
+        - Vendor Imports (Third party plugins)
+   ****************************************************** */
+
+/* ================================================================
+   Base Imports
+   ================================================================ */
+
+@import 'variables';
+@import 'globals/utilities';
+@import 'globals/normalize';
+@import 'globals/boilerplate';
+@import 'globals/grid';
+@import 'globals/print';
+@import 'globals/forms';
+
+/* ================================================================
+   Component Imports
+   ================================================================ */
+
+// Component Globals
+
+@import 'components/eventsapp';
+@import 'components/poapapp';
+@import 'components/burgermenu';
+@import 'components/backoffice';
+
+/* ================================================================
+   Vendor Imports
+   ================================================================ */
+// @import 'vendor/slick';
+// @import "vendor/slick-theme";
+@import 'vendor/aos';

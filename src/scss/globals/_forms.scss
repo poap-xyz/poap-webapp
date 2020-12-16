@@ -1,0 +1,607 @@
+/* ================================================================
+   Forms
+   ================================================================ */
+
+form {
+  position: relative;
+
+  label,
+  input[type='text'],
+  input[type='email'],
+  input[type='file'],
+  textarea,
+  select {
+    // float: left;
+    font-family: $font-family;
+    // clear: both;
+
+    &.error {
+      border: 2px solid #e13c5d;
+    }
+  }
+
+  ::-webkit-input-placeholder {
+    /* Chrome */
+    color: rgba($color-base, 0.5);
+  }
+
+  :-ms-input-placeholder {
+    /* IE 10+ */
+    color: rgba($color-base, 0.5);
+  }
+
+  ::-moz-placeholder {
+    /* Firefox 19+ */
+    color: rgba($color-base, 0.5);
+  }
+
+  :-moz-placeholder {
+    /* Firefox 4 - 18 */
+    color: rgba($color-base, 0.5);
+  }
+}
+
+label {
+  margin: 0 0 6px;
+  color: $color-base;
+  width: 100%;
+  display: inline-block;
+
+  @include x-rem(font-size, 16px);
+}
+
+input[type='text'],
+input[type='search'] {
+  -webkit-appearance: none !important;
+}
+
+div {
+  .DayPickerInput {
+    margin-right: 5px;
+    width: 100%;
+
+    input {
+      width: 100%;
+      color: $color-primary;
+      outline-color: $color-primary;
+      padding: 12px;
+      box-shadow: none;
+      border: 2px solid $color-invert;
+      background: $color-invert;
+      transition: right 0.2s ease-out;
+      border-radius: 4px;
+      margin: 0 auto 16px;
+      @include x-rem(font-size, 13px);
+      height: 50px;
+
+      &::placeholder {
+        color: $color-primary;
+        opacity: 1;
+      }
+
+      &:focus,
+      &:hover {
+        border: 2px solid $color-primary;
+      }
+    }
+
+    input:disabled {
+      cursor: not-allowed;
+      background: $color-light-grey;
+      color: #bababa;
+      border: none !important;
+
+      &:hover {
+        border: none !important;
+      }
+    }
+  }
+}
+
+.date-picker-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  label {
+    margin-bottom: 10px;
+    display: block;
+    color: $color-primary;
+  }
+
+  &.end-date-overlay {
+    div {
+      .DayPickerInput-Overlay {
+        right: 0;
+        left: auto;
+      }
+    }
+  }
+}
+
+.checkbox-field {
+  margin-top: $grid-gutter;
+  display: flex;
+  flex-direction: row;
+
+  label {
+    color: $color-primary;
+    cursor: pointer;
+  }
+  input {
+    cursor: pointer;
+    margin-top: 2px;
+  }
+}
+
+input[type='text'],
+input[type='password'],
+input[type='tel'],
+input[type='textarea'],
+input[type='email'],
+input[type='color'],
+input[type='number'],
+input[type='text'],
+input[type='file'] {
+  width: 100%;
+  height: 50px;
+  padding: 12px;
+  box-shadow: none;
+  border: 2px solid $color-invert;
+  background: $color-invert;
+  transition: right 0.2s ease-out;
+  border-radius: 4px;
+  margin: 0 auto 16px;
+  color: $color-primary;
+
+  outline-color: $color-primary;
+
+  &::placeholder {
+    color: $color-medium-violet;
+  }
+
+  @include x-rem(font-size, 13px);
+
+  @media (min-width: $bp-m) {
+    @include x-rem(font-size, 16px);
+  }
+
+  &:last-child {
+    margin: 0;
+  }
+
+  &:focus,
+  &:hover {
+    border: 2px solid $color-primary;
+  }
+
+  &:disabled {
+    background: $color-disabled-field;
+    border-color: $color-disabled-field;
+  }
+
+  &.error {
+    border: 2px solid #e13c5d;
+  }
+}
+
+.image-edit-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0 20px;
+}
+
+.image-edit {
+  height: 200px;
+}
+
+input[type='textarea'] {
+  height: 100px;
+  word-wrap: break-word;
+}
+
+.text-error {
+  color: #e13c5d;
+  max-width: 600px;
+  margin: 0 auto 16px;
+  @include x-rem(font-size, 16px);
+  text-align: center;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  margin-right: 2px;
+  border-radius: 0;
+  background: none;
+}
+
+input[type='checkbox'] {
+  &.by-range-modal {
+    margin-left: 12px;
+  }
+}
+
+input[type='color'] {
+  -webkit-appearance: none;
+  border: none;
+  padding: 0;
+}
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type='color']::-webkit-color-swatch {
+  border: none;
+}
+
+input[type='submit'] {
+  width: 100%;
+  cursor: pointer;
+
+  max-width: 350px;
+  margin: 0 auto 20px;
+
+  padding: 12px 24px;
+
+  border-radius: 40px;
+
+  font-weight: $fontWeight-normal;
+  font-family: $font-family-narrow;
+  @include x-rem(font-size, 24px);
+  border: 0;
+  color: $color-invert;
+  text-decoration: none;
+
+  background: $color-primary;
+  transition: all 0.2s ease-out;
+
+  -webkit-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+  -moz-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+  box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    background: #683dee;
+  }
+
+  &:active {
+    text-decoration: none;
+    background: #6534ff;
+  }
+  &:disabled {
+    text-decoration: none;
+    background: #ccc4f7;
+    color: #e6e7f7;
+    cursor: default;
+  }
+
+  &.loading {
+    background: url('../images/loading.svg') no-repeat center center #ccc4f7 !important;
+    background-size: 30px !important;
+  }
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  box-shadow: none;
+  border: 2px solid $color-invert;
+  background: $color-invert;
+  color: $color-primary;
+  transition: right 0.2s ease-out;
+  border-radius: 4px;
+  margin: 0 0 24px;
+  @include x-rem(font-size, 16px);
+  height: 50px;
+
+  appearance: none;
+
+  background-image: $violet-select-arrow;
+  background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px),
+    calc(100% - 2.5em) 0.5em;
+  background-size: 5px 5px, 5px 5px, 1px 1.5em;
+  background-repeat: no-repeat;
+
+  outline-color: $color-primary;
+
+  &:last-child {
+    margin: 0;
+  }
+
+  &:hover,
+  &:focus {
+    border: 2px solid $color-primary;
+  }
+
+  &:disabled {
+    background-color: $color-light-violet;
+    color: $color-primary;
+
+    &:hover {
+      border: none;
+    }
+  }
+
+  &.placeholder-option {
+    color: $color-medium-violet;
+  }
+}
+
+textarea {
+  padding: 12px;
+  box-shadow: none;
+  border: 2px solid $color-invert;
+  background: $color-invert;
+  transition: right 0.2s ease-out;
+  border-radius: 4px;
+  width: 100%;
+
+  @include x-rem(font-size, 16px);
+  height: 150px;
+
+  &:last-child {
+    margin: 0;
+  }
+
+  &:focus,
+  &:hover {
+    outline-color: $color-primary;
+    border: 2px solid $color-primary;
+  }
+
+  &:disabled {
+    background-color: $color-disabled-field;
+    border: none;
+  }
+}
+
+.modal-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(black, 0.3);
+}
+
+.modal-content {
+  input,
+  select,
+  textarea {
+    border: 2px solid $color-light-grey;
+
+    &:focus,
+    &:hover {
+      border: 2px solid $color-primary;
+    }
+  }
+}
+
+.option-container {
+  &:first-of-type {
+    padding-top: 25px;
+  }
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  padding-bottom: 25px;
+
+  > div {
+    &:not(:last-child) {
+      margin-right: 12px;
+    }
+  }
+}
+
+.label-container {
+  width: 75px;
+  color: $color-grey;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+
+  input {
+    width: 48%;
+    margin: 0;
+  }
+
+  span,
+  textarea {
+    color: $color-primary;
+
+    &.grey-text {
+      color: $color-grey;
+    }
+  }
+
+  input,
+  textarea {
+    &::placeholder {
+      color: $color-medium-violet;
+    }
+  }
+
+  &.list-container {
+    flex-direction: column;
+
+    span {
+      margin-top: 25px;
+    }
+  }
+}
+
+.modal-buttons-container {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  justify-content: space-between;
+
+  &.creation-modal {
+    justify-content: space-between;
+  }
+
+  button {
+    min-width: 96px;
+  }
+
+  @media (min-width: $bp-l) {
+    justify-content: space-between;
+
+    button {
+      min-width: 130px;
+    }
+  }
+}
+
+.modal-action-checkbox-container {
+  display: flex;
+  flex-direction: row;
+  input {
+    transform: scale(1.2);
+    margin: 2px 0 0 2px;
+  }
+  label,
+  input {
+    cursor: pointer;
+  }
+  label {
+    padding-left: 5px;
+    margin-bottom: 0;
+  }
+}
+
+.modal-action-buttons-container {
+  display: flex;
+  align-items: center;
+
+  button {
+    border: none;
+    margin-left: 10px;
+
+    @media (min-width: $bp-l) {
+      &:last-of-type {
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+.modal-top-bar {
+  h3 {
+    margin-bottom: 20px;
+  }
+}
+
+.modal-select-error {
+  border: 2px solid $color-error !important;
+  outline-color: $color-error;
+  color: $color-error;
+  background-image: $red-select-arrow;
+}
+
+.modal-input-error {
+  border: 2px solid $color-error !important;
+  outline-color: $color-error !important;
+  &::placeholder {
+    color: $color-error !important;
+  }
+
+  &.authentication-modal {
+    color: $color-error;
+  }
+}
+
+.modal-textarea {
+  height: 200px;
+}
+
+.authentication_modal_container {
+  display: flex;
+  flex-direction: column;
+
+  input {
+    margin-bottom: 20px;
+    width: 100%;
+    height: 50px;
+    padding: 12px;
+    box-shadow: none;
+    background: #fff;
+    transition: right 0.2s ease-out;
+    border-radius: 4px;
+    margin: 0 auto 16px;
+    color: #6534ff;
+    outline-color: #6534ff;
+    border: 2px solid #e9edf5;
+  }
+
+  input,
+  button {
+    width: 100%;
+  }
+}
+
+.creation-modal-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding: 20px 0;
+
+  > div {
+    width: 50%;
+
+    &:first-of-type {
+      margin-right: 10px;
+    }
+
+    textarea {
+      border: 2px solid $color-light-grey;
+      color: $color-primary;
+
+      &::placeholder {
+        color: $color-medium-violet;
+      }
+    }
+  }
+
+  span {
+    color: $color-primary;
+  }
+}
+
+.select-container {
+  margin-bottom: 20px;
+
+  select.select {
+    border: 2px solid $color-light-grey;
+
+    &.placeholder-option {
+      color: $color-medium-violet;
+    }
+  }
+
+  span {
+    color: $color-primary;
+  }
+}
+
+.input-field-helper {
+  color: $color-primary;
+
+  ul {
+    li {
+      color: $color-primary;
+      margin: 5px 0;
+    }
+  }
+}

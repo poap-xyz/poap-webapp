@@ -1,0 +1,509 @@
+/* ******************************************************
+   Main Sections POAP App
+   ****************************************************** */
+
+.poap-app {
+  background-color: $bg-color;
+
+  &.events-page {
+    .header-events {
+      padding: 0;
+      @media (min-width: $bp-mw) {
+        padding: 0 0 100px;
+      }
+    }
+    main {
+      padding: 0;
+    }
+    footer {
+      margin: 0;
+    }
+  }
+
+  .header-events {
+    clear: both;
+    h1 {
+      margin: 0 0 10px;
+    }
+    p {
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.poap-app {
+  header {
+    height: 200px;
+    background-image: url('../images/bg-header-m.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: top center;
+
+    -webkit-overflow-scrolling: touch;
+    -webkit-transition: all 0.5s ease-in-out-ut;
+    transition: all 0.5s ease-in-out;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    z-index: 100;
+    top: -200px;
+    position: static;
+    width: 100%;
+    padding: 20px 0 0;
+
+    @media (min-width: $bp-sw) {
+      background-image: url('../images/bg-header.png');
+      padding: 0;
+    }
+
+    &.fixed {
+      width: 100%;
+      z-index: 100;
+
+      position: fixed;
+      top: 0;
+      -webkit-overflow-scrolling: touch;
+      -webkit-transition: all 0.5s ease-in-out;
+      transition: all 0.5s ease-in-out;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+
+      background-image: url('../images/bg-header-m-fixed.png');
+
+      @media (min-width: $bp-sw) {
+        background-image: url('../images/bg-header-fixed.png');
+      }
+    }
+
+    .container {
+      max-width: 470px;
+
+      @media (min-width: $bp-mw) {
+        max-width: 690px;
+      }
+    }
+
+    .logo {
+      margin: 10px 0 0 10px;
+      float: left;
+    }
+
+    .page-title {
+      text-align: right;
+      @include x-rem(font-size, 40px);
+      font-weight: $fontWeight-bold;
+      color: $color-primary;
+      font-family: $font-family-narrow;
+      padding: 30px 30px 0;
+
+      @media (max-width: $bp-m) {
+        @include x-rem(font-size, 20px);
+      }
+    }
+  }
+}
+
+/* ******************************************************
+   App Content
+   ****************************************************** */
+
+.app-content {
+  .content-event {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+    text-align: center;
+    display: block;
+
+    p {
+      span {
+        font-weight: $fontWeight-bold;
+      }
+    }
+    .login-form {
+      text-align: center;
+
+      input[type='text'] {
+        max-width: 500px;
+        text-align: center;
+      }
+    }
+
+    &.years {
+      text-align: left;
+
+      @media (min-width: $bp-mw) {
+        margin: 0 auto 50px;
+        max-width: 600px;
+      }
+
+      h1 {
+        font-weight: $fontWeight-normal;
+        @include x-rem(font-size, 20px);
+        margin: 0 0 12px;
+
+        span {
+          font-weight: $fontWeight-bold;
+          @include x-rem(font-size, 16px);
+
+          @media (min-width: $bp-m) {
+            @include x-rem(font-size, 20px);
+          }
+        }
+      }
+
+      p {
+        max-width: none;
+      }
+
+      .event-year {
+        margin-bottom: 30px;
+
+        &:last-child {
+          margin: 0;
+        }
+
+        h2 {
+          color: $color-fourth;
+          @include x-rem(font-size, 30px);
+          font-family: $font-family-narrow;
+          margin-bottom: 12px;
+        }
+
+        &.empty-year {
+          img {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 20px;
+            display: block;
+          }
+
+          .image-description {
+            width: 100%;
+            margin: 0 auto;
+            max-width: 320px;
+            text-align: center;
+            color: #b29ffa;
+
+            @media (min-width: $bp-mw) {
+              max-width: 360px;
+              @include x-rem(font-size, 20px);
+            }
+          }
+        }
+
+        .events-logos {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+
+          .event-circle {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 12px 12px 0;
+            background-color: white;
+            -webkit-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+            -moz-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+            box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+
+            @media (min-width: $bp-mw) {
+              margin: 0 24px 24px 0;
+            }
+          }
+        }
+      }
+    }
+
+    &.contact-form {
+      text-align: left;
+
+      @media (min-width: $bp-m) {
+        margin: 0 auto 50px;
+        max-width: 600px;
+      }
+
+      h1 {
+        font-weight: $fontWeight-normal;
+        @include x-rem(font-size, 20px);
+        margin: 0 0 12px;
+      }
+
+      form {
+        margin: 24px 0 0;
+
+        input[type='text'],
+        select,
+        input[type='submit'] {
+          max-width: none;
+        }
+
+        .form-group {
+          margin: 0 0 24px;
+          float: left;
+          width: 100%;
+        }
+      }
+    }
+
+    .greetings-desktop {
+      display: inline;
+      @media (max-width: $bp-m) {
+        display: none;
+      }
+    }
+    .greetings-mobile {
+      display: none;
+      @media (max-width: $bp-m) {
+        display: inline;
+      }
+    }
+  }
+}
+
+.loading-content {
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+
+  img {
+    max-width: 38px;
+  }
+}
+
+.claim-modal-text-container {
+  p {
+    width: 100%;
+    max-width: 100%;
+    line-height: 20px;
+  }
+
+  margin-bottom: 24px;
+}
+
+.claim-modal-cancel-container {
+  display: flex;
+  justify-content: center;
+}
+
+/* ******************************************************
+   Email Redeem
+   ****************************************************** */
+
+.scan-email-badge-container {
+  display: flex;
+  flex-direction: column;
+
+  border-top: 1px solid $color-light-violet;
+
+  padding: 16px;
+
+  margin-bottom: 12px;
+}
+
+.scan-email-badge {
+  color: $color-primary;
+}
+
+.width-700 {
+  max-width: 700px;
+}
+
+.scan-email-badge-button-container {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 12px;
+}
+
+.redeem-page {
+  min-height: 100vh;
+}
+
+.redeem-content-container {
+  max-width: 600px;
+  margin: 0 auto;
+
+  .claim-form {
+    text-align: center;
+  }
+
+  .preloader {
+    padding: 100px 0;
+    img {
+      width: 25px;
+    }
+  }
+
+  .token-error {
+    text-align: center;
+  }
+
+  input {
+    text-align: center;
+
+    margin-top: 24px;
+  }
+
+  .tx-detail {
+    padding: 30px 0;
+    .tx-detail-title {
+      display: none;
+    }
+    .tx-detail-box {
+      background: white;
+    }
+  }
+
+  .redeem-text-container {
+    text-align: center;
+  }
+
+  .redeem-success {
+    text-align: center;
+    padding-bottom: 50px;
+    h6{
+      color: $color-primary;
+      text-transform: uppercase;
+      font-size: 24px;
+      margin: 5px 0;
+    }
+  }
+
+  .redeem-subtitle {
+    text-align: left;
+    color: $color-primary;
+    font-weight: bold;
+  }
+
+  .redeem-text {
+    font-size: 16px;
+    padding: 25px 0;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+
+    &.vertical-margin {
+      margin: 12px 0 24px;
+    }
+
+    span {
+      color: $color-primary;
+      font-weight: 600;
+    }
+  }
+
+  .redeem-poaps-container {
+    margin-top: 24px;
+  }
+
+  .event-circle {
+    margin: 10px !important;
+  }
+}
+
+.events-logos {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .event-circle {
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 12px 12px 0;
+    background-color: $color-primary;
+    -webkit-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+    -moz-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+    box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+
+    @media (min-width: $bp-mw) {
+      margin: 0 24px 24px 0;
+    }
+  }
+}
+
+.mb-24 {
+  margin-bottom: 36px;
+}
+
+.width500 {
+  width: 500px !important;
+}
+
+.redeem-modal {
+  position: relative;
+
+  h2 {
+    text-align: center;
+  }
+
+  &.submitting {
+    opacity: 0.6;
+  }
+}
+
+.redeem-modal-loading {
+  position: absolute;
+  margin: 0 auto;
+  top: 50%;
+  right: 34%;
+
+  padding: 8px 16px;
+
+  background-color: $color-light-violet;
+  color: $color-primary;
+
+  border: 1px solid $color-primary;
+  border-radius: 4px;
+}
+
+.redeem-modal-paragraph {
+  line-height: 20px;
+  width: 100% !important;
+
+  margin: 0;
+}
+
+.redeem-modal-email {
+  color: $color-primary;
+  font-weight: 600;
+}
+
+.redeem-modal-buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 12px;
+}
+
+.redeem-modal-button {
+  min-width: 96px;
+  padding: 8px 16px;
+  border-radius: 4px;
+
+  &.confirm {
+    color: $color-primary;
+    border: 1px solid $color-primary;
+    background-color: $color-light-violet;
+
+    margin-left: 12px;
+  }
+
+  &.cancel {
+    color: $color-error;
+    border: 1px solid $color-error;
+    background-color: $color-fourth-background;
+  }
+}
+
+/* ******************************************************
+   Web3 Modal
+   ****************************************************** */
+
+.web3modal-modal-lightbox {
+  z-index: 150 !important;
+}

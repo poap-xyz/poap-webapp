@@ -1,0 +1,140 @@
+@charset "UTF-8";
+
+// Default Variables
+$slick-font-path: "./fonts/" !default;
+$slick-font-family: "slick" !default;
+$slick-loader-path: "./" !default;
+$slick-arrow-color: white !default;
+$slick-dot-color: black !default;
+$slick-dot-color-active: $slick-dot-color !default;
+$slick-prev-character: "←" !default;
+$slick-next-character: "→" !default;
+$slick-dot-character: "•" !default;
+$slick-dot-size: 6px !default;
+$slick-opacity-default: 0.75 !default;
+$slick-opacity-on-hover: 1 !default;
+$slick-opacity-not-active: 0.25 !default;
+
+@function slick-image-url($url) {
+    @if function-exists(image-url) {
+        @return image-url($url);
+    }
+
+    @else {
+        @return url($slick-loader-path + $url);
+    }
+}
+
+@function slick-font-url($url) {
+    @if function-exists(font-url) {
+        @return font-url($url);
+    }
+
+    @else {
+        @return url($slick-font-path + $url);
+    }
+}
+
+
+
+/* Arrows */
+
+.slick-prev,
+.slick-next {
+    position: absolute;
+    display: block;
+    height: 40px;
+    width: 40px;
+    line-height: 0px;
+    font-size: 0px;
+    cursor: pointer;
+    background: transparent;
+    color: transparent;
+    top: calc(50% - 20px);
+    padding: 0;
+    border: none;
+    outline: none;
+
+    @media (min-width: $bp-l) {
+        height: 60px;
+        width: 60px;
+        top: calc(50% - 30px);
+    }
+
+    &.slick-disabled {
+        opacity: 0.5;
+    }
+}
+
+
+.slick-prev {
+    left: -25px;
+    background-image: url('../images/arrow-prev.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    [dir="rtl"] & {
+        left: auto;
+        right: -25px;
+    }
+
+    &:focus {
+        background-image: url('../images/arrow-prev.svg');
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-color: transparent;
+    }
+
+    &:hover {
+        outline: none;
+        color: transparent;
+        background-image: url('../images/arrow-prev-hover.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    @media (min-width: $bp-l) {
+        left: 0;
+
+        [dir="rtl"] & {
+            right: 0px;
+            auto: auto;
+        }
+    }
+}
+
+.slick-next {
+    right: -25px;
+    background-image: url('../images/arrow-next.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    [dir="rtl"] & {
+        left: -25px;
+        right: auto;
+    }
+
+    &:focus {
+        background-image: url('../images/arrow-next.svg');
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-color: transparent;
+    }
+
+    &:hover {
+        outline: none;
+        color: transparent;
+        background-image: url('../images/arrow-next-hover.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    @media (min-width: $bp-l) {
+        right: 0;
+
+        [dir="rtl"] & {
+            left: 0px;
+            right: auto;
+        }
+    }
+}

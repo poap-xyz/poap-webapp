@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "poapapp",
+    "testing": "poap-site-dev"
+  }
+}

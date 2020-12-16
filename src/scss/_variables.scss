@@ -1,0 +1,62 @@
+/* ================================================================
+   Variables
+   ================================================================ */
+
+// Color Variables
+$color-base: #4b4b4b; //Black
+$color-invert: #fff;
+$color-disabled-field: #f2f2f2;
+$bg-color: #e9edf5; //light blue
+$color-primary: #6534ff; //violet
+$color-secondary: #bbc4ef; //light violet
+$color-third: #52d2bd; // green
+$color-fourth: #f9879a; //rose
+$color-fourth-background: #f7b5c0;
+
+$color-medium-violet: #9b9cd5;
+$color-light-violet: #cabdf3;
+$color-light-grey: #eef0fb;
+$color-grey: #878787;
+$color-error: #e13d5e;
+
+$violet-select-arrow: linear-gradient(45deg, transparent 50%, $color-primary 50%),
+  linear-gradient(135deg, $color-primary 50%, transparent 50%);
+
+$red-select-arrow: linear-gradient(45deg, transparent 50%, $color-error 50%),
+  linear-gradient(135deg, $color-error 50%, transparent 50%);
+
+// Transactions
+$tx-success-background: rgba(0, 201, 167, 0.1);
+$tx-success-color: #3bb54a;
+$tx-error-background: rgba(222, 68, 55, 0.1);
+$tx-error-color: #de4437;
+
+// Typography
+$font-family: 'Archivo', sans-serif;
+$font-family-narrow: 'Archivo Narrow', sans-serif;
+
+$fontWeight-light: 300;
+$fontWeight-normal: 400;
+$fontWeight-medium: 500;
+$fontWeight-semibold: 600;
+$fontWeight-bold: 700;
+$typography-margin-bottom: 1em;
+
+// Breakpoints
+// You can convert these at http://pxtoem.com
+$bp-s: 20em; // 320px
+$bp-s-max: 29.938em; // 479px
+$bp-sw: 30em; // 480px
+$bp-sw-max: 47.938em; // 767px
+$bp-m: 48em; // 768px
+$bp-m-max: 59.938em; // 959px
+$bp-mw: 60em; // 960px
+$bp-mw-max: 71.188em; // 1139px
+$bp-l: 71.25em; // 1140px
+$bp-l-max: 81.188em; // 1299px
+$bp-xl: 81.25em; // 1300px
+$bp-xxl: 91.25em; // 1400px
+
+// Grid
+$grid-gutter: 16px;
+$grid-gutter-em: 1em; // Changing grid gutter to em causes a compiling error :/
