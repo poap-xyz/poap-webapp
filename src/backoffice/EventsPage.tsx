@@ -187,6 +187,8 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const dateRegex = /\//gi;
 
+  const isAdmin = authClient.isAuthenticated();
+
   const initialValues = useMemo(() => {
     if (event) {
       let { virtual_event, secret_code, start_date, end_date, ...eventKeys } = event;
@@ -449,6 +451,16 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                         <CheckboxIcon color={COLORS.primaryColor} /> Receive a backup of the event Edit Code
                       </div>
                       {includeEmail && <EventField disabled={false} title={'Email'} name="email" />}
+                    </div>
+                  )}
+                  {!create && isAdmin && (
+                    <div className={'email-checkbox'}>
+                      {event && event.email && (
+                        <>
+                          <label>Email</label>
+                          <input type={'text'} disabled value={event.email} />
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

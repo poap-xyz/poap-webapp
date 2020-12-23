@@ -47,6 +47,7 @@ export interface PoapEvent {
 }
 export interface PoapFullEvent extends PoapEvent {
   secret_code?: number;
+  email?: string;
 }
 export interface Claim extends ClaimProof {
   claimerSignature: string;
