@@ -123,7 +123,10 @@ export const templateFormSchema = yup.object().shape({
 });
 
 const PoapEventSchema = yup.object().shape({
-  name: yup.string().required('A unique name is required'),
+  name: yup
+    .string()
+    .required('A unique name is required')
+    .max(150, 'The event name should be less than 150 characters'),
   year: yup
     .number()
     .required()
