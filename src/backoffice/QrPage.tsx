@@ -32,7 +32,7 @@ import {
 
 // lib
 import { reduceAddress } from '../lib/helpers';
-import { etherscanLinks } from '../lib/constants';
+import { blockscoutLinks } from '../lib/constants';
 import { authClient } from '../auth';
 
 /* Assets */
@@ -460,7 +460,7 @@ const QrPage: FC = () => {
 
                   <div className={'col-md-2 col-xs-12 center'}>
                     <span className={'visible-sm'}>Tx Hash: </span>
-                    <a href={etherscanLinks.tx(qr.tx_hash)} target={'_blank'}>
+                    <a href={blockscoutLinks.tx(qr.tx_hash)} target={'_blank'}>
                       {qr.tx_hash && reduceAddress(qr.tx_hash)}
                     </a>
                     &nbsp;&nbsp;
@@ -471,7 +471,7 @@ const QrPage: FC = () => {
                     <span className={'visible-sm'}>Beneficiary: </span>
                     {qr.beneficiary && (
                       <a
-                        href={etherscanLinks.address(qr.beneficiary)}
+                        href={`/scan/${qr.beneficiary}`}
                         target={'_blank'}
                         title={qr.user_input ? qr.user_input : qr.beneficiary}
                       >
