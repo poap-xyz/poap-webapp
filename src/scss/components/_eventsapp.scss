@@ -157,39 +157,6 @@
       }
     }
 
-    .made-by {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-
-      svg {
-        margin: 0 2px 2px 2px;
-        transform: scale(0.85);
-        transition: all 400ms ease-in-out;
-
-        rect {
-          fill: transparent;
-        }
-
-        path {
-          fill: white;
-        }
-      }
-
-      &:hover svg {
-        transform: scale(0.9);
-      }
-    }
-
-    .made-by-link {
-      color: white;
-      font-weight: 500;
-      margin-left: 3px;
-      text-decoration: none;
-      pointer-events: auto;
-    }
-
     .social-icons {
       text-align: center;
       padding: 30px 0;

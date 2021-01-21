@@ -45,6 +45,11 @@ const ROUTES = {
   codeClaimWeb3PageHash: '/claim/:hash/:method',
   codeClaimPageHash: '/claim/:hash',
   codeClaimPage: '/claim',
+
+  checkout: {
+    main: '/e/:fancyId',
+  },
+
   admin: '/admin',
   adminLogin: {
     path: '/admin/login',
@@ -124,6 +129,10 @@ const ROUTES = {
     path: '/admin/qr',
     roles: [ROLES.administrator, ROLES.eventHost],
     title: 'Manage QR Codes',
+  },
+
+  misc: {
+    binance: '/binance',
   },
 };
 
