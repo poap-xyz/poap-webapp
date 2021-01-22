@@ -658,3 +658,19 @@ export async function redeemWithEmail(address: string, token: string, email: str
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+/* Checkout */
+export type Checkout = {
+  id: number;
+  fancy_id: string;
+  start_time: string;
+  end_time: string;
+  max_limit: number;
+  is_active: boolean;
+  event: PoapEvent;
+};
+
+export function getCheckout(fancyId: string): Promise<Checkout> {
+  // return fetchJson(`${API_BASE}/checkouts/${fancyId}`);
+  return fetchJson('https://run.mocky.io/v3/1bf9886c-50b0-437e-a937-7e1d78a04fa2');
+}

@@ -8,7 +8,6 @@ import { ScanFooter, ScanHeader } from '../../ScanPage';
 /* Helpers */
 
 const BinancePage: FC = () => {
-
   return (
     <div className="binance-page">
       <ScanHeader sectionName="" />
