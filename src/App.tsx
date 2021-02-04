@@ -10,7 +10,6 @@ import { ScanPage } from './ScanPage';
 import { AdminLoginPage } from './AdminLoginPage';
 import { RedeemPage } from './RedeemPage';
 import CheckoutPage from './CheckoutPage';
-import BinancePage from './MiscPages/BinancePage';
 
 type AppProps = { auth: AuthService };
 
@@ -31,9 +30,6 @@ const App: React.FC<AppProps> = ({ auth }) => (
 
         {/* Checkout */}
         <Route path={ROUTES.checkout.main} component={CheckoutPage} />
-
-        {/* Misc */}
-        <Route path={ROUTES.misc.binance} component={BinancePage} />
 
         {/* Home */}
         <Route path={ROUTES.home} component={ScanPage} />

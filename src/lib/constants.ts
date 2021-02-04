@@ -130,10 +130,6 @@ const ROUTES = {
     roles: [ROLES.administrator, ROLES.eventHost],
     title: 'Manage QR Codes',
   },
-
-  misc: {
-    binance: '/binance',
-  },
 };
 
 const IMAGE_SUPPORTED_FORMATS = ['image/png'];

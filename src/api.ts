@@ -670,7 +670,20 @@ export type Checkout = {
   event: PoapEvent;
 };
 
+type CheckoutRedeemResponse = {
+  qr_hash: string;
+};
+
 export function getCheckout(fancyId: string): Promise<Checkout> {
-  // return fetchJson(`${API_BASE}/checkouts/${fancyId}`);
-  return fetchJson('https://run.mocky.io/v3/1bf9886c-50b0-437e-a937-7e1d78a04fa2');
-}
+  return fetchJson(`${API_BASE}/checkouts/${fancyId}`);
+};
+
+export function redeemCheckout(fancyId: string, gRecaptchaResponse: string): Promise<CheckoutRedeemResponse> {
+  return fetchJson(`${API_BASE}/checkouts/${fancyId}/redeem`, {
+    method: 'POST',
+    body: JSON.stringify({ gRecaptchaResponse }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
+
