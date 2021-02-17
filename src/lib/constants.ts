@@ -46,8 +46,13 @@ const ROUTES = {
   codeClaimPageHash: '/claim/:hash',
   codeClaimPage: '/claim',
 
-  checkout: {
+  checkouts: {
     main: '/e/:fancyId',
+    admin: {
+      path: '/admin/checkouts',
+      roles: [ROLES.administrator],
+      title: 'Checkouts',
+    },
   },
 
   admin: '/admin',

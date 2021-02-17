@@ -19,6 +19,7 @@ import { TxStatus } from '../components/TxStatus';
 
 /* Helpers */
 import {
+  eventOptionType,
   getQrCodes,
   PoapEvent,
   getEvents,
@@ -49,13 +50,6 @@ import classNames from 'classnames';
 
 type PaginateAction = {
   selected: number;
-};
-
-// React Select types
-type eventOptionType = {
-  value: number;
-  label: string;
-  start_date: string;
 };
 
 // update modal types

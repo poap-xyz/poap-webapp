@@ -201,6 +201,13 @@ export interface PaginatedNotifications {
   notifications: Notification[];
 }
 
+export interface PaginatedCheckouts {
+  limit: number;
+  offset: number;
+  total: number;
+  checkouts: Checkout[];
+}
+
 export type QrCode = {
   beneficiary: string;
   user_input: string | null;
@@ -235,6 +242,12 @@ export type AddressQueryResult = { valid: false } | { valid: true; ens: string }
 export interface MigrateResponse {
   signature: string;
 }
+
+export type eventOptionType = {
+  value: number;
+  label: string;
+  start_date: string;
+};
 
 const API_BASE =
   process.env.NODE_ENV === 'development'
@@ -686,4 +699,20 @@ export function redeemCheckout(fancyId: string, gRecaptchaResponse: string): Pro
   });
 };
 
+export function getCheckouts(
+  limit: number,
+  offset: number,
+  eventId: number | undefined,
+  activeStatus: boolean | null,
+): Promise<PaginatedCheckouts> {
+  let paramsObject: any = { limit, offset };
 
+  if (eventId) paramsObject['event_id'] = eventId;
+
+  if (activeStatus !== null) {
+    paramsObject['is_active'] = activeStatus;
+  }
+
+  const params = queryString.stringify(paramsObject);
+  return secureFetch(`${API_BASE}/admin/checkouts/?${params}`);
+}

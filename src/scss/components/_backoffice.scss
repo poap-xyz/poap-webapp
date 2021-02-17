@@ -450,8 +450,15 @@
       }
     }
 
+    &.checkouts {
+      .new-button {
+        text-align: right;
+      }
+    }
+
     &.qr,
-    &.templates {
+    &.templates,
+    &.checkouts {
       &.space-between {
         display: flex;
         justify-content: space-between;
@@ -592,7 +599,8 @@
   &.notifications,
   &.transactions,
   &.templates,
-  &.addresses {
+  &.addresses,
+  &.checkouts{
     .no-results {
       text-align: center;
       padding: 50px 0;

@@ -29,7 +29,7 @@ const App: React.FC<AppProps> = ({ auth }) => (
         <Route path={ROUTES.redeem} component={RedeemPage} />
 
         {/* Checkout */}
-        <Route path={ROUTES.checkout.main} component={CheckoutPage} />
+        <Route path={ROUTES.checkouts.main} component={CheckoutPage} />
 
         {/* Home */}
         <Route path={ROUTES.home} component={ScanPage} />

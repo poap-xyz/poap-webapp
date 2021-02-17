@@ -9,6 +9,7 @@ import TokenDisplay from './components/TokenDisplay';
 import CheckoutMessage from './components/CheckoutMessage';
 import CheckoutForm from './components/CheckoutForm';
 import CheckoutSuccess from './components/CheckoutSuccess';
+import { Loading } from '../components/Loading';
 
 /* API & Types */
 import { Checkout, getCheckout } from '../api';
@@ -42,7 +43,7 @@ const CheckoutPage: FC<RouteComponentProps<CheckoutPageProps>> = ({ location, ma
       fn();
       setIsFetching(false);
     }
-  }, [location, match]);
+  }, [checkout, match]);
 
   const getLocalStorage = () => {
     let checkoutsString = localStorage.getItem(CHECKOUTS_KEY);
@@ -51,7 +52,7 @@ const CheckoutPage: FC<RouteComponentProps<CheckoutPageProps>> = ({ location, ma
       checkouts = JSON.parse(checkoutsString);
     }
     return checkouts;
-  }
+  };
 
   const renderBody = () => {
     // Loading scenario
@@ -59,14 +60,15 @@ const CheckoutPage: FC<RouteComponentProps<CheckoutPageProps>> = ({ location, ma
       return (
         <>
           <TokenDisplay image={null} title={''} />
-          <h1>Loading!</h1>
+          <Loading />
         </>
       );
     }
 
     // Error scenario
     if (fetchError) {
-      const msg = 'We encountered an error while fetching the event information. Are you sure the website URL is correct?';
+      const msg =
+        'We encountered an error while fetching the event information. Are you sure the website URL is correct?';
       return (
         <>
           <TokenDisplay image={null} title={''} />
