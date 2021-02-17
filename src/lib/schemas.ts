@@ -208,8 +208,7 @@ const CheckoutSchema = yup.object().shape({
   start_date: yup.string().required('The start date is required'),
   start_time: yup.string().required('The start date is required'),
   end_date: yup.string().required('The end date is required'),
-  end_time: yup.string().required('The end date is required'),
-  is_active: yup.boolean(),
+  end_time: yup.string().required('The end date is required')
 });
 
 export {

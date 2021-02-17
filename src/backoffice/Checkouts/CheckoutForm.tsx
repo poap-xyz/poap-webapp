@@ -1,19 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { FC, useState, useEffect, useMemo } from 'react';
+import { useHistory, RouteComponentProps } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import { Formik, Form, FormikActions } from 'formik';
 import { format, parse, isAfter } from 'date-fns';
-import { useToasts } from 'react-toast-notifications';
-import { useHistory } from 'react-router-dom';
+import delve from 'dlv';
 
 /* Helpers */
 import { ROUTES } from 'lib/constants';
 import { CheckoutSchema } from '../../lib/schemas';
-import { PoapEvent, getEvents, createCheckout } from '../../api';
+import { Checkout, PoapEvent, getEvents, getCheckout, createCheckout, editCheckout } from '../../api';
 
 /* Components */
 import DatePicker, { SetFieldValue, DatePickerDay } from '../../components/DatePicker';
 import FormFilterReactSelect from '../../components/FormFilterReactSelect';
 import { SubmitButton } from '../../components/SubmitButton';
 import { EventField } from '../EventsPage';
+import { Loading } from '../../components/Loading';
 
 /* Assets */
 
@@ -27,7 +29,6 @@ type CheckoutFormType = {
   start_time: string;
   end_date: string;
   end_time: string;
-  is_active: boolean;
 };
 type SelectOptionType = {
   value: string | number;
@@ -110,26 +111,46 @@ const timezones: SelectOptionType[] = [
   { value: 13, label: '(GMT+13:00) Nuku alofa' },
 ];
 
-const CheckoutForm = () => {
+const CheckoutForm: FC<RouteComponentProps> = (props) => {
+  const fancyId = delve(props, 'match.params.fancyId');
+  const isEdition: boolean = !!fancyId;
+
   /* State */
+  const [checkout, setCheckout] = useState<Checkout | null>(null);
   const [events, setEvents] = useState<PoapEvent[]>([]);
   const [isFetching, setIsFetching] = useState<null | boolean>(null);
   const [activeCheckout, setActiveCheckout] = useState<boolean>(true);
 
   const initialValues = useMemo(() => {
-    const values: CheckoutFormType = {
-      event_id: 0,
-      fancy_id: '',
-      max_limit: 100,
-      start_date: '',
-      start_time: '',
-      timezone: 0,
-      end_date: '',
-      end_time: '',
-      is_active: true,
-    };
-    return values;
-  }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
+    if (checkout) {
+      const _startDateTime = checkout.start_time.split(' ');
+      const _endDateTime = checkout.end_time.split(' ');
+
+      const values: CheckoutFormType = {
+        event_id: checkout.event.id,
+        fancy_id: checkout.fancy_id,
+        max_limit: checkout.max_limit,
+        start_date: _startDateTime[0],
+        start_time: _startDateTime[1].substr(0, 5),
+        timezone: 0,
+        end_date: _endDateTime[0],
+        end_time: _endDateTime[1].substr(0, 5),
+      };
+      return values;
+    } else {
+      const values: CheckoutFormType = {
+        event_id: 0,
+        fancy_id: '',
+        max_limit: 100,
+        start_date: '',
+        start_time: '',
+        timezone: 0,
+        end_date: '',
+        end_time: '',
+      };
+      return values;
+    }
+  }, [checkout]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   /* Libraries */
   const { addToast } = useToasts();
@@ -137,10 +158,25 @@ const CheckoutForm = () => {
 
   /* Effects */
   useEffect(() => {
+    if (isEdition) {
+      fetchCheckout();
+    }
     fetchEvents();
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   /* Data functions */
+  const fetchCheckout = async () => {
+    try {
+      const _checkout = await getCheckout(fancyId);
+      setCheckout(_checkout);
+      if (_checkout.is_active === 'false') setActiveCheckout(false);
+    } catch (e) {
+      addToast('Error while fetching checkout', {
+        appearance: 'error',
+        autoDismiss: false,
+      });
+    }
+  };
   const fetchEvents = async () => {
     setIsFetching(true);
     try {
@@ -176,6 +212,16 @@ const CheckoutForm = () => {
   if (events) eventOptions = parseEvents(events);
   const day = 60 * 60 * 24 * 1000;
 
+  // Edition Loading Component
+  if (isEdition && !checkout) {
+    return (
+      <div className={'bk-container'}>
+        <h2>Edit Checkout</h2>
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <div className={'bk-container'}>
       <Formik
@@ -197,7 +243,6 @@ const CheckoutForm = () => {
               end_time,
               timezone,
               max_limit,
-              is_active,
             } = submittedValues;
 
             // Validate event
@@ -232,7 +277,19 @@ const CheckoutForm = () => {
             const formattedEnd = `${_endDate} ${end_time}:00${timezoneSign}${timezoneFilled}`;
 
             try {
-              await createCheckout(event_id, fancy_id, formattedStart, formattedEnd, max_limit, timezone);
+              if (!isEdition) {
+                await createCheckout(event_id, fancy_id, formattedStart, formattedEnd, max_limit, timezone);
+              } else {
+                await editCheckout(
+                  event_id,
+                  fancy_id,
+                  formattedStart,
+                  formattedEnd,
+                  max_limit,
+                  timezone,
+                  activeCheckout.toString(),
+                );
+              }
               history.push(ROUTES.checkouts.admin.path);
             } catch (e) {
               addToast(e.message, {
@@ -271,7 +328,7 @@ const CheckoutForm = () => {
 
           return (
             <Form>
-              <h2>Create Checkout</h2>
+              <h2>{isEdition ? 'Edit' : 'Create'} Checkout</h2>
 
               <div className={'col-md-12'}>
                 <FormFilterReactSelect
@@ -286,7 +343,8 @@ const CheckoutForm = () => {
               </div>
               <div>
                 <div className={'col-md-8'}>
-                  <EventField disabled={false} title="URL" name="fancy_id" />
+                  {/*<div>https://app.poap.xyz/e/</div>*/}
+                  <EventField disabled={isEdition} title="URL" name="fancy_id" />
                 </div>
                 <div className={'col-md-4'}>
                   <EventField disabled={false} title="Limit" name="max_limit" />
@@ -300,7 +358,7 @@ const CheckoutForm = () => {
                     handleDayClick={handleDayClick}
                     setFieldValue={setFieldValue}
                     placeholder={values.start_date}
-                    value={values.start_date !== '' ? new Date(dateFormatterString(values.start_date).getTime()) : ''}
+                    value={values.start_date !== '' ? new Date(values.start_date) : ''}
                     disabled={false}
                     disabledDays={startDateLimit}
                   />
@@ -313,7 +371,7 @@ const CheckoutForm = () => {
                     handleDayClick={handleDayClick}
                     setFieldValue={setFieldValue}
                     placeholder={values.end_date}
-                    value={values.end_date !== '' ? new Date(dateFormatterString(values.end_date).getTime()) : ''}
+                    value={values.end_date !== '' ? new Date(values.end_date) : ''}
                     disabled={false}
                     disabledDays={endDateLimit}
                   />
@@ -331,12 +389,14 @@ const CheckoutForm = () => {
                   />
                 </div>
               </div>
-              <div className={'col-md-12'}>
-                <div className={'checkbox-field'} onClick={toggleActiveCheckout}>
-                  <input type="checkbox" checked={activeCheckout} readOnly />
-                  <label>Active checkout</label>
+              {isEdition && (
+                <div className={'col-md-12'}>
+                  <div className={'checkbox-field'} onClick={toggleActiveCheckout}>
+                    <input type="checkbox" checked={activeCheckout} readOnly />
+                    <label>Active checkout</label>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className={'col-md-12'}>
                 <SubmitButton text="Submit" isSubmitting={isSubmitting} canSubmit={true} />
               </div>

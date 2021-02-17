@@ -679,7 +679,8 @@ export type Checkout = {
   start_time: string;
   end_time: string;
   max_limit: number;
-  is_active: boolean;
+  timezone: string;
+  is_active: string;
   event: PoapEvent;
 };
 
@@ -688,8 +689,9 @@ type CheckoutRedeemResponse = {
 };
 
 export function getCheckout(fancyId: string): Promise<Checkout> {
-  return fetchJson(`${API_BASE}/checkouts/${fancyId}`);
-};
+  const isAdmin = authClient.isAuthenticated();
+  return isAdmin ? secureFetch(`${API_BASE}/checkouts/${fancyId}`) : fetchJson(`${API_BASE}/checkouts/${fancyId}`);
+}
 
 export function redeemCheckout(fancyId: string, gRecaptchaResponse: string): Promise<CheckoutRedeemResponse> {
   return fetchJson(`${API_BASE}/checkouts/${fancyId}/redeem`, {
@@ -697,7 +699,7 @@ export function redeemCheckout(fancyId: string, gRecaptchaResponse: string): Pro
     body: JSON.stringify({ gRecaptchaResponse }),
     headers: { 'Content-Type': 'application/json' },
   });
-};
+}
 
 export function getCheckouts(
   limit: number,
@@ -736,5 +738,29 @@ export function createCheckout(
       timezone,
     }),
     headers: { 'Content-Type': 'application/json' },
-  })
+  });
+}
+
+export function editCheckout(
+  event_id: number,
+  fancy_id: string,
+  start_time: string,
+  end_time: string,
+  max_limit: number,
+  timezone: number,
+  is_active: string,
+): Promise<Checkout> {
+  return secureFetch(`${API_BASE}/checkouts/${fancy_id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      event_id,
+      fancy_id,
+      start_time,
+      end_time,
+      max_limit,
+      timezone,
+      is_active,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
 }

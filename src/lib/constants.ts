@@ -58,6 +58,11 @@ const ROUTES = {
       roles: [ROLES.administrator],
       title: 'New Checkout',
     },
+    editForm: {
+      path: '/admin/checkouts/:fancyId',
+      roles: [ROLES.administrator],
+      title: 'Edit Checkout',
+    },
   },
 
   admin: '/admin',

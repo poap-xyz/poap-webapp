@@ -15,6 +15,7 @@ import FilterSelect from '../../components/FilterSelect';
 import ReactPaginate from 'react-paginate';
 
 /* Assets */
+import { ReactComponent as EditIcon } from '../../images/edit.svg';
 import checked from '../../images/checked.svg';
 import error from '../../images/error.svg';
 
@@ -106,12 +107,13 @@ const CheckoutList = () => {
 
   const tableHeaders = (
     <div className={'row table-header visible-md'}>
-      <div className={'col-md-4'}>Event</div>
+      <div className={'col-md-3'}>Event</div>
       <div className={'col-md-2'}>URL</div>
       <div className={'col-md-2 center'}>Start</div>
       <div className={'col-md-2 center'}>End</div>
       <div className={'col-md-1 center'}>Limit</div>
       <div className={'col-md-1 center'}>Active</div>
+      <div className={'col-md-1 '} />
     </div>
   );
 
@@ -167,7 +169,7 @@ const CheckoutList = () => {
               const url = `/e/${checkout.fancy_id}`;
               return (
                 <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={checkout.id}>
-                  <div className={'col-md-4 col-xs-12 ellipsis'}>
+                  <div className={'col-md-3 col-xs-12 ellipsis'}>
                     <span className={'visible-sm'}>Event: </span>
                     {checkout.event.name}
                   </div>
@@ -197,10 +199,15 @@ const CheckoutList = () => {
                   <div className={'col-md-1 col-xs-6 center status'}>
                     <span className={'visible-sm'}>Active: </span>
                     <img
-                      src={checkout.is_active ? checked : error}
-                      alt={checkout.is_active ? 'Active' : 'Inactive'}
+                      src={checkout.is_active === 'true' ? checked : error}
+                      alt={checkout.is_active === 'true' ? 'Active' : 'Inactive'}
                       className={'status-icon'}
                     />
+                  </div>
+                  <div className={'col-md-1 center event-edit-icon-container'}>
+                    <Link to={`/admin/checkouts/${checkout.fancy_id}`}>
+                      <EditIcon />
+                    </Link>
                   </div>
 
                 </div>

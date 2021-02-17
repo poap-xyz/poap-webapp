@@ -11,6 +11,7 @@ import CheckoutForm from './CheckoutForm';
 export const Checkouts = () => (
   <Switch>
     <Route exact path={ROUTES.checkouts.newForm.path} component={CheckoutForm} />
+    <Route exact path={ROUTES.checkouts.editForm.path} component={CheckoutForm} />
     <Route exact path={ROUTES.checkouts.admin.path} component={CheckoutList} />
   </Switch>
 );
