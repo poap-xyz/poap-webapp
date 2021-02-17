@@ -716,3 +716,25 @@ export function getCheckouts(
   const params = queryString.stringify(paramsObject);
   return secureFetch(`${API_BASE}/admin/checkouts/?${params}`);
 }
+
+export function createCheckout(
+  event_id: number,
+  fancy_id: string,
+  start_time: string,
+  end_time: string,
+  max_limit: number,
+  timezone: number,
+): Promise<Checkout> {
+  return secureFetch(`${API_BASE}/checkouts`, {
+    method: 'POST',
+    body: JSON.stringify({
+      event_id,
+      fancy_id,
+      start_time,
+      end_time,
+      max_limit,
+      timezone,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+}

@@ -53,6 +53,11 @@ const ROUTES = {
       roles: [ROLES.administrator],
       title: 'Checkouts',
     },
+    newForm: {
+      path: '/admin/checkouts/new',
+      roles: [ROLES.administrator],
+      title: 'New Checkout',
+    },
   },
 
   admin: '/admin',

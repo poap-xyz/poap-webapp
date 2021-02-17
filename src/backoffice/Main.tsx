@@ -208,7 +208,7 @@ export const BackOffice: React.FC = () => (
 
           <Route exact path={ROUTES.inboxList.path} render={() => <InboxListPageWithAuthentication />} />
 
-          <Route exact path={ROUTES.checkouts.admin.path} render={() => <CheckoutsWithAuthentication />} />
+          <Route path={ROUTES.checkouts.admin.path} render={() => <CheckoutsWithAuthentication />} />
 
           <Route path="*" render={() => <Redirect to="/admin" />} />
         </Switch>

@@ -196,6 +196,22 @@ const UpdateModalWithFormikListSchema = yup.object().shape({
 
 const UpdateModalWithFormikSelectedQrsSchema = yup.object().shape({});
 
+const CheckoutSchema = yup.object().shape({
+  event_id: yup.number().required(),
+  fancy_id: yup
+    .string()
+    .required('A unique name is required')
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Must be URL friendly. No spaces, only ASCII')
+    .max(150, 'The event name should be less than 150 characters'),
+  max_limit: yup.number().required().min(0),
+  timezone: yup.number().required(),
+  start_date: yup.string().required('The start date is required'),
+  start_time: yup.string().required('The start date is required'),
+  end_date: yup.string().required('The end date is required'),
+  end_time: yup.string().required('The end date is required'),
+  is_active: yup.boolean(),
+});
+
 export {
   AddressSchema,
   GasPriceSchema,
@@ -210,4 +226,5 @@ export {
   UpdateModalWithFormikRangeSchema,
   UpdateModalWithFormikSelectedQrsSchema,
   UpdateModalWithFormikListSchema,
+  CheckoutSchema
 };
