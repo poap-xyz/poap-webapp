@@ -327,7 +327,7 @@ const CheckoutForm: FC<RouteComponentProps> = (props) => {
               : undefined;
 
           return (
-            <Form>
+            <Form className={'checkout-admin-form'}>
               <h2>{isEdition ? 'Edit' : 'Create'} Checkout</h2>
 
               <div className={'col-md-12'}>
@@ -342,15 +342,15 @@ const CheckoutForm: FC<RouteComponentProps> = (props) => {
                 />
               </div>
               <div>
-                <div className={'col-md-8'}>
+                <div className={'col-xs-8 url-field'}>
                   {/*<div>https://app.poap.xyz/e/</div>*/}
                   <EventField disabled={isEdition} title="URL" name="fancy_id" />
                 </div>
-                <div className={'col-md-4'}>
+                <div className={'col-xs-4 limit-field'}>
                   <EventField disabled={false} title="Limit" name="max_limit" />
                 </div>
               </div>
-              <div>
+              <div className={'date-row'}>
                 <div className={'col-md-4'}>
                   <DatePicker
                     text="Start Date"
