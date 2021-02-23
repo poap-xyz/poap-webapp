@@ -124,16 +124,18 @@ const CheckoutForm: FC<RouteComponentProps> = (props) => {
   const initialValues = useMemo(() => {
     if (checkout) {
       const _startDateTime = checkout.start_time.split(' ');
+      const _startDate = _startDateTime[0].split('-');
       const _endDateTime = checkout.end_time.split(' ');
+      const _endDate = _endDateTime[0].split('-');
 
       const values: CheckoutFormType = {
         event_id: checkout.event.id,
         fancy_id: checkout.fancy_id,
         max_limit: checkout.max_limit,
-        start_date: _startDateTime[0],
+        start_date: `${_startDate[1]}-${_startDate[2]}-${_startDate[0]}`,
         start_time: _startDateTime[1].substr(0, 5),
         timezone: 0,
-        end_date: _endDateTime[0],
+        end_date: `${_endDate[1]}-${_endDate[2]}-${_endDate[0]}`,
         end_time: _endDateTime[1].substr(0, 5),
       };
       return values;

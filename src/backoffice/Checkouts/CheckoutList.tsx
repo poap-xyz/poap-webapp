@@ -45,7 +45,7 @@ const CheckoutList = () => {
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
   useEffect(() => {
     if (checkouts.length > 0) fetchCheckouts();
-  }, [page]);
+  }, [page]); /* eslint-disable-line react-hooks/exhaustive-deps */
   useEffect(() => {
     setPage(0);
     fetchCheckouts();
@@ -91,7 +91,7 @@ const CheckoutList = () => {
   };
   const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { value } = e.target;
-    let finalValue = value === '' ? null : value === 'true' ? true : false;
+    let finalValue = value === '' ? null : value === 'true';
     setActiveStatus(finalValue);
   };
   const handlePageChange = (obj: PaginateAction) => setPage(obj.selected);
