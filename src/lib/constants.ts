@@ -45,6 +45,26 @@ const ROUTES = {
   codeClaimWeb3PageHash: '/claim/:hash/:method',
   codeClaimPageHash: '/claim/:hash',
   codeClaimPage: '/claim',
+
+  checkouts: {
+    main: '/e/:fancyId',
+    admin: {
+      path: '/admin/checkouts',
+      roles: [ROLES.administrator],
+      title: 'Checkouts',
+    },
+    newForm: {
+      path: '/admin/checkouts/new',
+      roles: [ROLES.administrator],
+      title: 'New Checkout',
+    },
+    editForm: {
+      path: '/admin/checkouts/:fancyId',
+      roles: [ROLES.administrator],
+      title: 'Edit Checkout',
+    },
+  },
+
   admin: '/admin',
   adminLogin: {
     path: '/admin/login',

@@ -63,9 +63,9 @@ Note: Beware of modifying this element as it can break the animations - you shou
 
 /* Individual item */
 a.bm-item {
-  display: inline-block;
+  display: flex;
   color: #fff;
-  padding-left: 10px;
+  padding: 2px 0 2px 10px;
   &:focus {
     outline: none;
     text-decoration: none;

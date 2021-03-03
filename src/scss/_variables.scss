@@ -10,14 +10,16 @@ $bg-color: #e9edf5; //light blue
 $color-primary: #6534ff; //violet
 $color-secondary: #bbc4ef; //light violet
 $color-third: #52d2bd; // green
-$color-fourth: #f9879a; //rose
+$color-fourth: #F38499; //rose
 $color-fourth-background: #f7b5c0;
 
 $color-medium-violet: #9b9cd5;
 $color-light-violet: #cabdf3;
 $color-light-grey: #eef0fb;
 $color-grey: #878787;
-$color-error: #e13d5e;
+$color-error: #F76278;
+
+$color-grey-0: #F6F9FF;
 
 $violet-select-arrow: linear-gradient(45deg, transparent 50%, $color-primary 50%),
   linear-gradient(135deg, $color-primary 50%, transparent 50%);

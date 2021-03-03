@@ -1,0 +1,80 @@
+.checkout-page {
+  .checkout-header {
+    padding: 0 0 50px;
+    text-align: center;
+
+    .image-wrapper {
+      img {
+        height: 200px;
+
+        &.logo {
+          border-radius: 50%;
+          box-shadow: 0 4px 14px 0 rgba($color-primary, 0.5);
+        }
+      }
+    }
+
+    .title {
+      color: $color-primary;
+      font-weight: bold;
+      font-size: 32px;
+      padding: 50px 0 0;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+  }
+  .checkout-message {
+    text-align: center;
+    padding: 25px 0 100px;
+    max-width: 500px;
+    font-size: 18px;
+    line-height: 24px;
+    margin: 0 auto;
+    color: $color-error;
+  }
+  .checkout-form {
+    text-align: center;
+
+    .recaptcha {
+      div > div > div {
+        margin: 0 auto;
+      }
+    }
+
+    form {
+      padding: 20px 0 100px;
+    }
+
+    .error {
+      color: $color-error;
+      font-size: 16px;
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+  }
+  .checkout-success {
+    padding-bottom: 100px;
+    .title{
+      color: $color-fourth;
+      text-align: center;
+      font-size: 22px;
+    }
+    p {
+     text-align: center;
+    }
+    .link {
+      background: $color-grey-0;
+      text-align: center;
+      max-width: 300px;
+      border-radius: 5px;
+      padding: 20px 0;
+      margin: 0 auto;
+    }
+  }
+  .loading-content {
+    margin-bottom: 150px;
+  }
+}

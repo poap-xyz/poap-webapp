@@ -201,6 +201,13 @@ export interface PaginatedNotifications {
   notifications: Notification[];
 }
 
+export interface PaginatedCheckouts {
+  limit: number;
+  offset: number;
+  total: number;
+  checkouts: Checkout[];
+}
+
 export type QrCode = {
   beneficiary: string;
   user_input: string | null;
@@ -235,6 +242,12 @@ export type AddressQueryResult = { valid: false } | { valid: true; ens: string }
 export interface MigrateResponse {
   signature: string;
 }
+
+export type eventOptionType = {
+  value: number;
+  label: string;
+  start_date: string;
+};
 
 const API_BASE =
   process.env.NODE_ENV === 'development'
@@ -655,6 +668,99 @@ export async function redeemWithEmail(address: string, token: string, email: str
   return fetchJson(`${API_BASE}/actions/redeem-email-tokens`, {
     method: 'POST',
     body: JSON.stringify({ email, address, token }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/* Checkout */
+export type Checkout = {
+  id: number;
+  fancy_id: string;
+  start_time: string;
+  end_time: string;
+  max_limit: number;
+  timezone: string;
+  is_active: string;
+  event: PoapEvent;
+};
+
+type CheckoutRedeemResponse = {
+  qr_hash: string;
+};
+
+export function getCheckout(fancyId: string): Promise<Checkout> {
+  const isAdmin = authClient.isAuthenticated();
+  return isAdmin ? secureFetch(`${API_BASE}/checkouts/${fancyId}`) : fetchJson(`${API_BASE}/checkouts/${fancyId}`);
+}
+
+export function redeemCheckout(fancyId: string, gRecaptchaResponse: string): Promise<CheckoutRedeemResponse> {
+  return fetchJson(`${API_BASE}/checkouts/${fancyId}/redeem`, {
+    method: 'POST',
+    body: JSON.stringify({ gRecaptchaResponse }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export function getCheckouts(
+  limit: number,
+  offset: number,
+  eventId: number | undefined,
+  activeStatus: boolean | null,
+): Promise<PaginatedCheckouts> {
+  let paramsObject: any = { limit, offset };
+
+  if (eventId) paramsObject['event_id'] = eventId;
+
+  if (activeStatus !== null) {
+    paramsObject['is_active'] = activeStatus;
+  }
+
+  const params = queryString.stringify(paramsObject);
+  return secureFetch(`${API_BASE}/admin/checkouts/?${params}`);
+}
+
+export function createCheckout(
+  event_id: number,
+  fancy_id: string,
+  start_time: string,
+  end_time: string,
+  max_limit: number,
+  timezone: number,
+): Promise<Checkout> {
+  return secureFetch(`${API_BASE}/checkouts`, {
+    method: 'POST',
+    body: JSON.stringify({
+      event_id,
+      fancy_id,
+      start_time,
+      end_time,
+      max_limit,
+      timezone,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export function editCheckout(
+  event_id: number,
+  fancy_id: string,
+  start_time: string,
+  end_time: string,
+  max_limit: number,
+  timezone: number,
+  is_active: string,
+): Promise<Checkout> {
+  return secureFetch(`${API_BASE}/checkouts/${fancy_id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      event_id,
+      fancy_id,
+      start_time,
+      end_time,
+      max_limit,
+      timezone,
+      is_active,
+    }),
     headers: { 'Content-Type': 'application/json' },
   });
 }
