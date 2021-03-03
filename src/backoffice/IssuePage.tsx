@@ -16,6 +16,7 @@ import {
 /* Components */
 import { SubmitButton } from '../components/SubmitButton';
 import FormSelect from '../components/FormSelect';
+import { Loading } from '../components/Loading';
 
 interface IssueForEventPageState {
   events: PoapEvent[];
@@ -82,6 +83,16 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
       return;
     }
 
+    const maxLimitAddress = 40;
+    if (addresses.length > maxLimitAddress) {
+      actions.setStatus({
+        ok: false,
+        msg: `Please, limit the list of addresses to ${maxLimitAddress}. Currently ${addresses.length}`,
+      });
+      actions.setSubmitting(false);
+      return;
+    }
+
     try {
       actions.setStatus(null);
       await mintEventToManyUsers(values.eventId, addresses, values.signer);
@@ -102,7 +113,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
   render() {
     let { events } = this.state;
     if (events.length === 0) {
-      return <div className="bk-msg-error">No Events</div>;
+      return <Loading />;
     }
 
     const eventOptions = events.map(event => {
