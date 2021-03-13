@@ -23,19 +23,19 @@ const Transaction: FC<TransactionProps> = ({ queueId, layer }) => {
 
   if (failedRequest) {
     return (
-      <>
+      <div className={'tx-message'}>
         <p className="bk-msg-error">An error occurred!</p>
         <p className="bk-msg-error">We couldn't process your request, please try again</p>
-      </>
+      </div>
     );
   }
 
   if (!transactionHash) {
     return (
-      <>
+      <div className={'tx-message'}>
         <Loading />
         Processing your request
-      </>
+      </div>
     );
   }
 

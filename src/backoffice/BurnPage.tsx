@@ -130,7 +130,6 @@ const BurnToken: FC<RouteComponentProps> = props => {
       <Fragment>
         {errorTokenInfo && <p className="bk-msg-error">Couldn't find token {tokenId}</p>}
         {errorBurn && <p className="bk-msg-error">Couldn't burn token {tokenId}</p>}
-        {/*{isPolling && <p className="bk-msg-ok">Token {tokenId} was queued for burning!</p>}*/}
 
         {queueMessage && token && <Transaction queueId={queueMessage} layer={token.layer} />}
 

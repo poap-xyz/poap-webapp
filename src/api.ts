@@ -425,8 +425,12 @@ export async function mintEventToManyUsers(eventId: number, addresses: string[],
   });
 }
 
-export async function mintUserToManyEvents(eventIds: number[], address: string, signer_address: string): Promise<any> {
-  return secureFetchNoResponse(`${API_BASE}/actions/mintUserToManyEvents`, {
+export async function mintUserToManyEvents(
+  eventIds: number[],
+  address: string,
+  signer_address: string,
+): Promise<QueueResponse> {
+  return secureFetch(`${API_BASE}/actions/mintUserToManyEvents`, {
     method: 'POST',
     body: JSON.stringify({
       eventIds,

@@ -3,20 +3,15 @@ import classNames from 'classnames';
 import { ErrorMessage, Field, Form, Formik, FormikActions, FieldProps } from 'formik';
 
 /* Helpers */
+import { LAYERS } from '../lib/constants';
 import { convertToGWEI } from '../lib/helpers';
 import { IssueForEventFormValueSchema, IssueForUserFormValueSchema } from '../lib/schemas';
-import {
-  getEvents,
-  getSigners,
-  mintEventToManyUsers,
-  AdminAddress,
-  PoapEvent,
-  mintUserToManyEvents,
-} from '../api';
+import { getEvents, getSigners, mintEventToManyUsers, AdminAddress, PoapEvent, mintUserToManyEvents } from '../api';
 /* Components */
 import { SubmitButton } from '../components/SubmitButton';
 import FormSelect from '../components/FormSelect';
 import { Loading } from '../components/Loading';
+import Transaction from '../components/Transaction';
 
 interface IssueForEventPageState {
   events: PoapEvent[];
@@ -63,7 +58,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
 
   onSubmit = async (
     values: IssueForEventFormValues,
-    actions: FormikActions<IssueForEventFormValues>
+    actions: FormikActions<IssueForEventFormValues>,
   ) => {
     const addresses = values.addressList
       .trim()
@@ -118,8 +113,8 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
 
     const eventOptions = events.map(event => {
       const label = `${event.name ? event.name : 'No name'} (${event.fancy_id}) - ${event.year}`;
-      return {value: event.id, label: label};
-    })
+      return { value: event.id, label: label };
+    });
 
     return (
       <div className={'bk-container'}>
@@ -135,7 +130,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
                   <label htmlFor="eventId">Choose Event:</label>
                   <Field
                     component={FormSelect}
-                    name={"eventId"}
+                    name={'eventId'}
                     options={eventOptions}
                     placeholder={'Select an event'}
                   />
@@ -196,6 +191,7 @@ interface IssueForUserPageState {
   events: PoapEvent[];
   initialValues: IssueForUserFormValues;
   signers: AdminAddress[];
+  queueMessage: string;
 }
 
 interface IssueForUserFormValues {
@@ -213,6 +209,7 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
       signer: '',
     },
     signers: [],
+    queueMessage: '',
   };
 
   async componentDidMount() {
@@ -226,15 +223,13 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
 
   onSubmit = async (
     values: IssueForUserFormValues,
-    actions: FormikActions<IssueForUserFormValues>
+    actions: FormikActions<IssueForUserFormValues>,
   ) => {
     try {
       actions.setStatus(null);
-      await mintUserToManyEvents(values.eventIds, values.address, values.signer);
-      actions.setStatus({
-        ok: true,
-        msg: `All Done`,
-      });
+      const response = await mintUserToManyEvents(values.eventIds, values.address, values.signer);
+      this.setState({ queueMessage: response.queue_uid });
+      actions.setStatus({ ok: true });
     } catch (err) {
       actions.setStatus({
         ok: false,
@@ -303,18 +298,13 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
                   </Field>
                   <ErrorMessage name="signer" component="p" className="bk-error" />
                 </div>
-                {status && (
-                  <div className={status.ok ? 'bk-msg-ok' : 'bk-msg-error'}>{status.msg}</div>
-                )}
-                <SubmitButton
-                  text="Mint"
-                  isSubmitting={isSubmitting}
-                  canSubmit={isValid && dirty}
-                />
+                {status && <div className={status.ok ? 'bk-msg-ok' : 'bk-msg-error'}>{status.msg}</div>}
+                <SubmitButton text="Mint" isSubmitting={isSubmitting} canSubmit={isValid && dirty} />
               </Form>
             );
           }}
         />
+        {this.state.queueMessage && <Transaction queueId={this.state.queueMessage} layer={LAYERS.layer2} />}
       </div>
     );
   }
