@@ -19,8 +19,6 @@ import { BurnPage } from './BurnPage';
 import { IssueForEventPage, IssueForUserPage } from './IssuePage';
 import { AddressManagementPage } from './AddressManagementPage';
 import { TransactionsPage } from './TransactionsPage';
-import { InboxPage } from './InboxPage';
-import { InboxListPage } from './InboxListPage';
 import { QrPage } from './QrPage';
 import { EventsPage } from './EventsPage';
 import { TemplatePage } from './templates/TemplatePage';
@@ -88,11 +86,6 @@ export const NavigationMenu = withRouter(({ history }) => {
           <SidebarLink route={ROUTES.issueForEvent} handleClick={closeMenu} />
 
           <SidebarLink route={ROUTES.issueForUser} handleClick={closeMenu} />
-          <Label label={LABELS.inbox} />
-
-          <SidebarLink route={ROUTES.inbox} handleClick={closeMenu} />
-
-          <SidebarLink route={ROUTES.inboxList} handleClick={closeMenu} />
 
           <Label label={LABELS.otherTasks} />
 
@@ -151,11 +144,9 @@ const Landing = () => {
 
 const IssueForEventPageWithAuthentication = withAuthentication(IssueForEventPage);
 const IssueForUserPageWithAuthentication = withAuthentication(IssueForUserPage);
-const InboxListPageWithAuthentication = withAuthentication(InboxListPage);
 const TransactionsPageWithAuthentication = withAuthentication(TransactionsPage);
 const MintersPageWithAuthentication = withAuthentication(MintersPage);
 const BurnPageWithAuthentication = withAuthentication(BurnPage);
-const InboxPageWithAuthentication = withAuthentication(InboxPage);
 const AddressManagementPageWithAuthentication = withAuthentication(AddressManagementPage);
 const CheckoutsWithAuthentication = withAuthentication(Checkouts);
 
@@ -203,10 +194,6 @@ export const BackOffice: React.FC = () => (
           />
 
           <Route exact path={ROUTES.transactions.path} render={() => <TransactionsPageWithAuthentication />} />
-
-          <Route exact path={ROUTES.inbox.path} render={() => <InboxPageWithAuthentication />} />
-
-          <Route exact path={ROUTES.inboxList.path} render={() => <InboxListPageWithAuthentication />} />
 
           <Route path={ROUTES.checkouts.admin.path} render={() => <CheckoutsWithAuthentication />} />
 

@@ -636,6 +636,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 20px;
+    background: $color-invert;
 
     &:hover {
       transform: scale(1.05);

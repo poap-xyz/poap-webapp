@@ -249,6 +249,28 @@ export type eventOptionType = {
   start_date: string;
 };
 
+export type QueueResponse = {
+  queue_uid: string;
+};
+
+type QueueResult = {
+  tx_hash: string;
+};
+
+export type Queue = {
+  uid: string;
+  operation: string;
+  status: string;
+  result: QueueResult | null;
+};
+
+export enum QueueStatus {
+  finish = 'FINISH',
+  finish_with_error = 'FINISH_WITH_ERROR',
+  in_process = 'IN_PROCESS',
+  pending = 'PENDING',
+}
+
 const API_BASE =
   process.env.NODE_ENV === 'development'
     ? `${process.env.REACT_APP_TEST_API_ROOT}`
@@ -367,8 +389,8 @@ export function setSetting(settingName: string, settingValue: string): Promise<a
   });
 }
 
-export function burnToken(tokenId: string): Promise<any> {
-  return secureFetchNoResponse(`${API_BASE}/burn/${tokenId}`, {
+export function burnToken(tokenId: string): Promise<QueueResponse> {
+  return secureFetch(`${API_BASE}/burn/${tokenId}`, {
     method: 'POST',
   });
 }
@@ -763,4 +785,8 @@ export function editCheckout(
     }),
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+export function getQueueMessage(messageId: string): Promise<Queue> {
+  return fetchJson(`${API_BASE}/queue-message/${messageId}`);
 }
