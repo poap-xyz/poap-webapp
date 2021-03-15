@@ -17,6 +17,7 @@ interface IssueForEventPageState {
   events: PoapEvent[];
   initialValues: IssueForEventFormValues;
   signers: AdminAddress[];
+  queueMessage: string;
 }
 
 interface IssueForEventFormValues {
@@ -34,6 +35,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
       signer: '',
     },
     signers: [],
+    queueMessage: '',
   };
 
   async componentDidMount() {
@@ -63,10 +65,10 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
     const addresses = values.addressList
       .trim()
       .split('\n')
-      .map(adr => adr.trim());
+      .map((adr) => adr.trim());
 
     let error = false;
-    addresses.forEach(address => {
+    addresses.forEach((address) => {
       if (address.indexOf('.') === -1 && !address.match(/^0x[0-9a-fA-F]{40}$/)) error = true;
     });
     if (error) {
@@ -90,11 +92,9 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
 
     try {
       actions.setStatus(null);
-      await mintEventToManyUsers(values.eventId, addresses, values.signer);
-      actions.setStatus({
-        ok: true,
-        msg: `All Done`,
-      });
+      const response = await mintEventToManyUsers(values.eventId, addresses, values.signer);
+      this.setState({ queueMessage: response.queue_uid });
+      actions.setStatus({ ok: true });
     } catch (err) {
       actions.setStatus({
         ok: false,
@@ -157,7 +157,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
                 <div className="bk-form-row">
                   <label htmlFor="signer">Choose Address:</label>
                   <Field name="signer" component="select">
-                    {this.state.signers.map(signer => {
+                    {this.state.signers.map((signer) => {
                       const label = `${signer.id} - ${signer.signer} (${signer.role}) - Pend: ${
                         signer.pending_tx
                       } - Gas: ${convertToGWEI(signer.gas_price)}`;
@@ -182,6 +182,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
             );
           }}
         />
+        {this.state.queueMessage && <Transaction queueId={this.state.queueMessage} layer={LAYERS.layer2} />}
       </div>
     );
   }

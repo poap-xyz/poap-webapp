@@ -13,7 +13,7 @@ const useTransactionPolling = (hash: string, layer: string) => {
       togglePolling(true);
       runPolling();
     }
-  }, [web3, hash]);
+  }, [web3, hash]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   useEffect(() => {
     if (layer) {
@@ -25,13 +25,14 @@ const useTransactionPolling = (hash: string, layer: string) => {
   }, [layer]);
 
   const runPolling = () => {
-    console.log('Running Tx Polling');
     setTimeout(async () => {
       try {
         if (hash && web3) {
           let _receipt = await web3.eth.getTransactionReceipt(hash);
           if (_receipt) {
             setTimeout(() => setReceipt(_receipt), 1000);
+          } else {
+            runPolling();
           }
         } else {
           runPolling();

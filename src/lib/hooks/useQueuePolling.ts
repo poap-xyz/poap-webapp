@@ -11,7 +11,7 @@ const useQueuePolling = (messageId: string) => {
       togglePolling(true);
       runPolling();
     }
-  }, [messageId]);
+  }, [messageId]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   const runPolling = () => {
     setTimeout(async () => {
