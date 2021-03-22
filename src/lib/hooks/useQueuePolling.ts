@@ -31,7 +31,7 @@ const useQueuePolling = (messageId: string) => {
         console.log(e);
         runPolling();
       }
-    }, 2000);
+    }, 1000);
   };
 
   return [transactionHash, failedRequest, isQueuePolling];

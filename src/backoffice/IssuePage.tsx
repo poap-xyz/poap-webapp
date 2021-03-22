@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import Select, { OptionTypeBase, ValueType } from 'react-select';
 import { ErrorMessage, Field, Form, Formik, FormikActions, FieldProps } from 'formik';
 
 /* Helpers */
@@ -44,7 +45,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
 
     const signer = signers.length > 0 ? signers[0].signer : '';
 
-    this.setState(old => {
+    this.setState((old) => {
       return {
         ...old,
         events,
@@ -58,10 +59,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
     });
   }
 
-  onSubmit = async (
-    values: IssueForEventFormValues,
-    actions: FormikActions<IssueForEventFormValues>,
-  ) => {
+  onSubmit = async (values: IssueForEventFormValues, actions: FormikActions<IssueForEventFormValues>) => {
     const addresses = values.addressList
       .trim()
       .split('\n')
@@ -92,6 +90,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
 
     try {
       actions.setStatus(null);
+      this.setState({ queueMessage: '' });
       const response = await mintEventToManyUsers(values.eventId, addresses, values.signer);
       this.setState({ queueMessage: response.queue_uid });
       actions.setStatus({ ok: true });
@@ -111,7 +110,7 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
       return <Loading />;
     }
 
-    const eventOptions = events.map(event => {
+    const eventOptions = events.map((event) => {
       const label = `${event.name ? event.name : 'No name'} (${event.fancy_id}) - ${event.year}`;
       return { value: event.id, label: label };
     });
@@ -170,14 +169,8 @@ export class IssueForEventPage extends React.Component<{}, IssueForEventPageStat
                   </Field>
                   <ErrorMessage name="signer" component="p" className="bk-error" />
                 </div>
-                {status && (
-                  <div className={status.ok ? 'bk-msg-ok' : 'bk-msg-error'}>{status.msg}</div>
-                )}
-                <SubmitButton
-                  text="Mint"
-                  isSubmitting={isSubmitting}
-                  canSubmit={isValid && dirty}
-                />
+                {status && <div className={status.ok ? 'bk-msg-ok' : 'bk-msg-error'}>{status.msg}</div>}
+                <SubmitButton text="Mint" isSubmitting={isSubmitting} canSubmit={isValid && dirty} />
               </Form>
             );
           }}
@@ -193,10 +186,10 @@ interface IssueForUserPageState {
   initialValues: IssueForUserFormValues;
   signers: AdminAddress[];
   queueMessage: string;
+  selectedEvents: number[];
 }
 
 interface IssueForUserFormValues {
-  eventIds: number[];
   address: string;
   signer: string;
 }
@@ -205,10 +198,10 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
   state: IssueForUserPageState = {
     events: [],
     initialValues: {
-      eventIds: [],
       address: '',
       signer: '',
     },
+    selectedEvents: [],
     signers: [],
     queueMessage: '',
   };
@@ -222,13 +215,27 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
     this.setState({ events, signers, initialValues: { ...this.state.initialValues, signer } });
   }
 
-  onSubmit = async (
-    values: IssueForUserFormValues,
-    actions: FormikActions<IssueForUserFormValues>,
-  ) => {
+  onSelectChange = (value: ValueType<OptionTypeBase>): void => {
+    if (Array.isArray(value)) {
+      let selectedEvents = value.map((option) => option.value);
+      this.setState({ selectedEvents });
+    }
+  };
+
+  onSubmit = async (values: IssueForUserFormValues, actions: FormikActions<IssueForUserFormValues>) => {
+    let { selectedEvents } = this.state;
+    if (selectedEvents.length === 0) {
+      actions.setStatus({
+        ok: false,
+        msg: `Please, select at least one event`,
+      });
+      return;
+    }
+
     try {
       actions.setStatus(null);
-      const response = await mintUserToManyEvents(values.eventIds, values.address, values.signer);
+      this.setState({ queueMessage: '' });
+      const response = await mintUserToManyEvents(selectedEvents, values.address, values.signer);
       this.setState({ queueMessage: response.queue_uid });
       actions.setStatus({ ok: true });
     } catch (err) {
@@ -241,33 +248,43 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
     }
   };
 
+  parseEvents = (events: PoapEvent[]): OptionTypeBase[] => {
+    return events.map((event: PoapEvent) => {
+      return { value: event.id, label: `${event.name} (${event.year})` };
+    });
+  };
+
   render() {
-    if (this.state.events.length === 0) {
+    let { events, signers, queueMessage, initialValues } = this.state;
+    if (events.length === 0) {
       return <div className="bk-msg-error">No Events</div>;
     }
 
+    let eventOptions: OptionTypeBase[] = [];
+    if (events) eventOptions = this.parseEvents(events);
+
     return (
       <div className={'bk-container'}>
+        <div className="bk-form-row">
+          <label htmlFor="event">Events</label>
+          <Select
+            name={'event'}
+            // value={getValue()}
+            onChange={this.onSelectChange}
+            options={eventOptions}
+            placeholder={'Select any amount of events'}
+            className={'rselect'}
+            isMulti
+          />
+        </div>
         <Formik
           enableReinitialize
-          initialValues={this.state.initialValues}
+          initialValues={initialValues}
           onSubmit={this.onSubmit}
           validationSchema={IssueForUserFormValueSchema}
           render={({ dirty, isValid, isSubmitting, status }) => {
             return (
               <Form>
-                <div className="bk-form-row">
-                  <label>Choose Events:</label>
-                  <div>
-                    {this.state.events.map(event => {
-                      const label = `${event.name} (${event.fancy_id}) - ${event.year}`;
-                      return (
-                        <Checkbox key={event.id} name="eventIds" value={event.id} label={label} />
-                      );
-                    })}
-                  </div>
-                  <ErrorMessage name="eventIds" component="p" className="bk-error" />
-                </div>
                 <div className="bk-form-row">
                   <label htmlFor="address">Beneficiary Address</label>
                   <Field
@@ -286,7 +303,7 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
                 <div className="bk-form-row">
                   <label htmlFor="signer">Choose Address:</label>
                   <Field name="signer" component="select">
-                    {this.state.signers.map(signer => {
+                    {signers.map((signer) => {
                       const label = `${signer.id} - ${signer.signer} (${signer.role}) - Pend: ${
                         signer.pending_tx
                       } - Gas: ${convertToGWEI(signer.gas_price)}`;
@@ -305,39 +322,8 @@ export class IssueForUserPage extends React.Component<{}, IssueForUserPageState>
             );
           }}
         />
-        {this.state.queueMessage && <Transaction queueId={this.state.queueMessage} layer={LAYERS.layer2} />}
+        {queueMessage && <Transaction queueId={queueMessage} layer={LAYERS.layer2} />}
       </div>
     );
   }
 }
-
-type CheckboxProps = {
-  name: string;
-  value: any;
-  label: string;
-};
-
-const Checkbox: React.FC<CheckboxProps> = props => {
-  return (
-    <Field name={props.name}>
-      {({ field, form }: FieldProps) => (
-        <label>
-          <input
-            type="checkbox"
-            checked={field.value.includes(props.value)}
-            onChange={() => {
-              if (field.value.includes(props.value)) {
-                const nextValue = field.value.filter((value: any) => value !== props.value);
-                form.setFieldValue(props.name, nextValue);
-              } else {
-                const nextValue = field.value.concat([props.value]);
-                form.setFieldValue(props.name, nextValue);
-              }
-            }}
-          />
-          {props.label}
-        </label>
-      )}
-    </Field>
-  );
-};

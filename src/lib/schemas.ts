@@ -161,7 +161,6 @@ const IssueForEventFormValueSchema = yup.object().shape({
 });
 
 const IssueForUserFormValueSchema = yup.object().shape({
-  eventIds: yup.array().of(yup.number().min(1)).required().min(1),
   address: yup.string().required(),
   signer: yup
     .string()

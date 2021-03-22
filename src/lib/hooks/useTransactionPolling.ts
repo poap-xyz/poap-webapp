@@ -42,7 +42,7 @@ const useTransactionPolling = (hash: string, layer: string) => {
         console.log(e);
         runPolling();
       }
-    }, 2000);
+    }, 500);
   };
 
   return [receipt, isTransactionPolling];
