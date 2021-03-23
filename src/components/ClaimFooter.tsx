@@ -5,11 +5,6 @@ import PoapBadge from '../images/POAP.svg';
 import Twitter from '../images/logo-twitter.svg';
 import Telegram from '../images/logo-telegram.svg';
 import Github from '../images/logo-git.svg';
-// import BuiltOnEth from '../images/built-on-eth.png';
-
-type ClaimFooterProps = {
-  path: string;
-};
 
 export const ClaimFooter: React.FC = () => (
   <footer role="contentinfo" className="footer-events white-background">

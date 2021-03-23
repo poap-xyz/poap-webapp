@@ -1,11 +1,11 @@
 import React from 'react';
 
 /* Helpers */
-import { HashClaim } from '../api';
-import { isValidEmail } from '../lib/helpers';
+import { HashClaim } from '../../api';
+import { isValidEmail } from '../../lib/helpers';
 
 /* Components */
-import { LinkButton } from '../components/LinkButton';
+import { LinkButton } from '../../components/LinkButton';
 import ClaimFooterMessage from './ClaimFooterMessage';
 
 /*

@@ -138,11 +138,12 @@ export interface HashClaim {
   claimed: boolean;
   claimed_date: string;
   created_date: string;
-  tx_status: string;
+  tx_status?: string;
   secret: string;
   delegated_mint: boolean;
   delegated_signed_message: string;
   result: QrResult | null;
+  queue_uid?: string;
 }
 export interface PoapSetting {
   id: number;

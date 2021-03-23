@@ -1,7 +1,7 @@
 import React from 'react';
 
 /* Assets */
-import LoadingSpinner from '../images/loading.svg';
+import LoadingSpinner from '../../images/loading.svg';
 
 const ClaimLoading: React.FC = () => {
   return (

@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 
 /* Helpers */
-import { HashClaim } from '../api';
-import { blockscoutLinks } from '../lib/constants';
+import { HashClaim } from '../../api';
+import { blockscoutLinks } from '../../lib/constants';
 
 /* Components */
-
-import { LinkButton } from '../components/LinkButton';
-/* Assets */
-import Spinner from '../images/etherscan-spinner.svg';
 import ClaimFooterMessage from './ClaimFooterMessage';
+import { LinkButton } from 'components/LinkButton';
+
+/* Assets */
+import Spinner from 'images/etherscan-spinner.svg';
 
 /*
  * @dev: Component to show user that transactions is being mined
@@ -29,13 +29,17 @@ const ClaimPending: React.FC<{ claim: HashClaim; checkClaim: (hash: string) => v
         <img src={Spinner} alt={'Mining'} />
         Pending
       </div>
-      <div className={'text-info'}>Please wait a few seconds, or follow the transaction on the block explorer</div>
-      <LinkButton
-        text={'View Transaction'}
-        link={blockscoutLinks.tx(claim.tx_hash)}
-        extraClass={'link-btn'}
-        target={'_blank'}
-      />
+      {claim.tx_hash && (
+        <>
+          <div className={'text-info'}>Please wait a few seconds, or follow the transaction on the block explorer</div>
+          <LinkButton
+            text={'View Transaction'}
+            link={blockscoutLinks.tx(claim.tx_hash)}
+            extraClass={'link-btn'}
+            target={'_blank'}
+          />
+        </>
+      )}
       <ClaimFooterMessage />
     </div>
   );
