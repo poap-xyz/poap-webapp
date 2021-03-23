@@ -608,7 +608,7 @@
   }
 
   .claim-footer {
-    padding: 10px 0 0;
+    padding: 30px 0 0;
     text-align: center;
     font-size: 1.1rem;
     line-height: 1.5rem;
@@ -618,6 +618,10 @@
     background: #fff;
     //padding: 0 0 300px;
   }
+}
+
+.tx-message {
+  text-align: center;
 }
 
 .tx-detail {
@@ -636,6 +640,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 20px;
+    background: $color-invert;
 
     &:hover {
       transform: scale(1.05);

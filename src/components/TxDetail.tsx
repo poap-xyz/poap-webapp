@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
-import { TransactionReceipt } from 'web3-core'
+import { TransactionReceipt } from 'web3-core';
 
 /* Helpers */
-import { reduceAddress } from '../lib/helpers'
+import { reduceAddress } from '../lib/helpers';
 import { blockscoutLinks, etherscanLinks } from '../lib/constants';
 
 /* Assets */
-import arrow from '../images/arrow-link.svg'
-import close from '../images/close.svg'
-import tick from '../images/tick.svg'
+import arrow from '../images/arrow-link.svg';
+import close from '../images/close.svg';
+import tick from '../images/tick.svg';
 import spinner from '../images/etherscan-spinner.svg';
 
 type TxDetailProps = {
@@ -32,20 +32,19 @@ const TxDetail: FC<TxDetailProps> = ({ hash, receipt, layer1 = true }) => {
           <img src={tick} alt={'Success'} />
           Success
         </div>
-      )
+      );
     } else {
       status = (
         <div className={'info-tx info-error'}>
           <img src={close} alt={'Failed'} />
           Failed
         </div>
-      )
+      );
     }
   }
 
   return (
     <div className={'tx-detail'} data-aos="fade-up" data-aos-delay="300">
-      <div className={'tx-detail-title'}>Your transaction</div>
       <div className={'tx-detail-box'}>
         <div className={'tx-detail-cell'}>
           <div className={'tx-detail-cell-title'}>Hash</div>

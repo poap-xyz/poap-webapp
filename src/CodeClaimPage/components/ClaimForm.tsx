@@ -8,21 +8,22 @@ import { useToasts } from 'react-toast-notifications';
 import { Tooltip } from 'react-lightweight-tooltip';
 
 /* Helpers */
-import { connectWallet, NETWORK } from '../poap-eth';
+import { connectWallet, NETWORK } from 'poap-eth';
 import { HashClaim, postClaimHash, getClaimHash, postTokenMigration, Template, TemplatePageFormValues } from 'api';
 import { AddressSchema } from 'lib/schemas';
 
 /* Components */
-import { TxDetail } from '../components/TxDetail';
-import { SubmitButton } from 'components/SubmitButton';
 import ClaimFooterMessage from './ClaimFooterMessage';
+import { SubmitButton } from 'components/SubmitButton';
+import { TxDetail } from 'components/TxDetail';
 
 /* Lib */
-import { COLORS, STYLES, TX_STATUS } from 'lib/constants';
+import { isValidEmail } from 'lib/helpers';
 import { useImageSrc } from 'lib/hooks/useImageSrc';
+import { COLORS, STYLES, TX_STATUS } from 'lib/constants';
 
 /* ABI */
-import abi from '../abis/PoapDelegatedMint.json';
+import abi from 'abis/PoapDelegatedMint.json';
 
 type QRFormValues = {
   address: string;
@@ -175,7 +176,7 @@ const ClaimForm: React.FC<{
       if (claim) {
         const newClaim = await postClaimHash(claim.qr_hash.toLowerCase(), values.address.toLowerCase(), claim.secret);
         setClaimed(true);
-        if (migrate) {
+        if (migrate && !isValidEmail(values.address)) {
           setMigrateInProcess(true);
           setCompleteClaim(newClaim);
           actions.setSubmitting(false);
@@ -217,6 +218,7 @@ const ClaimForm: React.FC<{
     <div className={'backoffice-tooltip'}>
       All POAPs are minted in xDAI, but should you want your POAP in mainnet, un-check this checkbox so that you can
       submit the transaction to migrate the badge to mainnet. You'll need to pay for the transaction cost.
+      Not available for claims with email.
     </div>
   );
 

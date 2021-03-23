@@ -10,6 +10,7 @@ import { BurnFormSchema } from '../lib/schemas';
 /* Components */
 import { SubmitButton } from '../components/SubmitButton';
 import { Loading } from '../components/Loading';
+import Transaction from '../components/Transaction';
 
 const BurnPage: FC = () => {
   return (
@@ -67,11 +68,13 @@ const BurnToken: FC<RouteComponentProps> = props => {
   const [loadingBurn, setLoadingBurn] = useState<null | boolean>(null);
   const [errorBurn, setErrorBurn] = useState<null | Error>(null);
 
+  const [queueMessage, setQueueMessage] = useState<string>('');
+
   useEffect(() => {
     setLoadingTokenInfo(true);
     getTokenInfoWithENS(tokenId)
-      .then(token => setToken(token))
-      .catch(error => setErrorTokenInfo(error))
+      .then((token) => setToken(token))
+      .catch((error) => setErrorTokenInfo(error))
       .finally(() => setLoadingTokenInfo(false));
   }, [tokenId]);
 
@@ -80,7 +83,8 @@ const BurnToken: FC<RouteComponentProps> = props => {
 
     try {
       setLoadingBurn(true);
-      await burnToken(tokenId);
+      const queueMessageRequest = await burnToken(tokenId);
+      setQueueMessage(queueMessageRequest.queue_uid);
       setSuccessBurn(true);
     } catch (error) {
       setErrorBurn(error.message);
@@ -126,7 +130,8 @@ const BurnToken: FC<RouteComponentProps> = props => {
       <Fragment>
         {errorTokenInfo && <p className="bk-msg-error">Couldn't find token {tokenId}</p>}
         {errorBurn && <p className="bk-msg-error">Couldn't burn token {tokenId}</p>}
-        {successBurn && <p className="bk-msg-ok">Token {tokenId} was successfully burned!</p>}
+
+        {queueMessage && token && <Transaction queueId={queueMessage} layer={token.layer} />}
 
         {(errorTokenInfo || errorBurn || successBurn) && (
           <Link to={`/admin/burn`}>

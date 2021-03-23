@@ -6,16 +6,14 @@ import { HashClaim, getClaimHash, getTokensFor } from '../api';
 import { isValidEmail } from '../lib/helpers';
 
 /* Components*/
-import ClaimHeader from './ClaimHeader';
-import QRHashForm from './QRHashForm';
-import ClaimLoading from './ClaimLoading';
-import ClaimForm from './ClaimForm';
-import ClaimBlocked from './ClaimBlocked';
-import ClaimPending from './ClaimPending';
-import ClaimFinished from './ClaimFinished';
-import ClaimBumped from './ClaimBumped';
+import ClaimForm from './components/ClaimForm';
+import QRHashForm from './components/QRHashForm';
+import ClaimHeader from './components/ClaimHeader';
+import ClaimLoading from './components/ClaimLoading';
+import ClaimPending from './components/ClaimPending';
+import ClaimFinished from './components/ClaimFinished';
 import { TemplateClaimLoading } from './templateClaim/TemplateClaimLoading';
-import { ClaimFooter } from '../components/ClaimFooter';
+import { ClaimFooter } from 'components/ClaimFooter';
 
 /* Constants */
 import { TX_STATUS } from '../lib/constants';
@@ -59,7 +57,7 @@ export const CodeClaimPage: React.FC<RouteComponentProps<{ hash: string }>> = ({
   };
 
   const checkUserTokens = () => {
-    console.log('check user tokens')
+    console.log('check user tokens');
     if (!claim) return;
 
     let { user_input, beneficiary } = claim;
@@ -93,6 +91,8 @@ export const CodeClaimPage: React.FC<RouteComponentProps<{ hash: string }>> = ({
     setClaim(claim);
   };
 
+  /* Render component */
+  const claimedWithEmail = !!(claim && claim.claimed && claim.user_input && isValidEmail(claim.user_input));
   let body = <QRHashForm loading={isClaimLoading} checkClaim={fetchClaim} error={claimError} />;
 
   if (claim && claim.event.image_url) {
@@ -104,18 +104,11 @@ export const CodeClaimPage: React.FC<RouteComponentProps<{ hash: string }>> = ({
 
     title = claim.event.name;
     if (claim.claimed) {
-      if (!claim.tx_status && !beneficiaryHasToken) {
-        body = <ClaimBlocked claim={claim} />;
-      }
       // POAP minting
-      if (claim.tx_status && claim.tx_status === TX_STATUS.pending) {
-        body = <ClaimPending claim={claim} checkClaim={fetchClaim} />;
-      }
-      if ((claim.tx_status && claim.tx_status === TX_STATUS.passed) || beneficiaryHasToken) {
+      body = <ClaimPending claim={claim} checkClaim={fetchClaim} />;
+
+      if ((claim.tx_status && claim.tx_status === TX_STATUS.passed) || beneficiaryHasToken || claimedWithEmail) {
         body = <ClaimFinished claim={claim} />;
-      }
-      if (claim.tx_status && claim.tx_status === TX_STATUS.bumped) {
-        body = <ClaimBumped claim={claim} />;
       }
     }
   }
@@ -123,8 +116,6 @@ export const CodeClaimPage: React.FC<RouteComponentProps<{ hash: string }>> = ({
   if (claim && !claimError && !isVerified) {
     body = <ClaimLoading />;
   }
-
-  const claimedWithEmail = !!(claim && claim.claimed && claim.user_input && isValidEmail(claim.user_input));
 
   return (
     <>

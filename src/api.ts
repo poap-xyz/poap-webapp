@@ -138,11 +138,12 @@ export interface HashClaim {
   claimed: boolean;
   claimed_date: string;
   created_date: string;
-  tx_status: string;
+  tx_status?: string;
   secret: string;
   delegated_mint: boolean;
   delegated_signed_message: string;
   result: QrResult | null;
+  queue_uid?: string;
 }
 export interface PoapSetting {
   id: number;
@@ -248,6 +249,28 @@ export type eventOptionType = {
   label: string;
   start_date: string;
 };
+
+export type QueueResponse = {
+  queue_uid: string;
+};
+
+type QueueResult = {
+  tx_hash: string;
+};
+
+export type Queue = {
+  uid: string;
+  operation: string;
+  status: string;
+  result: QueueResult | null;
+};
+
+export enum QueueStatus {
+  finish = 'FINISH',
+  finish_with_error = 'FINISH_WITH_ERROR',
+  in_process = 'IN_PROCESS',
+  pending = 'PENDING',
+}
 
 const API_BASE =
   process.env.NODE_ENV === 'development'
@@ -367,8 +390,8 @@ export function setSetting(settingName: string, settingValue: string): Promise<a
   });
 }
 
-export function burnToken(tokenId: string): Promise<any> {
-  return secureFetchNoResponse(`${API_BASE}/burn/${tokenId}`, {
+export function burnToken(tokenId: string): Promise<QueueResponse> {
+  return secureFetch(`${API_BASE}/burn/${tokenId}`, {
     method: 'POST',
   });
 }
@@ -391,8 +414,12 @@ export async function sendNotification(
   });
 }
 
-export async function mintEventToManyUsers(eventId: number, addresses: string[], signer_address: string): Promise<any> {
-  return secureFetchNoResponse(`${API_BASE}/actions/mintEventToManyUsers`, {
+export async function mintEventToManyUsers(
+  eventId: number,
+  addresses: string[],
+  signer_address: string,
+): Promise<QueueResponse> {
+  return secureFetch(`${API_BASE}/actions/mintEventToManyUsers`, {
     method: 'POST',
     body: JSON.stringify({
       eventId,
@@ -403,8 +430,12 @@ export async function mintEventToManyUsers(eventId: number, addresses: string[],
   });
 }
 
-export async function mintUserToManyEvents(eventIds: number[], address: string, signer_address: string): Promise<any> {
-  return secureFetchNoResponse(`${API_BASE}/actions/mintUserToManyEvents`, {
+export async function mintUserToManyEvents(
+  eventIds: number[],
+  address: string,
+  signer_address: string,
+): Promise<QueueResponse> {
+  return secureFetch(`${API_BASE}/actions/mintUserToManyEvents`, {
     method: 'POST',
     body: JSON.stringify({
       eventIds,
@@ -763,4 +794,8 @@ export function editCheckout(
     }),
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+export function getQueueMessage(messageId: string): Promise<Queue> {
+  return fetchJson(`${API_BASE}/queue-message/${messageId}`);
 }
