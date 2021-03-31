@@ -6,9 +6,6 @@ export type Address = string;
 export type Params = {
   [key: string]: string | number | boolean | undefined;
 };
-export type TxHashResposne = {
-  tx_hash: string;
-};
 export interface TemplatesResponse<Result> {
   total: number;
   next?: string;
@@ -695,7 +692,7 @@ export function requestEmailRedeem(email: string): Promise<void> {
   });
 }
 
-export async function redeemWithEmail(address: string, token: string, email: string): Promise<TxHashResposne> {
+export async function redeemWithEmail(address: string, token: string, email: string): Promise<QueueResponse> {
   return fetchJson(`${API_BASE}/actions/redeem-email-tokens`, {
     method: 'POST',
     body: JSON.stringify({ email, address, token }),
