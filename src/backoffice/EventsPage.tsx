@@ -327,6 +327,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
             history.push(ROUTES.events.path);
           } catch (err) {
+            console.log(err);
             actions.setSubmitting(false);
             addToast(err.message, {
               appearance: 'error',

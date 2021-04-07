@@ -18,7 +18,7 @@ const ClaimPending: React.FC<{ claim: HashClaim; checkClaim: (hash: string) => v
   useEffect(() => {
     const interval = setInterval(() => {
       checkClaim(claim.qr_hash);
-    }, 1000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
 

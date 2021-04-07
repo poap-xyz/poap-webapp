@@ -56,7 +56,7 @@ const ClaimForm: React.FC<{
 
   useEffect(() => {
     if (migrateInProcess && !token) {
-      const interval = setInterval(fetchClaim, 2000);
+      const interval = setInterval(fetchClaim, 5000);
       return () => clearInterval(interval);
     }
   }, [migrateInProcess, token]); /* eslint-disable-line react-hooks/exhaustive-deps */
