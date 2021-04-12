@@ -10,14 +10,16 @@ import { Loading } from './Loading';
 
 /* Constants */
 import { LAYERS } from '../lib/constants';
+import { Link } from 'react-router-dom';
 
 /* Types */
 type TransactionProps = {
   queueId: string;
   layer: string;
+  address?: string;
 };
 
-const Transaction: FC<TransactionProps> = ({ queueId, layer }) => {
+const Transaction: FC<TransactionProps> = ({ queueId, layer, address }) => {
   const [transactionHash, failedRequest] = useQueuePolling(queueId);
   const [receipt] = useTransactionPolling(typeof transactionHash === 'boolean' ? '' : transactionHash, layer);
 
@@ -43,6 +45,14 @@ const Transaction: FC<TransactionProps> = ({ queueId, layer }) => {
     <>
       {typeof transactionHash === 'string' && typeof receipt !== 'boolean' && (
         <TxDetail hash={transactionHash} receipt={receipt} layer1={layer === LAYERS.layer1} />
+      )}
+      {receipt && typeof receipt !== 'boolean' && receipt.status && address && (
+        <div className="redeem-success">
+          <h6>Success!</h6>
+          <div>
+            Check your POAPs <Link to={`/scan/${address}`}>here</Link>
+          </div>
+        </div>
       )}
     </>
   );

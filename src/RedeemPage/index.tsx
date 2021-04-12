@@ -7,9 +7,9 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import Web3 from 'web3';
 import delve from 'dlv';
+import { LAYERS } from '../lib/constants';
 
 // components
-import { TxDetail } from '../components/TxDetail';
 import { ScanHeader, ScanFooter } from '../ScanPage';
 import { SubmitButton } from '../components/SubmitButton';
 
@@ -21,6 +21,7 @@ import { EmailClaim, redeemWithEmail, TokenInfo, getTokensFor, getEmailClaim } f
 
 /* Assets */
 import LoadingSpinner from '../images/loading.svg';
+import Transaction from '../components/Transaction';
 
 type RedeemFormValues = {
   address: string;
@@ -34,9 +35,7 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
   const [claim, setClaim] = useState<EmailClaim | null>(null);
   const [tokens, setTokens] = useState<TokenInfo[]>([]);
   const [tokenError, setTokenError] = useState<boolean>(false);
-  const [txHash, setTxHash] = useState<string>('');
-  const [web3, setWeb3] = useState<any>(null);
-  const [txReceipt, setTxReceipt] = useState<null | TransactionReceipt>(null);
+  const [queueMessage, setQueueMessage] = useState<string>('');
   const [ethereumAddress, setEthereumAddress] = useState<string>('');
 
   // lib hooks
@@ -52,14 +51,6 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
   useEffect(() => {
     if (claim) getTokens();
   }, [claim]) // eslint-disable-line
-  useEffect(() => {
-    if (txHash && web3) {
-      const interval = setInterval(() => {
-        getReceipt();
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [txHash, web3]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   // methods
   const getClaim = async () => {
@@ -84,15 +75,6 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
       });
     }
   };
-  const getReceipt = async () => {
-    let receipt: null | TransactionReceipt = null;
-    if (web3 && txHash && !txReceipt) {
-      receipt = await web3.eth.getTransactionReceipt(txHash);
-      if (receipt) {
-        setTimeout(() => setTxReceipt(receipt), 1000);
-      }
-    }
-  };
 
   // handlers
   const handleForm = async (values: RedeemFormValues) => {
@@ -103,9 +85,7 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
     setEthereumAddress(address);
     redeemWithEmail(address, uid, claim.email)
       .then((response) => {
-        const _web3 = new Web3(process.env.REACT_APP_L2_RPC_URL || '');
-        setWeb3(_web3);
-        setTxHash(response.tx_hash);
+        setQueueMessage(response.queue_uid);
       })
       .catch((error) => {
         addToast(error.message, {
@@ -142,7 +122,8 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
             return (
               <Form className="claim-form">
                 <div className="redeem-text">
-                  This POAPs were claimed with email <span>{claim.email}</span>, please enter your Ethereum address or ENS to claim them
+                  This POAPs were claimed with email <span>{claim.email}</span>, please enter your Ethereum address or
+                  ENS to claim them
                 </div>
                 <Field
                   name="hash"
@@ -156,12 +137,12 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
                         name="address"
                         onChange={handleChange}
                         value={values.address}
-                        disabled={isRedeemLoading || !!txHash}
+                        disabled={isRedeemLoading || !!queueMessage}
                       />
                     );
                   }}
                 />
-                {!txHash && (
+                {!queueMessage && (
                   <SubmitButton
                     className="mb-24"
                     text="Continue"
@@ -174,16 +155,7 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
           }}
         </Formik>
 
-        {txHash && <TxDetail hash={txHash} receipt={txReceipt} layer1={false} />}
-
-        {txReceipt && txReceipt.status && (
-          <div className="redeem-success">
-            <h6>Success!</h6>
-            <div>
-              Check your POAPs <Link to={`/scan/${ethereumAddress}`}>here</Link>
-            </div>
-          </div>
-        )}
+        {queueMessage && <Transaction queueId={queueMessage} layer={LAYERS.layer2} address={ethereumAddress} />}
 
         <div className="redeem-text-container">
           <div className="redeem-subtitle">POAPs to be claimed</div>
@@ -209,9 +181,7 @@ export const RedeemPage: FC<RouteComponentProps> = ({ match }) => {
   return (
     <div className="landing">
       <ScanHeader sectionName="Claim" />
-      <div className="redeem-content-container">
-        {body}
-      </div>
+      <div className="redeem-content-container">{body}</div>
       <ScanFooter path="home" />
     </div>
   );
