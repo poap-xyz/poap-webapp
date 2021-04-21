@@ -2,10 +2,8 @@ import React, { FC, useState, useEffect } from 'react';
 import { Formik, Form, Field, FieldProps } from 'formik';
 import { RouteComponentProps } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
-import { TransactionReceipt } from 'web3-core';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
-import Web3 from 'web3';
 import delve from 'dlv';
 import { LAYERS } from '../lib/constants';
 

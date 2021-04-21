@@ -162,7 +162,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
   if (token == null) {
     return (
       <>
-        <div className="header-events">
+        <div className="header-events token-page">
           <div className="container">
             <h1>Loading</h1>
             <div className="logo-event token-page">
@@ -187,18 +187,25 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
     );
   }
 
+  const { event, owner, layer } = token;
+
   return (
     <>
-      <div className="header-events">
+      <div className="header-events token-page">
         <div className="container">
-          <h1>{token.event.name}</h1>
+          <h1>{event.name}</h1>
           <p>
-            {token.event.city}, {token.event.country}
-            <br />
-            <b>{token.event.start_date}</b>
+            {(event.city || event.country) && (
+              <>
+                {event.city ? `${event.city}, ` : ''}
+                {event.country}
+                <br />
+              </>
+            )}
+            <b>{event.start_date}</b>
           </p>
           <div className="logo-event token-page">
-            {typeof token.event.image_url === 'string' && <img src={token.event.image_url} alt="Event" />}
+            {typeof event.image_url === 'string' && <img src={event.image_url} alt="Event" />}
           </div>
         </div>
       </div>
@@ -212,33 +219,33 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
             <div className="content-event">
               <h2>Owner</h2>
               <p className="wallet-number">
-                <Link to={`/scan/${token.owner}`}>{token.owner}</Link>
+                <Link to={`/scan/${owner}`}>{owner}</Link>
               </p>
               <h2>Brog on the interwebz</h2>
               <ul className="social-icons">
                 <li>
                   <TwitterShareButton
                     url={window.location.toString()}
-                    title={`Look at my ${token.event.name} badge!`}
+                    title={`Look at my ${event.name} badge!`}
                     via="poapxyz"
                   >
                     <TwitterIcon size={40} round iconBgStyle={{ fill: '#6534FF' }} />
                   </TwitterShareButton>
                 </li>
                 <li>
-                  <TelegramShareButton url={window.location.toString()} title={`Look at my ${token.event.name} badge!`}>
+                  <TelegramShareButton url={window.location.toString()} title={`Look at my ${event.name} badge!`}>
                     <TelegramIcon size={40} round iconBgStyle={{ fill: '#6534FF' }} />
                   </TelegramShareButton>
                 </li>
                 <li>
-                  <RedditShareButton url={window.location.toString()} title={`Look at my ${token.event.name} badge!`}>
+                  <RedditShareButton url={window.location.toString()} title={`Look at my ${event.name} badge!`}>
                     <RedditIcon size={40} round iconBgStyle={{ fill: '#6534FF' }} />
                   </RedditShareButton>
                 </li>
               </ul>
             </div>
             <div className={'migration-section'}>
-              {token.layer === LAYERS.layer2 && !migrationFinished && !txHash && (
+              {layer === LAYERS.layer2 && !migrationFinished && !txHash && (
                 <>
                   <div className={'divider'} />
                   <p>This POAP is currently on xDAI and it can be migrated to mainnet</p>
@@ -249,9 +256,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
                   </div>
                 </>
               )}
-              {token.layer === LAYERS.layer2 && migrationFinished && (
-                <p className={'success'}>POAP migrated successfully!</p>
-              )}
+              {layer === LAYERS.layer2 && migrationFinished && <p className={'success'}>POAP migrated successfully!</p>}
               {txHash && <TxDetail hash={txHash} receipt={txReceipt} />}
               {txReceipt && !txReceipt.status && (
                 <>
