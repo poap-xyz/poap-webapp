@@ -651,7 +651,7 @@ const EventTable: React.FC<EventTableProps> = ({ initialEvents, criteria, create
   const [events, setEvents] = useState<PoapEvent[]>(initialEvents);
   const [total, setTotal] = useState<number>(events.length);
   const [page, setPage] = useState<number>(0);
-  const [idSort, setIdSort] = useState<number>(0);
+  const [idSort, setIdSort] = useState<number>(-1);
   const [nameSort, setNameSort] = useState<number>(0);
 
   useEffect(() => {
@@ -697,7 +697,8 @@ const EventTable: React.FC<EventTableProps> = ({ initialEvents, criteria, create
     return events.slice(page * limit, page * limit + limit);
   };
 
-  const handleCriteriaFilter = (event: PoapEvent): boolean => event.name.toLowerCase().includes(criteria);
+  const handleCriteriaFilter = (event: PoapEvent): boolean =>
+    event.name.toLowerCase().includes(criteria) || event.id.toString() === criteria;
 
   const handleIdSort = () => {
     if (idSort === 0) {
