@@ -1,7 +1,7 @@
 import React, { useCallback, useState, ReactElement, useEffect, useMemo, ChangeEvent, ReactNode } from 'react';
 import { Link, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import classNames from 'classnames';
-import { Formik, Form, Field, ErrorMessage, FieldProps, FormikActions, FormikHandlers, FormikValues } from 'formik';
+import { Formik, Form, Field, ErrorMessage, FieldProps, FormikActions, FormikHandlers } from 'formik';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import { format } from 'date-fns';
@@ -19,7 +19,6 @@ import { Tooltip } from 'react-lightweight-tooltip';
 import { SubmitButton } from '../components/SubmitButton';
 import { Loading } from '../components/Loading';
 import FilterButton from '../components/FilterButton';
-import FilterSelect from '../components/FilterSelect';
 
 // constants
 import { COLORS, ROUTES } from 'lib/constants';
