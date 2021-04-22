@@ -87,7 +87,6 @@ type PaginateAction = {
 type EventTableProps = {
   initialEvents: PoapEvent[];
   criteria: string;
-  createdBy: string;
   limit: number;
 };
 
@@ -585,7 +584,6 @@ const CheckboxField: React.FC<EventFieldProps> = ({ title, action, checked }) =>
 export const EventList: React.FC = () => {
   const [criteria, setCriteria] = useState<string>('');
   const [limit, setLimit] = useState<number>(10);
-  const [createdBy, setCreatedBy] = useState<string>('all');
 
   const [events, fetchingEvents, fetchEventsError] = useAsync(getEvents);
 
@@ -595,18 +593,10 @@ export const EventList: React.FC = () => {
     setCriteria(value.toLowerCase());
   };
 
-  const handleCreatedByChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    const { value } = e.target;
-
-    setCreatedBy(value);
-  };
-
   const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { value } = e.target;
     setLimit(parseInt(value, 10));
   };
-
-  const isAdmin = authClient.isAuthenticated();
 
   return (
     <div className={'bk-container'}>
@@ -614,13 +604,6 @@ export const EventList: React.FC = () => {
       <div className="event-top-bar-container">
         <div className="left_content">
           <input type="text" placeholder="Search by name" onChange={handleNameChange} />
-          {isAdmin && (
-            <FilterSelect handleChange={handleCreatedByChange}>
-              <option value="all">All events</option>
-              <option value="admin">Created by admin</option>
-              <option value="community">Created by community</option>
-            </FilterSelect>
-          )}
         </div>
         <div className="right_content">
           <Link to="/admin/events/new">
@@ -642,27 +625,17 @@ export const EventList: React.FC = () => {
 
       {fetchEventsError && <div>There was a problem fetching events</div>}
 
-      {events && <EventTable createdBy={createdBy} criteria={criteria} initialEvents={events} limit={limit} />}
+      {events && <EventTable criteria={criteria} initialEvents={events} limit={limit} />}
     </div>
   );
 };
 
-const EventTable: React.FC<EventTableProps> = ({ initialEvents, criteria, createdBy, limit }) => {
+const EventTable: React.FC<EventTableProps> = ({ initialEvents, criteria, limit }) => {
   const [events, setEvents] = useState<PoapEvent[]>(initialEvents);
   const [total, setTotal] = useState<number>(events.length);
   const [page, setPage] = useState<number>(0);
   const [idSort, setIdSort] = useState<number>(-1);
   const [nameSort, setNameSort] = useState<number>(0);
-
-  useEffect(() => {
-    const eventsByCreator = initialEvents.filter((event) =>
-      createdBy === 'admin' ? event.from_admin : !event.from_admin,
-    );
-
-    setEvents(eventsByCreator);
-
-    if (createdBy === 'all') setEvents(initialEvents);
-  }, [createdBy]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   useEffect(() => {
     setEvents(initialEvents.filter(handleCriteriaFilter));
