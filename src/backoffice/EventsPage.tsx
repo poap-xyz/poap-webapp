@@ -114,15 +114,6 @@ export interface RangeModifier {
   to: Date;
 }
 
-type SelectProps = {
-  name: string;
-  options?: any[];
-  disabled: boolean;
-  handleChange: HandleChange;
-  values: FormikValues;
-  label: string;
-};
-
 export const EventsPage = () => (
   <Switch>
     <Route exact path={ROUTES.events.path} component={EventList} />
