@@ -7,7 +7,6 @@ import 'react-day-picker/lib/style.css';
 import { format } from 'date-fns';
 import { useToasts } from 'react-toast-notifications';
 import { useHistory } from 'react-router-dom';
-import { FiCheckSquare, FiSquare } from 'react-icons/fi';
 
 import { authClient } from 'auth';
 
@@ -21,7 +20,7 @@ import { Loading } from '../components/Loading';
 import FilterButton from '../components/FilterButton';
 
 // constants
-import { COLORS, ROUTES } from 'lib/constants';
+import { ROUTES } from 'lib/constants';
 
 // assets
 import { ReactComponent as EditIcon } from 'images/edit.svg';
@@ -153,7 +152,6 @@ type TemplateOptionType = {
 const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ create, event }) => {
   const [virtualEvent, setVirtualEvent] = useState<boolean>(event ? event.virtual_event : false);
   const [templateOptions, setTemplateOptions] = useState<Template[] | null>(null);
-  const [includeEmail, setIncludeEmail] = useState<boolean>(!!create);
 
   const [multiDay, setMultiDay] = useState<boolean>(event ? event.start_date !== event.end_date : false);
   const history = useHistory();
@@ -270,11 +268,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     return [{ value: 0, label: 'Standard template' }, ...options];
   };
 
-  const toggleCheckbox = () => setIncludeEmail(!includeEmail);
-
   const templateSelectOptions = templateOptions ? parseTemplateToOptions(templateOptions) : [];
-
-  let CheckboxIcon = includeEmail ? FiCheckSquare : FiSquare;
 
   return (
     <div className={'bk-container'}>
@@ -296,7 +290,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
               return;
             }
 
-            if (includeEmail && !submittedValues['email']) {
+            if (create && !submittedValues['email']) {
               actions.setErrors({ email: 'An email is required' });
               actions.setSubmitting(false);
               return;
@@ -437,10 +431,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   <EventField disabled={false} title={editLabel} name="secret_code" />
                   {create && (
                     <div className={'email-checkbox'}>
-                      <div onClick={toggleCheckbox} className={'box-label'}>
-                        <CheckboxIcon color={COLORS.primaryColor} /> Receive a backup of the event Edit Code
-                      </div>
-                      {includeEmail && <EventField disabled={false} title={'Email'} name="email" />}
+                      <EventField disabled={false} title={'Email'} name="email" />
                     </div>
                   )}
                   {!create && isAdmin && (
