@@ -199,12 +199,6 @@ export interface PaginatedNotifications {
   notifications: Notification[];
 }
 
-export interface PaginatedCheckouts {
-  limit: number;
-  offset: number;
-  total: number;
-  checkouts: Checkout[];
-}
 
 export type QrCode = {
   beneficiary: string;
@@ -712,6 +706,13 @@ export type Checkout = {
   event: PoapEvent;
 };
 
+export interface PaginatedCheckouts {
+  limit: number;
+  offset: number;
+  total: number;
+  checkouts: Checkout[];
+}
+
 type CheckoutRedeemResponse = {
   qr_hash: string;
 };
@@ -795,4 +796,45 @@ export function editCheckout(
 
 export function getQueueMessage(messageId: string): Promise<Queue> {
   return fetchJson(`${API_BASE}/queue-message/${messageId}`);
+}
+
+/* Deliveries */
+export type Delivery = {
+  id: number;
+  slug: string;
+  card_title: string;
+  card_text: string;
+  page_title: string;
+  page_title_image: string;
+  page_text: string;
+  image: string;
+  active: boolean;
+  metadata_title: string;
+  metadata_description: string;
+  event_ids: string;
+};
+
+export interface PaginatedDeliveries {
+  limit: number;
+  offset: number;
+  total: number;
+  deliveries: Delivery[];
+}
+
+export function getDeliveries(
+  limit: number,
+  offset: number,
+  // eventId: number | undefined,
+  active: boolean | null,
+): Promise<PaginatedDeliveries> {
+  let paramsObject: any = { limit, offset };
+
+  // if (eventId) paramsObject['event_id'] = eventId;
+
+  if (active !== null) {
+    paramsObject['active'] = active;
+  }
+
+  const params = queryString.stringify(paramsObject);
+  return secureFetch(`${API_BASE}/deliveries?${params}`);
 }
