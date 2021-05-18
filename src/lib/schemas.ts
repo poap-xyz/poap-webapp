@@ -207,7 +207,24 @@ const CheckoutSchema = yup.object().shape({
   start_date: yup.string().required('The start date is required'),
   start_time: yup.string().required('The start date is required'),
   end_date: yup.string().required('The end date is required'),
-  end_time: yup.string().required('The end date is required')
+  end_time: yup.string().required('The end date is required'),
+});
+
+const DeliverySchema = yup.object().shape({
+  slug: yup
+    .string()
+    .required('A unique name is required')
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Must be URL friendly. No spaces, only ASCII')
+    .max(100, 'The event name should be less than 100 characters'),
+  card_title: yup.string().required('Card title is required'),
+  card_text: yup.string().required('Card text is required'),
+  page_title: yup.string().required('Page title is required'),
+  page_text: yup.string().required('Page text is required'),
+  metadata_title: yup.string().required('Metadata title text is required'),
+  metadata_description: yup.string().required('Metadata description is required'),
+  image: yup.string().required('An image URL is required'),
+  page_title_image: yup.string(),
+  event_ids: yup.string().required(),
 });
 
 export {
@@ -224,5 +241,6 @@ export {
   UpdateModalWithFormikRangeSchema,
   UpdateModalWithFormikSelectedQrsSchema,
   UpdateModalWithFormikListSchema,
-  CheckoutSchema
+  CheckoutSchema,
+  DeliverySchema,
 };

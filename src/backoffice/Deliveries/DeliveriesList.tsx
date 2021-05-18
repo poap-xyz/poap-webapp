@@ -53,7 +53,7 @@ const DeliveriesList = () => {
   const fetchDeliveries = async () => {
     setIsFetching(true);
     try {
-      const response = await getDeliveries(limit, page * limit, activeStatus);
+      const response = await getDeliveries(limit, page * limit, selectedEvent, activeStatus);
       if (response) {
         setDeliveries(response.deliveries);
         setTotal(response.total);
@@ -105,9 +105,9 @@ const DeliveriesList = () => {
 
   const tableHeaders = (
     <div className={'row table-header visible-md'}>
-      <div className={'col-md-3'}>Name</div>
-      <div className={'col-md-4'}>Events</div>
-      <div className={'col-md-3'}>URL</div>
+      <div className={'col-md-2'}>Name</div>
+      <div className={'col-md-6'}>Events</div>
+      <div className={'col-md-2'}>URL</div>
       <div className={'col-md-1 center'}>Active</div>
       <div className={'col-md-1'} />
     </div>
@@ -164,17 +164,28 @@ const DeliveriesList = () => {
             {deliveries.map((delivery, i) => {
               return (
                 <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={delivery.id}>
-                  <div className={'col-md-3 col-xs-12 ellipsis'}>
+                  <div className={'col-md-2 col-xs-12 ellipsis'}>
                     <span className={'visible-sm'}>Name: </span>
                     {delivery.card_title}
                   </div>
 
-                  <div className={'col-md-4 col-xs-12 ellipsis'}>
+                  <div className={'col-md-6 col-xs-12 ellipsis'}>
                     <span className={'visible-sm'}>Events: </span>
-                    {delivery.event_ids}
+                    {delivery.event_ids.split(',').map((id) => {
+                      if (events) {
+                        try {
+                          let _id = parseInt(id, 10);
+                          let event = events.find((e) => e.id === _id);
+                          if (event) return event.name.substr(0, 20) + '; ';
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }
+                      return id;
+                    })}
                   </div>
 
-                  <div className={'col-md-3 col-xs-12'}>
+                  <div className={'col-md-2 col-xs-12'}>
                     <span className={'visible-sm'}>URL: </span>
                     <a href={`https://poap.delivery/${delivery.slug}`} target={'_blank'} rel="noopener noreferrer">
                       {delivery.slug}

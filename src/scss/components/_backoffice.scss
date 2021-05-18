@@ -1108,3 +1108,48 @@
     }
   }
 }
+
+.delivery-admin-form {
+
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .col-xs-6 {
+    &:first-of-type {
+      padding-right: 10px;
+    }
+
+    &:not(:first-of-type) {
+      padding-left: 10px;
+    }
+  }
+
+  .delivery-address-list {
+    margin-top: 50px;
+
+    .center {
+      text-align: center;
+    }
+
+    &-title {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    &-row {
+      padding: 10px 5px;
+      &.even {
+        background: white;
+      }
+
+      .poap-badge,
+      .status-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 20px;
+        object-fit: cover;
+      }
+    }
+  }
+}

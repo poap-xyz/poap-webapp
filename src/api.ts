@@ -814,6 +814,12 @@ export type Delivery = {
   event_ids: string;
 };
 
+export type DeliveryAddress = {
+  address: string;
+  claimed: boolean;
+  event_ids: string;
+};
+
 export interface PaginatedDeliveries {
   limit: number;
   offset: number;
@@ -824,12 +830,12 @@ export interface PaginatedDeliveries {
 export function getDeliveries(
   limit: number,
   offset: number,
-  // eventId: number | undefined,
+  eventId: number | undefined,
   active: boolean | null,
 ): Promise<PaginatedDeliveries> {
   let paramsObject: any = { limit, offset };
 
-  // if (eventId) paramsObject['event_id'] = eventId;
+  if (eventId) paramsObject['event_id'] = eventId;
 
   if (active !== null) {
     paramsObject['active'] = active;
@@ -837,4 +843,42 @@ export function getDeliveries(
 
   const params = queryString.stringify(paramsObject);
   return secureFetch(`${API_BASE}/deliveries?${params}`);
+}
+
+export function getDelivery(id: string | number): Promise<Delivery> {
+  return fetchJson(`${API_BASE}/delivery/${id}`);
+}
+
+export function getDeliveryAddresses(id: string | number): Promise<DeliveryAddress[]> {
+  return fetchJson(`${API_BASE}/delivery-addresses/${id}`);
+}
+
+export function createDelivery(
+  slug: string,
+  event_ids: string,
+  card_title: string,
+  card_text: string,
+  page_title: string,
+  page_text: string,
+  metadata_title: string,
+  metadata_description: string,
+  image: string,
+  page_title_image: string,
+): Promise<Delivery> {
+  return secureFetch(`${API_BASE}/deliveries`, {
+    method: 'POST',
+    body: JSON.stringify({
+      slug,
+      event_ids,
+      card_title,
+      card_text,
+      page_title,
+      page_text,
+      metadata_title,
+      metadata_description,
+      image,
+      page_title_image
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
 }

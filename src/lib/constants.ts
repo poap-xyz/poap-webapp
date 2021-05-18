@@ -157,6 +157,11 @@ const ROUTES = {
       roles: [ROLES.administrator],
       title: 'New Delivery',
     },
+    editForm: {
+      path: '/admin/deliveries/:id',
+      roles: [ROLES.administrator],
+      title: 'Edit Delivery',
+    },
   },
 };
 
