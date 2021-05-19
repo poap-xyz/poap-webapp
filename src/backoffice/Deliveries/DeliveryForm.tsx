@@ -15,6 +15,7 @@ import {
   getDelivery,
   getDeliveryAddresses,
   createDelivery,
+  updateDelivery,
 } from '../../api';
 
 /* Components */
@@ -47,7 +48,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
   const [addressesError, setAddressesError] = useState<string>('');
   const [listInput, setListInput] = useState<string>('');
   const [events, setEvents] = useState<PoapEvent[]>([]);
-  const [activeCheckout, setActiveCheckout] = useState<boolean>(true);
+  const [activeDelivery, setActiveDelivery] = useState<boolean>(true);
 
   const initialValues = useMemo(() => {
     if (delivery) {
@@ -98,9 +99,9 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
     try {
       const _delivery = await getDelivery(id);
       setDelivery(_delivery);
+      setActiveDelivery(_delivery.active);
       const _addresses = await getDeliveryAddresses(id);
       setAddresses(_addresses);
-      // if (_checkout.is_active === 'false') setActiveCheckout(false);
     } catch (e) {
       addToast('Error while fetching delivery', {
         appearance: 'error',
@@ -124,7 +125,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
   const handleListChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
     setListInput(ev.target.value);
   };
-  const toggleActiveDelivery = () => setActiveCheckout(!activeCheckout);
+  const toggleActiveDelivery = () => setActiveDelivery(!activeDelivery);
 
   // Edition Loading Component
   if (isEdition && !delivery) {
@@ -146,7 +147,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
         validationSchema={DeliverySchema}
         onSubmit={async (submittedValues: DeliveryFormType, actions: FormikActions<DeliveryFormType>) => {
           try {
-            if (!listInput) {
+            if (!listInput && !isEdition) {
               setAddressesError('An address list is required');
               actions.setSubmitting(false);
               return;
@@ -215,6 +216,20 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
                   page_title_image,
                   clean_addresses,
                 );
+              } else {
+                await updateDelivery(
+                  id,
+                  slug,
+                  card_title,
+                  card_text,
+                  page_title,
+                  page_text,
+                  metadata_title,
+                  metadata_description,
+                  image,
+                  page_title_image,
+                  activeDelivery,
+                );
               }
               history.push(ROUTES.deliveries.admin.path);
             } catch (e) {
@@ -259,7 +274,7 @@ address/ENS`;
               <div>
                 <h3>General Info</h3>
                 <div className={'col-xs-6'}>
-                  <EventField title="Event IDs" name="event_ids" />
+                  <EventField title="Event IDs" disabled={isEdition} name="event_ids" />
                 </div>
                 <div className={'col-xs-6'}>
                   <EventField title="Delivery URL" name="slug" />
@@ -321,7 +336,7 @@ address/ENS`;
               {isEdition && (
                 <div className={'col-md-12'}>
                   <div className={'checkbox-field'} onClick={toggleActiveDelivery}>
-                    <input type="checkbox" checked={activeCheckout} readOnly />
+                    <input type="checkbox" checked={activeDelivery} readOnly />
                     <label>Active delivery</label>
                   </div>
                 </div>

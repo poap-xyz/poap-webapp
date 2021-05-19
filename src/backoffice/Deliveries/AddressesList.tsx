@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { ROUTES } from '../../lib/constants';
 
 /* Assets */
 import checked from '../../images/checked.svg';

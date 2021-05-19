@@ -884,3 +884,34 @@ export function createDelivery(
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+export function updateDelivery(
+  id: number,
+  slug: string,
+  card_title: string,
+  card_text: string,
+  page_title: string,
+  page_text: string,
+  metadata_title: string,
+  metadata_description: string,
+  image: string,
+  page_title_image: string,
+  active: boolean,
+): Promise<Delivery> {
+  return secureFetch(`${API_BASE}/deliveries/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      slug,
+      card_title,
+      card_text,
+      page_title,
+      page_text,
+      metadata_title,
+      metadata_description,
+      image,
+      page_title_image,
+      active,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
