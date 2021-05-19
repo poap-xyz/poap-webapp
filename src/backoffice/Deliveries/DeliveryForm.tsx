@@ -44,6 +44,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
   /* State */
   const [delivery, setDelivery] = useState<Delivery | null>(null);
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
+  const [addressesError, setAddressesError] = useState<string>('');
   const [listInput, setListInput] = useState<string>('');
   const [events, setEvents] = useState<PoapEvent[]>([]);
   const [activeCheckout, setActiveCheckout] = useState<boolean>(true);
@@ -145,7 +146,12 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
         validationSchema={DeliverySchema}
         onSubmit={async (submittedValues: DeliveryFormType, actions: FormikActions<DeliveryFormType>) => {
           try {
-            actions.setSubmitting(true);
+            if (!listInput) {
+              setAddressesError('An address list is required');
+              actions.setSubmitting(false);
+              return;
+            }
+            setAddressesError('');
 
             const {
               slug,
@@ -160,6 +166,40 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
               page_title_image,
             } = submittedValues;
 
+            // Clean addresses
+            const clean_addresses = [];
+            try {
+              const _addresses = listInput.split(/\n/);
+              let ctr = 0;
+              for (let each of _addresses) {
+                ctr++;
+                // Split by ;
+                let parts = each.split(';');
+                if (parts.length > 2) {
+                  setAddressesError(`Line ${ctr} is incorrectly formed!`);
+                  actions.setSubmitting(false);
+                  return;
+                }
+                let _events: number[] = [];
+                if (parts.length === 2) {
+                  _events = parts[1].split(',').map((e) => parseInt(e, 10));
+                } else {
+                  _events = event_ids.split(',').map((e) => parseInt(e, 10));
+                }
+                // Split by ,
+                clean_addresses.push({
+                  address: parts[0],
+                  events: _events,
+                });
+              }
+            } catch (e) {
+              console.log('Error parsing addresses');
+              console.log(e);
+              setAddressesError('Unexpected error parsing addresses list');
+              actions.setSubmitting(false);
+              return;
+            }
+
             try {
               if (!isEdition) {
                 await createDelivery(
@@ -173,6 +213,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
                   metadata_description,
                   image,
                   page_title_image,
+                  clean_addresses,
                 );
               }
               history.push(ROUTES.deliveries.admin.path);
@@ -193,9 +234,6 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
         }}
       >
         {({ values, errors, isSubmitting, setFieldValue }) => {
-          const handleSelectChange = (name: string) => (selectedOption: any) =>
-            setFieldValue(name, selectedOption.value);
-
           const addressPlaceholder = `address/ENS;id1,id2,id3
 address/ENS`;
 
@@ -254,7 +292,13 @@ address/ENS`;
                   <div className={'col-xs-12'}>
                     <div className="bk-form-row">
                       <label>List of addresses for Delivery</label>
-                      <textarea placeholder={addressPlaceholder} className="" value={listInput} onChange={handleListChange} />
+                      <textarea
+                        placeholder={addressPlaceholder}
+                        className={`${addressesError ? 'error' : ''}`}
+                        value={listInput}
+                        onChange={handleListChange}
+                      />
+                      {addressesError && <p className={'bk-error'}>{addressesError}</p>}
                     </div>
                   </div>
                 </div>

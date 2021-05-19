@@ -864,6 +864,7 @@ export function createDelivery(
   metadata_description: string,
   image: string,
   page_title_image: string,
+  addresses: any[],
 ): Promise<Delivery> {
   return secureFetch(`${API_BASE}/deliveries`, {
     method: 'POST',
@@ -877,7 +878,8 @@ export function createDelivery(
       metadata_title,
       metadata_description,
       image,
-      page_title_image
+      page_title_image,
+      addresses,
     }),
     headers: { 'Content-Type': 'application/json' },
   });
