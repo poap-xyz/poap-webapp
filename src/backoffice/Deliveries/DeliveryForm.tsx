@@ -181,7 +181,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
                   return;
                 }
                 let _events: number[] = [];
-                if (parts.length === 2) {
+                if (parts.length === 2 && parts[1].trim() !== '') {
                   _events = parts[1].split(',').map((e) => parseInt(e, 10));
                 } else {
                   _events = event_ids.split(',').map((e) => parseInt(e, 10));
@@ -189,7 +189,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
                 // Split by ,
                 clean_addresses.push({
                   address: parts[0],
-                  events: _events,
+                  events: _events.filter((e) => !isNaN(e)),
                 });
               }
             } catch (e) {
@@ -218,7 +218,22 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
               }
               history.push(ROUTES.deliveries.admin.path);
             } catch (e) {
-              addToast(e.message, {
+              let _msg: React.ReactNode | string = e.message;
+              try {
+                if (e.message.startsWith('[')) {
+                  let errors = JSON.parse(e.message);
+                  _msg = (
+                    <>
+                      {errors.map((e: string) => (
+                        <p>&bull; {e}</p>
+                      ))}
+                    </>
+                  );
+                }
+              } catch (e) {
+                console.log('Error parsing error > ', e);
+              }
+              addToast(_msg, {
                 appearance: 'error',
                 autoDismiss: false,
               });
