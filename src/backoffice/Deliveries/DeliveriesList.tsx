@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { OptionTypeBase } from 'react-select';
 import { useToasts } from 'react-toast-notifications';
 
 /* Helpers */
-import { eventOptionType, PoapEvent, Checkout, getEvents, getCheckouts } from '../../api';
+import { eventOptionType, PoapEvent, Delivery, getEvents, getDeliveries } from '../../api';
+import { ROUTES } from '../../lib/constants';
 
 /* Components */
 import { Loading } from '../../components/Loading';
@@ -24,7 +24,7 @@ type PaginateAction = {
   selected: number;
 };
 
-const CheckoutList = () => {
+const DeliveriesList = () => {
   /* State */
   const [page, setPage] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -32,36 +32,34 @@ const CheckoutList = () => {
   const [activeStatus, setActiveStatus] = useState<boolean | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<number | undefined>(undefined);
   const [events, setEvents] = useState<PoapEvent[]>([]);
-  const [checkouts, setCheckouts] = useState<Checkout[]>([]);
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [isFetching, setIsFetching] = useState<null | boolean>(null);
 
   const { addToast } = useToasts();
-
-  const dateFormatter = (day: string) => format(new Date(day), 'dd-MMM HH:mm');
 
   /* Effects */
   useEffect(() => {
     fetchEvents();
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (checkouts.length > 0) fetchCheckouts();
+    if (deliveries.length > 0) fetchDeliveries();
   }, [page]); /* eslint-disable-line react-hooks/exhaustive-deps */
   useEffect(() => {
     setPage(0);
-    fetchCheckouts();
+    fetchDeliveries();
   }, [selectedEvent, activeStatus, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   /* Data functions */
-  const fetchCheckouts = async () => {
+  const fetchDeliveries = async () => {
     setIsFetching(true);
     try {
-      const response = await getCheckouts(limit, page * limit, selectedEvent, activeStatus);
+      const response = await getDeliveries(limit, page * limit, selectedEvent, activeStatus);
       if (response) {
-        setCheckouts(response.checkouts);
+        setDeliveries(response.deliveries);
         setTotal(response.total);
       }
     } catch (e) {
-      addToast('Error while fetching checkouts', {
+      addToast('Error while fetching deliveries', {
         appearance: 'error',
         autoDismiss: false,
       });
@@ -107,20 +105,18 @@ const CheckoutList = () => {
 
   const tableHeaders = (
     <div className={'row table-header visible-md'}>
-      <div className={'col-md-3'}>Event</div>
+      <div className={'col-md-2'}>Name</div>
+      <div className={'col-md-6'}>Events</div>
       <div className={'col-md-2'}>URL</div>
-      <div className={'col-md-2 center'}>Start</div>
-      <div className={'col-md-2 center'}>End</div>
-      <div className={'col-md-1 center'}>Limit</div>
       <div className={'col-md-1 center'}>Active</div>
-      <div className={'col-md-1 '} />
+      <div className={'col-md-1'} />
     </div>
   );
 
   return (
-    <div className={'admin-table checkouts'}>
-      <h2>Checkouts</h2>
-      <div className="filters-container checkouts">
+    <div className={'admin-table deliveries'}>
+      <h2>Deliveries</h2>
+      <div className="filters-container deliveries">
         <div className={'filter col-md-4 col-xs-12'}>
           <div className="filter-option">
             <FilterReactSelect options={eventOptions} onChange={handleSelectChange} placeholder={'Filter by Event'} />
@@ -137,7 +133,7 @@ const CheckoutList = () => {
         </div>
         <div className={'col-md-2'} />
         <div className={'filter col-md-3 col-xs-6 new-button'}>
-          <Link to="/admin/checkouts/new">
+          <Link to={ROUTES.deliveries.newForm.path}>
             <FilterButton text="Create new" />
           </Link>
         </div>
@@ -153,59 +149,59 @@ const CheckoutList = () => {
         </div>
       </div>
       {isFetching && (
-        <div className={'checkout-table-section'}>
+        <div className={'delivery-table-section'}>
           {tableHeaders}
           <Loading />
         </div>
       )}
 
-      {checkouts && checkouts.length === 0 && !isFetching && <div className={'no-results'}>No Checkouts found</div>}
+      {deliveries && deliveries.length === 0 && !isFetching && <div className={'no-results'}>No Deliveries found</div>}
 
-      {checkouts && checkouts.length !== 0 && !isFetching && (
-        <div className={'checkout-table-section'}>
+      {deliveries && deliveries.length !== 0 && !isFetching && (
+        <div className={'delivery-table-section'}>
           {tableHeaders}
-          <div className={'admin-table-row checkout-table'}>
-            {checkouts.map((checkout, i) => {
-              const url = `/e/${checkout.fancy_id}`;
+          <div className={'admin-table-row delivery-table'}>
+            {deliveries.map((delivery, i) => {
               return (
-                <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={checkout.id}>
-                  <div className={'col-md-3 col-xs-12 ellipsis'}>
-                    <span className={'visible-sm'}>Event: </span>
-                    {checkout.event.name}
+                <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={delivery.id}>
+                  <div className={'col-md-2 col-xs-12 ellipsis'}>
+                    <span className={'visible-sm'}>Name: </span>
+                    {delivery.card_title}
+                  </div>
+
+                  <div className={'col-md-6 col-xs-12 ellipsis'}>
+                    <span className={'visible-sm'}>Events: </span>
+                    {delivery.event_ids.split(',').map((id) => {
+                      if (events) {
+                        try {
+                          let _id = parseInt(id, 10);
+                          let event = events.find((e) => e.id === _id);
+                          if (event) return event.name.substr(0, 20) + '; ';
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }
+                      return id;
+                    })}
                   </div>
 
                   <div className={'col-md-2 col-xs-12'}>
                     <span className={'visible-sm'}>URL: </span>
-                    <a href={url} target={'_blank'} rel="noopener noreferrer">
-                      {url}
+                    <a href={`https://poap.delivery/${delivery.slug}`} target={'_blank'} rel="noopener noreferrer">
+                      {delivery.slug}
                     </a>
-                  </div>
-
-                  <div className={'col-md-2 col-xs-6 center'}>
-                    <span className={'visible-sm'}>Start: </span>
-                    {dateFormatter(checkout.start_time)}
-                  </div>
-
-                  <div className={'col-md-2 col-xs-6 center'}>
-                    <span className={'visible-sm'}>End: </span>
-                    {dateFormatter(checkout.end_time)}
-                  </div>
-
-                  <div className={'col-md-1 col-xs-6 center'}>
-                    <span className={'visible-sm'}>Limit: </span>
-                    {checkout.max_limit}
                   </div>
 
                   <div className={'col-md-1 col-xs-6 center status'}>
                     <span className={'visible-sm'}>Active: </span>
                     <img
-                      src={checkout.is_active === 'true' ? checked : error}
-                      alt={checkout.is_active === 'true' ? 'Active' : 'Inactive'}
+                      src={delivery.active ? checked : error}
+                      alt={delivery.active ? 'Active' : 'Inactive'}
                       className={'status-icon'}
                     />
                   </div>
                   <div className={'col-md-1 center event-edit-icon-container'}>
-                    <Link to={`/admin/checkouts/${checkout.fancy_id}`}>
+                    <Link to={`/admin/deliveries/${delivery.id}`}>
                       <EditIcon />
                     </Link>
                   </div>
@@ -228,9 +224,8 @@ const CheckoutList = () => {
           )}
         </div>
       )}
-
     </div>
   );
 };
 
-export default CheckoutList;
+export default DeliveriesList;

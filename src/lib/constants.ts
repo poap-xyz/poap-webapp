@@ -145,6 +145,24 @@ const ROUTES = {
     roles: [ROLES.administrator, ROLES.eventHost],
     title: 'Manage QR Codes',
   },
+
+  deliveries: {
+    admin: {
+      path: '/admin/deliveries',
+      roles: [ROLES.administrator],
+      title: 'Deliveries',
+    },
+    newForm: {
+      path: '/admin/deliveries/new',
+      roles: [ROLES.administrator],
+      title: 'New Delivery',
+    },
+    editForm: {
+      path: '/admin/deliveries/:id',
+      roles: [ROLES.administrator],
+      title: 'Edit Delivery',
+    },
+  },
 };
 
 const IMAGE_SUPPORTED_FORMATS = ['image/png'];

@@ -199,12 +199,6 @@ export interface PaginatedNotifications {
   notifications: Notification[];
 }
 
-export interface PaginatedCheckouts {
-  limit: number;
-  offset: number;
-  total: number;
-  checkouts: Checkout[];
-}
 
 export type QrCode = {
   beneficiary: string;
@@ -712,6 +706,13 @@ export type Checkout = {
   event: PoapEvent;
 };
 
+export interface PaginatedCheckouts {
+  limit: number;
+  offset: number;
+  total: number;
+  checkouts: Checkout[];
+}
+
 type CheckoutRedeemResponse = {
   qr_hash: string;
 };
@@ -795,4 +796,122 @@ export function editCheckout(
 
 export function getQueueMessage(messageId: string): Promise<Queue> {
   return fetchJson(`${API_BASE}/queue-message/${messageId}`);
+}
+
+/* Deliveries */
+export type Delivery = {
+  id: number;
+  slug: string;
+  card_title: string;
+  card_text: string;
+  page_title: string;
+  page_title_image: string;
+  page_text: string;
+  image: string;
+  active: boolean;
+  metadata_title: string;
+  metadata_description: string;
+  event_ids: string;
+};
+
+export type DeliveryAddress = {
+  address: string;
+  claimed: boolean;
+  event_ids: string;
+};
+
+export interface PaginatedDeliveries {
+  limit: number;
+  offset: number;
+  total: number;
+  deliveries: Delivery[];
+}
+
+export function getDeliveries(
+  limit: number,
+  offset: number,
+  eventId: number | undefined,
+  active: boolean | null,
+): Promise<PaginatedDeliveries> {
+  let paramsObject: any = { limit, offset };
+
+  if (eventId) paramsObject['event_id'] = eventId;
+
+  if (active !== null) {
+    paramsObject['active'] = active;
+  }
+
+  const params = queryString.stringify(paramsObject);
+  return secureFetch(`${API_BASE}/deliveries?${params}`);
+}
+
+export function getDelivery(id: string | number): Promise<Delivery> {
+  return fetchJson(`${API_BASE}/delivery/${id}`);
+}
+
+export function getDeliveryAddresses(id: string | number): Promise<DeliveryAddress[]> {
+  return fetchJson(`${API_BASE}/delivery-addresses/${id}`);
+}
+
+export function createDelivery(
+  slug: string,
+  event_ids: string,
+  card_title: string,
+  card_text: string,
+  page_title: string,
+  page_text: string,
+  metadata_title: string,
+  metadata_description: string,
+  image: string,
+  page_title_image: string,
+  addresses: any[],
+): Promise<Delivery> {
+  return secureFetch(`${API_BASE}/deliveries`, {
+    method: 'POST',
+    body: JSON.stringify({
+      slug,
+      event_ids,
+      card_title,
+      card_text,
+      page_title,
+      page_text,
+      metadata_title,
+      metadata_description,
+      image,
+      page_title_image,
+      addresses,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export function updateDelivery(
+  id: number,
+  slug: string,
+  card_title: string,
+  card_text: string,
+  page_title: string,
+  page_text: string,
+  metadata_title: string,
+  metadata_description: string,
+  image: string,
+  page_title_image: string,
+  active: boolean,
+): Promise<Delivery> {
+  return secureFetch(`${API_BASE}/deliveries/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      slug,
+      card_title,
+      card_text,
+      page_title,
+      page_text,
+      metadata_title,
+      metadata_description,
+      image,
+      page_title_image,
+      active,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
