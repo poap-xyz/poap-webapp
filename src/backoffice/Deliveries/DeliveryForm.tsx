@@ -264,8 +264,7 @@ const DeliveryForm: FC<RouteComponentProps> = (props) => {
         }}
       >
         {({ values, errors, isSubmitting, setFieldValue }) => {
-          const addressPlaceholder = `address/ENS;id1,id2,id3
-address/ENS`;
+          const addressPlaceholder = `address/ENS;id1,id2,id3   or   address/ENS (for all events)`;
 
           return (
             <Form className={'delivery-admin-form'}>
