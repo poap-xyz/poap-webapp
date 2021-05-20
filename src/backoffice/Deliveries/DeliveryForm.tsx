@@ -274,7 +274,7 @@ address/ENS`;
               <div>
                 <h3>General Info</h3>
                 <div className={'col-xs-6'}>
-                  <EventField title="Event IDs" disabled={isEdition} name="event_ids" />
+                  <EventField title="Event IDs" disabled={isEdition} placeholder={'id1,id2,id3'} name="event_ids" />
                 </div>
                 <div className={'col-xs-6'}>
                   <EventField title="Delivery URL" name="slug" />

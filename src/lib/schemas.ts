@@ -224,7 +224,7 @@ const DeliverySchema = yup.object().shape({
   metadata_description: yup.string().required('Metadata description is required'),
   image: yup.string().required('An image URL is required'),
   page_title_image: yup.string(),
-  event_ids: yup.string().required(),
+  event_ids: yup.string().required('Event IDs comma separated'),
 });
 
 export {

@@ -1110,7 +1110,8 @@
 }
 
 .delivery-admin-form {
-
+  display: flex;
+  flex-direction: column;
   h3 {
     margin: 0;
     font-size: 1.5rem;
