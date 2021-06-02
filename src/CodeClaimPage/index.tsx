@@ -43,17 +43,19 @@ export const CodeClaimPage: React.FC<RouteComponentProps<{ hash: string }>> = ({
     }
   }, [claim]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
-  const fetchClaim = (hash: string) => {
+  const fetchClaim = async (hash: string): Promise<null | HashClaim> => {
     setIsClaimLoading(true);
-    getClaimHash(hash.toLowerCase())
-      .then((claim) => {
-        setClaim(claim);
-        setClaimError(false);
-      })
-      .catch((error) => {
-        setClaimError(true);
-      })
-      .finally(() => setIsClaimLoading(false));
+    try {
+      const _claim = await getClaimHash(hash.toLowerCase());
+      setClaim(_claim);
+      setClaimError(false);
+      setIsClaimLoading(false);
+      return _claim;
+    } catch (e) {
+      setClaimError(true);
+      setIsClaimLoading(false);
+    }
+    return null;
   };
 
   const checkUserTokens = () => {
@@ -93,7 +95,7 @@ export const CodeClaimPage: React.FC<RouteComponentProps<{ hash: string }>> = ({
 
   /* Render component */
   const claimedWithEmail = !!(claim && claim.claimed && claim.user_input && isValidEmail(claim.user_input));
-  let body = <QRHashForm loading={isClaimLoading} checkClaim={fetchClaim} error={claimError} />;
+  let body = <QRHashForm loading={isClaimLoading} checkClaim={fetchClaim} error={claimError} qrHash={hash || ''} />;
 
   if (claim && claim.event.image_url) {
     image = claim.event.image_url;

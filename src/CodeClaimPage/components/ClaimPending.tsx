@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 /* Helpers */
 import { HashClaim } from '../../api';
-import { blockscoutLinks } from '../../lib/constants';
+import { blockscoutLinks, TX_STATUS } from '../../lib/constants';
 
 /* Components */
 import ClaimFooterMessage from './ClaimFooterMessage';
@@ -14,12 +14,18 @@ import Spinner from 'images/etherscan-spinner.svg';
 /*
  * @dev: Component to show user that transactions is being mined
  * */
-const ClaimPending: React.FC<{ claim: HashClaim; checkClaim: (hash: string) => void }> = ({ claim, checkClaim }) => {
+const ClaimPending: React.FC<{ claim: HashClaim; checkClaim: (hash: string) => Promise<null | HashClaim> }> = ({
+  claim,
+  checkClaim,
+}) => {
+  const checkLoop = async () => {
+    const result = await checkClaim(claim.qr_hash);
+    if (!result || result.tx_status === '' || result.tx_status === TX_STATUS.pending) {
+      setTimeout(checkLoop, 5000);
+    }
+  };
   useEffect(() => {
-    const interval = setInterval(() => {
-      checkClaim(claim.qr_hash);
-    }, 5000);
-    return () => clearInterval(interval);
+    checkLoop();
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   return (

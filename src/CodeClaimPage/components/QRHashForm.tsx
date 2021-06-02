@@ -10,6 +10,7 @@ import { ClaimHashSchema } from 'lib/schemas';
 import ClaimFooterMessage from './ClaimFooterMessage';
 import { SubmitButton } from 'components/SubmitButton';
 
+import { HashClaim } from '../../api';
 type HashFormValues = {
   hash: string;
 };
@@ -20,8 +21,9 @@ type HashFormValues = {
 const QRHashForm: React.FC<{
   error: boolean;
   loading: boolean;
-  checkClaim: (hash: string) => void;
-}> = ({ error, loading, checkClaim }) => {
+  checkClaim: (hash: string) => Promise<null | HashClaim>;
+  qrHash: string;
+}> = ({ error, loading, checkClaim, qrHash }) => {
   const handleForm = (values: HashFormValues) => {
     checkClaim(values.hash);
   };
@@ -32,7 +34,7 @@ const QRHashForm: React.FC<{
         <Formik
           enableReinitialize
           onSubmit={handleForm}
-          initialValues={{ hash: '' }}
+          initialValues={{ hash: qrHash }}
           validationSchema={ClaimHashSchema}
         >
           {({ dirty, isValid }) => {
