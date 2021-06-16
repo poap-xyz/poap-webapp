@@ -60,11 +60,11 @@ router.get('/', async (req, res) => {
       res.write(`
       <!doctype html>
       <head>
-            <title>POAP Gallery</title>
+            <title>POAP Scan</title>
             <meta name="title" content="${event.name}">
             <meta name="description" content="${event.description}">
             <meta property="og:type" content="article">
-            <meta property="og:site_name" content="POAP Gallery">
+            <meta property="og:site_name" content="POAP Scan">
             <meta property="og:title" content="${event.name}">
             <meta property="og:description" content="${event.description}">
             <meta property="og:image" content="${event.image_url}">
