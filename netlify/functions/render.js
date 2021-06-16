@@ -41,7 +41,7 @@ function dectectBot(userAgent) {
 
 const getToken = async (id) => {
   try {
-    return await axios.get('https://api.poap.xyz/token/348214' + id);
+    return await axios.get('https://api.poap.xyz/token/' + id);
   } catch (error) {
     console.error(error);
   }
