@@ -1,5 +1,5 @@
 [[redirects]]
-  from = "/event/*"
+  from = "/token/*"
   to = "https://poap-webapp-prerender.netlify.app/.netlify/functions/render/:route"
   status = 200
   force = true
