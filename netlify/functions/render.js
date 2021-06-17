@@ -50,9 +50,9 @@ const getToken = async (id) => {
 const router = express.Router();
 router.get('/', async (req, res) => {
   const isBot = dectectBot(req.headers['user-agent']);
-  const tokenId = req.baseUrl.split('/')[2];
+  const token = req.baseUrl.split('/')[2];
   if (isBot) {
-    const response = await getToken(tokenId);
+    const response = await getToken(token);
     const { data } = response;
     const { event, tokenId } = data;
     if (event) {
@@ -92,7 +92,7 @@ router.get('/', async (req, res) => {
       res.redirect('http://' + req.hostname);
     }
   } else {
-    res.redirect('http://' + req.hostname + '/r/token/' + tokenId);
+    res.redirect('http://' + req.hostname + '/r/token/' + token);
   }
 });
 app.use(
