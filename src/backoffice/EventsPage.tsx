@@ -55,6 +55,7 @@ type EventEditValues = {
   country: string;
   event_url: string;
   event_template_id: number;
+  requested_codes?: number;
   image?: Blob;
   isFile: boolean;
   secret_code: string;
@@ -199,6 +200,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         end_date: '',
         city: '',
         event_template_id: 0,
+        requested_codes: 1,
         country: '',
         event_url: '',
         image: new Blob(),
@@ -451,6 +453,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   <img alt={event.image_url} className={'image-edit'} src={event.image_url} />
                 </div>
               )}
+              <EventField title="Amount of codes" type="number" name="requested_codes" />
               <SubmitButton text="Save" isSubmitting={isSubmitting} canSubmit={true} />
             </Form>
           );

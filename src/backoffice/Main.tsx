@@ -141,6 +141,12 @@ const Landing = () => {
           <img className={'icon'} src={Qr} alt={'Manage QR Codes'} />
         </Link>
       )}
+      {isAdmin && (
+        <Link to={ROUTES.qr.path} className={'card card-link'}>
+          <h3>Manage QR Requests</h3>
+          <img className={'icon'} src={Qr} alt={'Manage QR Codes'} />
+        </Link>
+      )}
     </div>
   );
 };
