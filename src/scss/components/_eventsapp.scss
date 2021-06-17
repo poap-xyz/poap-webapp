@@ -809,6 +809,10 @@
   .title-container {
     flex: 1;
 
+    @media (max-width: $bp-m) {
+      text-align: center;
+    }
+
     img {
       border-radius: 4px;
       height: 40px;
@@ -821,6 +825,9 @@
   .header-link-container {
     a {
       font-size: 24px;
+    }
+    @media (max-width: $bp-m) {
+      display: none;
     }
   }
 }
