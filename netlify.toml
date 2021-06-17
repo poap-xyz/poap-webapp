@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "/token/*"
+  to = "https://poap-webapp-prerender.netlify.app/.netlify/functions/render/:route"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false

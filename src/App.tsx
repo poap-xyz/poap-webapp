@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 
 import { ROUTES } from './lib/constants';
 import { AuthProvider, AuthService } from './auth';
@@ -17,6 +17,9 @@ const App: React.FC<AppProps> = ({ auth }) => (
   <AuthProvider value={auth}>
     <Router>
       <Switch>
+        {/* Render redirects */}
+        <Redirect from={ROUTES.renderToken} to={ROUTES.token} />
+        
         {/* Backoffice */}
         <Route exact path={ROUTES.callback} component={Callback} />
         <Route exact path={ROUTES.adminLogin.path} component={AdminLoginPage} />
