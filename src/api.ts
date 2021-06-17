@@ -18,6 +18,7 @@ export interface TokenInfo {
   event: PoapEvent;
   ownerText?: string;
   layer: string;
+  ens?: any
 }
 
 export type QrCodesListAssignResponse = {
