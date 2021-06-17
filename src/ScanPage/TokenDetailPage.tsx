@@ -145,7 +145,6 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
   useEffect(() => {
     const fn = async () => {
       const token = await getTokenInfoWithENS(match.params.tokenId);
-      console.log(token);
       setToken(token);
     };
     fn();
