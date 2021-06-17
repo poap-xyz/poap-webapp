@@ -245,8 +245,16 @@
         margin-bottom: 20px;
         max-width: none;
 
+        &.ens {
+          @include x-rem(font-size, 22px);
+        }
+
         @media (min-width: $bp-m) {
           @include x-rem(font-size, 19px);
+
+          &.ens {
+            @include x-rem(font-size, 24px);
+          }
         }
       }
 

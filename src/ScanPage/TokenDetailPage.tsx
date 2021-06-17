@@ -17,7 +17,7 @@ import {
 
 // Helpers
 import { connectWallet, NETWORK } from '../poap-eth';
-import { getTokenInfo, postTokenMigration, TokenInfo } from '../api';
+import { getTokenInfoWithENS, postTokenMigration, TokenInfo } from '../api';
 
 // constants
 import { LAYERS } from '../lib/constants';
@@ -144,7 +144,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
 
   useEffect(() => {
     const fn = async () => {
-      const token = await getTokenInfo(match.params.tokenId);
+      const token = await getTokenInfoWithENS(match.params.tokenId);
       setToken(token);
     };
     fn();
@@ -178,7 +178,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
           <div className="main-content">
             <div className="container">
               <div className="content-event">
-                <h2>Owner</h2>
+                <h2>Collection</h2>
               </div>
             </div>
           </div>
@@ -187,7 +187,12 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
     );
   }
 
-  const { event, owner, layer } = token;
+  const { event, owner, layer, ens } = token;
+  let address = owner;
+
+  if (ens && ens.valid) {
+    address = ens.ens;
+  }
 
   return (
     <>
@@ -217,9 +222,9 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
         <div className="main-content">
           <div className="container claim-info">
             <div className="content-event">
-              <h2>Owner</h2>
-              <p className="wallet-number">
-                <Link to={`/scan/${owner}`}>{owner}</Link>
+              <h2>Collection</h2>
+              <p className={`wallet-number ${(ens && ens.valid) ? "ens":""}`}>
+                <Link to={`/scan/${address}`}>{address}</Link>
               </p>
               <h2>Brog on the interwebz</h2>
               <ul className="social-icons">
