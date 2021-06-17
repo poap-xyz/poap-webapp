@@ -42,3 +42,44 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+## How to run with functions localy
+### Link to configuration of Netlify
+* https://docs.netlify.com/cli/get-started/#get-started-with-netlify-dev
+
+
+### Files to change before to start running locally 
+#### netlify.toml
+From this
+```
+[[redirects]]
+  from = "/token/*"
+  to = "https://gallery-prerender.netlify.app/.netlify/functions/render/:route"
+  status = 200
+  force = true
+```
+To this
+```
+[[redirects]]
+  from = "/token/*"
+  to = "/.netlify/functions/render/:route"
+  status = 200
+  force = true
+```
+
+#### render.js
+From this
+```
+const eventId = req.baseUrl.split('/')[2];
+```
+To this
+```
+const eventId = req.baseUrl.split('/')[4]
+```
+### Commands to run
+```
+npm install netlify-cli -g
+netlify init
+netlify dev
+```
