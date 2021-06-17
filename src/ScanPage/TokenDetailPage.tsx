@@ -191,7 +191,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
   const { event, owner, layer, ens } = token;
   let address = owner;
 
-  if (ens.valid) {
+  if (ens && ens.valid) {
     address = ens.ens;
   }
 
@@ -224,7 +224,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
           <div className="container claim-info">
             <div className="content-event">
               <h2>Collection</h2>
-              <p className="wallet-number">
+              <p className={`wallet-number ${(ens && ens.valid) ? "ens":""}`}>
                 <Link to={`/scan/${address}`}>{address}</Link>
               </p>
               <h2>Brog on the interwebz</h2>
