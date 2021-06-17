@@ -54,13 +54,13 @@ router.get('/', async (req, res) => {
   if (isBot) {
     const response = await getToken(tokenId);
     const { data } = response;
-    const { event } = data;
+    const { event, tokenId } = data;
     if (event) {
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.write(`
       <!doctype html>
       <head>
-            <title>POAP Scan</title>
+            <title>POAP #${tokenId}</title>
             <meta name="title" content="${event.name}">
             <meta name="description" content="${event.description}">
             <meta property="og:type" content="article">
