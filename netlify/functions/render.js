@@ -64,7 +64,7 @@ router.get('/', async (req, res) => {
             <meta name="title" content="${event.name}">
             <meta name="description" content="${event.description}">
             <meta property="og:type" content="article">
-            <meta property="og:site_name" content="POAP Scan">
+            <meta property="og:site_name" content="POAP #${tokenId}">
             <meta property="og:title" content="${event.name}">
             <meta property="og:description" content="${event.description}">
             <meta property="og:image" content="${event.image_url}">
