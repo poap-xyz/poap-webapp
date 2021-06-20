@@ -222,6 +222,16 @@ const ClaimForm: React.FC<{
     </div>
   );
 
+  if (claim?.event && claim.event.expiry_date) {
+    if (new Date(claim.event.expiry_date) < new Date()) {
+      return (
+        <div className={'container claim-info'} data-aos="fade-up" data-aos-delay="300">
+          This POAP can’t be minted because it’s been too long since the event finished
+        </div>
+      );
+    }
+  }
+
   return (
     <div className={'container claim-info'} data-aos="fade-up" data-aos-delay="300">
       <div>
