@@ -41,7 +41,7 @@ export interface PoapEvent {
   year: number;
   start_date: string;
   end_date: string;
-  expiry_date?: string | null;
+  expiry_date: string;
   virtual_event: boolean;
 }
 export interface PoapFullEvent extends PoapEvent {

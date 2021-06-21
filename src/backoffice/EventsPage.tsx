@@ -51,6 +51,7 @@ type EventEditValues = {
   description: string;
   start_date: string;
   end_date: string;
+  expiry_date: string;
   city: string;
   country: string;
   event_url: string;
@@ -61,7 +62,7 @@ type EventEditValues = {
   email: string;
 };
 
-type DatePickerDay = 'start_date' | 'end_date';
+type DatePickerDay = 'start_date' | 'end_date' | 'expiry_date';
 
 type SetFieldValue = (field: string, value: any) => void;
 
@@ -178,11 +179,12 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const initialValues = useMemo(() => {
     if (event) {
-      let { virtual_event, secret_code, start_date, end_date, ...eventKeys } = event;
+      let { virtual_event, secret_code, start_date, end_date, expiry_date, ...eventKeys } = event;
       return {
         ...eventKeys,
         start_date: start_date.replace(dateRegex, '-'),
         end_date: end_date.replace(dateRegex, '-'),
+        expiry_date: expiry_date.replace(dateRegex, '-'),
         isFile: false,
         secret_code: secret_code ? secret_code.toString().padStart(6, '0') : '',
         email: '',
@@ -197,6 +199,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         description: '',
         start_date: '',
         end_date: '',
+        expiry_date: '',
         city: '',
         event_template_id: 0,
         country: '',
@@ -235,6 +238,18 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     }
   };
 
+  const setExpiryDateValue = (expiry_date: string, end_date: string): Date | string => {
+    if (expiry_date !== '' && new Date(expiry_date) > new Date(end_date)) {
+      return format(new Date(dateFormatterString(expiry_date)), 'yyyy-MM-dd');
+    }
+    if (end_date !== '') {
+      const new_expiry_date = new Date(end_date);
+      new_expiry_date.setMonth(new_expiry_date.getMonth() + 1);
+      return format(new_expiry_date, 'yyyy-MM-dd');
+    }
+    return '';
+  };
+
   const day = 60 * 60 * 24 * 1000;
 
   const warning = (
@@ -269,7 +284,6 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   };
 
   const templateSelectOptions = templateOptions ? parseTemplateToOptions(templateOptions) : [];
-
   return (
     <div className={'bk-container'}>
       <Formik
@@ -402,6 +416,23 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                       ? {
                           from: veryOldDate,
                           to: new Date(dateFormatterString(values.start_date).getTime()),
+                        }
+                      : undefined
+                  }
+                />
+                <DayPickerContainer
+                  text="Expiry Date"
+                  dayToSetup="expiry_date"
+                  handleDayClick={handleDayClick}
+                  setFieldValue={setFieldValue}
+                  placeholder={values.expiry_date}
+                  value={setExpiryDateValue(values.expiry_date, values.end_date)}
+                  disabled={!values.end_date}
+                  disabledDays={
+                    values.end_date !== ''
+                      ? {
+                          from: veryOldDate,
+                          to: new Date(dateFormatterString(values.end_date).getTime()),
                         }
                       : undefined
                   }
