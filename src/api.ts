@@ -341,6 +341,10 @@ export async function getEvents(): Promise<PoapEvent[]> {
   return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/events`) : fetchJson(`${API_BASE}/events`);
 }
 
+export async function getQrRequests(): Promise<PoapEvent[]> {
+  return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests`) : fetchJson(`${API_BASE}/qr-requests`);
+}
+
 export type TemplateResponse = TemplatesResponse<Template>;
 
 export async function getTemplates({ limit = 10, offset = 0, name = '' }: Params = {}): Promise<TemplateResponse> {

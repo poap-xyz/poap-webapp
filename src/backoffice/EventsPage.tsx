@@ -200,7 +200,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         end_date: '',
         city: '',
         event_template_id: 0,
-        requested_codes: 1,
+        requested_codes: 0,
         country: '',
         event_url: '',
         image: new Blob(),
@@ -453,7 +453,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   <img alt={event.image_url} className={'image-edit'} src={event.image_url} />
                 </div>
               )}
-              <EventField title="Amount of codes" type="number" name="requested_codes" />
+              <EventField title="Amount of codes" type="number" name="requested_codes"/>
               <SubmitButton text="Save" isSubmitting={isSubmitting} canSubmit={true} />
             </Form>
           );

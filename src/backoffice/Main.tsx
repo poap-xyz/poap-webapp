@@ -20,6 +20,7 @@ import { IssueForEventPage, IssueForUserPage } from './IssuePage';
 import { AddressManagementPage } from './AddressManagementPage';
 import { TransactionsPage } from './TransactionsPage';
 import { QrPage } from './QrPage';
+import { QrRequest } from './QrRequest';
 import { EventsPage } from './EventsPage';
 import { TemplatePage } from './templates/TemplatePage';
 import { TemplateFormPage } from './templates/TemplateFormPage';
@@ -108,6 +109,8 @@ export const NavigationMenu = withRouter(({ history }) => {
 
       <SidebarLink route={ROUTES.qr} handleClick={closeMenu} />
 
+      {isAdmin && <SidebarLink route={ROUTES.qrRequest} handleClick={closeMenu} />}
+
       <SidebarLink route={ROUTES.template} handleClick={closeMenu} />
 
       {!isAdmin && <SidebarLink route={ROUTES.adminLogin} handleClick={closeMenu} />}
@@ -136,16 +139,16 @@ const Landing = () => {
         <img className={'icon'} src={Calendar} alt={'Manage Events'} />
       </Link>
       {isAdmin && (
-        <Link to={ROUTES.qr.path} className={'card card-link'}>
-          <h3>Manage QR Codes</h3>
-          <img className={'icon'} src={Qr} alt={'Manage QR Codes'} />
-        </Link>
-      )}
-      {isAdmin && (
-        <Link to={ROUTES.qr.path} className={'card card-link'}>
-          <h3>Manage QR Requests</h3>
-          <img className={'icon'} src={Qr} alt={'Manage QR Codes'} />
-        </Link>
+        <>
+          <Link to={ROUTES.qr.path} className={'card card-link'}>
+            <h3>Manage QR Codes</h3>
+            <img className={'icon'} src={Qr} alt={'Manage QR Codes'} />
+          </Link>
+          <Link to={ROUTES.qrRequest.path} className={'card card-link'}>
+            <h3>Manage QR Requests</h3>
+            <img className={'icon'} src={Qr} alt={'Manage QR Requests'} />
+          </Link>
+        </>
       )}
     </div>
   );
@@ -178,6 +181,8 @@ export const BackOffice: React.FC = () => (
       <div className="container">
         <Switch>
           <Route exact path={ROUTES.qr.path} render={() => <QrPage />} />
+
+          <Route exact path={ROUTES.qrRequest.path} render={() => <QrRequest />} />
 
           <Route path={ROUTES.events.path} render={() => <EventsPage />} />
 
