@@ -136,6 +136,7 @@ const PoapEventSchema = yup.object().shape({
   description: yup.string(),
   start_date: yup.string().required('The start date is required'),
   end_date: yup.string().required('The end date is required'),
+  expiry_date: yup.string().required('The end date is required'),
   city: yup.string(),
   country: yup.string(),
   event_url: yup.string().url(),
