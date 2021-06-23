@@ -29,6 +29,7 @@ import {
   qrCodesListAssign,
   qrCreateMassive,
   generateRandomCodes,
+  QrRequest
 } from '../api';
 
 // lib
@@ -99,7 +100,7 @@ type LinkCreationModalFormikValues = {
   amount: number;
 };
 
-const QrRequest: FC = () => {
+const QrRequests: FC = () => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [total, setTotal] = useState<number>(0);
@@ -118,6 +119,7 @@ const QrRequest: FC = () => {
   const [isAuthenticationModalOpen, setIsAuthenticationModalOpen] = useState<boolean>(true);
   const [isCreationModalOpen, setIsCreationModalOpen] = useState<boolean>(false);
   const [isLinkCreationModalOpen, setIsLinkCreationModalOpen] = useState<boolean>(false);
+  const [qrRequests, setQrRequests] = useState<null | QrRequest[]>(null);
 
   const { addToast } = useToasts();
 
@@ -126,16 +128,11 @@ const QrRequest: FC = () => {
   useEffect(() => {
     fetchQrRequests();
     setInitialFetch(false);
-
-    if (isAdmin) {
-      setIsAuthenticationModalOpen(false);
-      fetchQrCodes();
-    }
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   useEffect(() => {
     if (!initialFetch) {
-      fetchQrCodes();
+      fetchQrRequests();
       setCheckedAllQrs(false);
     }
   }, [page]); /* eslint-disable-line react-hooks/exhaustive-deps */
@@ -144,7 +141,7 @@ const QrRequest: FC = () => {
     if (!initialFetch) {
       cleanQrSelection();
       setPage(0);
-      fetchQrCodes();
+      fetchQrRequests();
       setCheckedAllQrs(false);
     }
   }, [selectedEvent, claimStatus, claimScanned, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
@@ -153,42 +150,10 @@ const QrRequest: FC = () => {
 
   const fetchQrRequests = async () => {
     const events = await getQrRequests();
-    
-    if (false) {
-      setEvents(events);
-    } else {
-      const eventsForCommunity = events.filter((event) => !event.from_admin);
-
-      setEvents(eventsForCommunity);
-    }
-  };
-
-  const fetchQrCodes = async () => {
-    setIsFetchingQrCodes(true);
-
-    let event_id = undefined;
-    if (selectedEvent !== undefined) event_id = selectedEvent > -1 ? selectedEvent : undefined;
-
-    let _status = undefined;
-    let _scanned = undefined;
-
-    if (claimStatus) _status = claimStatus === 'claimed';
-    if (claimScanned) _scanned = claimScanned === 'true';
-
-    try {
-      const response = await getQrCodes(limit, page * limit, passphrase, _status, _scanned, event_id);
-      setQrCodes(response.qr_claims);
-      setTotal(response.total);
-      setIsAuthenticationModalOpen(false);
-    } catch (e) {
-      addToast(e.message, {
-        appearance: 'error',
-        autoDismiss: false,
-      });
-      setPassphraseError(true);
-    } finally {
-      setIsFetchingQrCodes(false);
-    }
+    console.log(events)
+    const { qr_requests } = events
+    setQrRequests(qr_requests)
+    setIsFetchingQrCodes(false)
   };
 
   const handleSelectChange = (option: OptionTypeBase): void => {
@@ -282,57 +247,12 @@ const QrRequest: FC = () => {
           </div>
         </div>
         <ReactModal
-          isOpen={isUpdateModalOpen}
-          onRequestClose={handleUpdateModalRequestClose}
-          shouldFocusAfterRender={true}
-          shouldCloseOnOverlayClick={true}
-          shouldCloseOnEsc={true}
-          style={{ content: { overflow: 'visible' } }}
-        >
-          <UpdateModal
-            handleUpdateModalClosing={handleUpdateModalRequestClose}
-            selectedQrs={selectedQrs}
-            refreshQrs={fetchQrCodes}
-            onSuccessAction={cleanQrSelection}
-            passphrase={passphrase}
-            events={eventOptions}
-          />
-        </ReactModal>
-        <ReactModal
-          isOpen={isAuthenticationModalOpen}
+          isOpen={false}
           shouldFocusAfterRender={true}
           shouldCloseOnEsc={false}
           shouldCloseOnOverlayClick={false}
         >
           <AuthenticationModal setPassphrase={setPassphrase} passphraseError={passphraseError} />
-        </ReactModal>
-        <ReactModal
-          isOpen={isCreationModalOpen}
-          onRequestClose={handleCreationModalRequestClose}
-          shouldFocusAfterRender={true}
-          shouldCloseOnEsc={true}
-          shouldCloseOnOverlayClick={true}
-          style={{ content: { overflow: 'visible' } }}
-        >
-          <CreationModal
-            events={eventOptions}
-            refreshQrs={fetchQrCodes}
-            handleModalClose={handleCreationModalRequestClose}
-          />
-        </ReactModal>
-        <ReactModal
-          isOpen={isLinkCreationModalOpen}
-          onRequestClose={handleLinkCreationClose}
-          shouldFocusAfterRender={true}
-          shouldCloseOnEsc={true}
-          shouldCloseOnOverlayClick={true}
-          style={{ content: { overflow: 'visible' } }}
-        >
-          <LinkCreationModal
-            events={eventOptions}
-            refreshQrs={fetchQrCodes}
-            handleModalClose={handleLinkCreationClose}
-          />
         </ReactModal>
       </div>
       <div className={'secondary-filters'}>
@@ -348,40 +268,28 @@ const QrRequest: FC = () => {
 
       {isFetchingQrCodes && <Loading />}
 
-      {qrCodes && qrCodes.length !== 0 && !isFetchingQrCodes && (
+      {qrRequests && qrRequests.length !== 0 && !isFetchingQrCodes && (
         <div className={'qr-table-section'}>
           <div className={'row table-header visible-md'}>
-            <div className={'col-md-1 center'}>
-              {isAdmin ? <input type="checkbox" onChange={handleQrCheckboxChangeAll} checked={checkedAllQrs} /> : '-'}
-            </div>
             <div className={'col-md-1'}>ID</div>
-            <div className={'col-md-3'}>Evento</div>
-            <div className={'col-md-1 center'}>Mail</div>
-            <div className={'col-md-1 center'}>Start Date</div>
-            <div className={'col-md-1 center'}>Code amount</div>
+            <div className={'col-md-3'}>Event</div>
+            <div className={'col-md-2'}>Mail</div>
+            <div className={'col-md-2'}>Start Date</div>
+            <div className={'col-md-2'}>Code amount</div>
           </div>
           <div className={'admin-table-row qr-table'}>
-            {qrCodes.map((qr, i) => {
+            {qrRequests && qrRequests.map((qr, i) => {
               return (
                 <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={qr.id}>
-                  <div className={'col-md-1 center checkbox'}>
-                    {!qr.claimed && (
-                      <input
-                        type="checkbox"
-                        disabled={qr.claimed}
-                        onChange={handleQrCheckboxChange}
-                        checked={selectedQrs.includes(String(qr.id))}
-                        id={String(qr.id)}
-                      />
-                    )}
+
+                  <div className={'col-md-1 col-xs-4 start status'}>
+                    <span className={'visible-sm'}>ID: </span>
+                    <a href={'https://app.poap.xyz/admin/events/' + qr.event.id} target="_blank" rel="noopener noreferrer">
+                        {qr.event.id}
+                    </a>
                   </div>
 
-                  <div className={'col-md-1 col-xs-12'}>
-                    <span className={'visible-sm'}>QR Hash: </span>
-                    {qr.qr_hash}
-                  </div>
-
-                  <div className={'col-md-3 ellipsis col-xs-12 event-name'}>
+                  <div className={'co l-md-3 ellipsis col-xs-12 event-name'}>
                     <span className={'visible-sm'}>Event: </span>
                     {(!qr.event || !qr.event.name) && <span>-</span>}
 
@@ -396,54 +304,21 @@ const QrRequest: FC = () => {
                     )}
                   </div>
 
-                  <div className={'col-md-1 col-xs-4 center status'}>
-                    <span className={'visible-sm'}>Web3: </span>
-                    {qr.delegated_mint && (
-                      <>
-                        <img src={checked} alt={'Web3 claim'} className={'status-icon'} />
-                      </>
-                    )}
+                  <div className={'col-md-2 col-xs-12'}>
+                    <span className={'visible-sm'}>Mail: </span>
+                    {qr.event.start_date}
                   </div>
 
-                  <div className={'col-md-1 col-xs-4 center status'}>
-                    <span className={'visible-sm'}>Status: </span>
-                    <img
-                      src={qr.claimed ? checked : error}
-                      alt={qr.event && qr.event.name ? `${qr.event.name} status` : 'qr status'}
-                      className={'status-icon'}
-                    />
+
+
+                  <div className={'col-md-2 col-xs-4 status'}>
+                    <span className={'visible-sm'}>Start Date: </span>
+                    {qr.event.start_date}
                   </div>
 
-                  <div className={'col-md-1 col-xs-4 center'}>
-                    <span className={'visible-sm'}>Scanned: </span>
-                    <img
-                      src={qr.scanned ? checked : error}
-                      alt={qr.scanned ? `QR Scanned` : 'QR not scanned'}
-                      className={'status-icon'}
-                    />
-                  </div>
-
-                  <div className={'col-md-2 col-xs-12 center'}>
-                    <span className={'visible-sm'}>Tx Hash: </span>
-                    <a href={blockscoutLinks.tx(qr.tx_hash)} target={'_blank'}>
-                      {qr.tx_hash && reduceAddress(qr.tx_hash)}
-                    </a>
-                    &nbsp;&nbsp;
-                    {qr.tx_status && <TxStatus status={qr.tx_status} />}
-                  </div>
-
-                  <div className={'col-md-2 col-xs-12 center ellipsis'}>
-                    <span className={'visible-sm'}>Beneficiary: </span>
-                    {qr.beneficiary && (
-                      <a
-                        href={`/scan/${qr.beneficiary}`}
-                        target={'_blank'}
-                        title={qr.user_input ? qr.user_input : qr.beneficiary}
-                      >
-                        {qr.user_input ? qr.user_input : qr.beneficiary}
-                      </a>
-                    )}
-                    {!qr.beneficiary && qr.user_input && <>{qr.user_input}</>}
+                  <div className={'col-md-2 col-xs-4 status'}>
+                    <span className={'visible-sm'}>Code amount: </span>
+                    {qr.requested_codes}
                   </div>
                 </div>
               );
@@ -1087,4 +962,4 @@ const LinkCreationModal: React.FC<CreationModalProps> = ({ handleModalClose, ref
   );
 };
 
-export { QrRequest };
+export { QrRequests };

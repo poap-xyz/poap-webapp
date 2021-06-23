@@ -20,7 +20,7 @@ import { IssueForEventPage, IssueForUserPage } from './IssuePage';
 import { AddressManagementPage } from './AddressManagementPage';
 import { TransactionsPage } from './TransactionsPage';
 import { QrPage } from './QrPage';
-import { QrRequest } from './QrRequest';
+import { QrRequests } from './QrRequests';
 import { EventsPage } from './EventsPage';
 import { TemplatePage } from './templates/TemplatePage';
 import { TemplateFormPage } from './templates/TemplateFormPage';
@@ -182,7 +182,7 @@ export const BackOffice: React.FC = () => (
         <Switch>
           <Route exact path={ROUTES.qr.path} render={() => <QrPage />} />
 
-          <Route exact path={ROUTES.qrRequest.path} render={() => <QrRequest />} />
+          <Route exact path={ROUTES.qrRequest.path} render={() => <QrRequests />} />
 
           <Route path={ROUTES.events.path} render={() => <EventsPage />} />
 

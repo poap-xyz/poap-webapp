@@ -43,6 +43,17 @@ export interface PoapEvent {
   end_date: string;
   virtual_event: boolean;
 }
+export interface QrRequest {
+  event: PoapEvent;
+  accepted_codes: number;
+  created_date: string;
+  event_id: number;
+  id: number;
+  requested_codes: number;
+  reviewed: boolean;
+  reviewed_by: string;
+  reviewed_date: string;
+}
 export interface PoapFullEvent extends PoapEvent {
   secret_code?: number;
   email?: string;
@@ -228,6 +239,13 @@ export type PaginatedQrCodes = {
   qr_claims: QrCode[];
 };
 
+export type PaginatedQrRequest = {
+  limit: number;
+  offset: number;
+  total: number;
+  qr_requests: QrRequest[];
+};
+
 export type ENSQueryResult = { valid: false } | { valid: true; ens: string };
 
 export type AddressQueryResult = { valid: false } | { valid: true; ens: string };
@@ -341,7 +359,7 @@ export async function getEvents(): Promise<PoapEvent[]> {
   return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/events`) : fetchJson(`${API_BASE}/events`);
 }
 
-export async function getQrRequests(): Promise<PoapEvent[]> {
+export async function getQrRequests(): Promise<PaginatedQrRequest> {
   return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests`) : fetchJson(`${API_BASE}/qr-requests`);
 }
 
