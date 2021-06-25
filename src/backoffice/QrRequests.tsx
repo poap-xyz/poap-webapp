@@ -2,6 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { OptionTypeBase } from 'react-select';
 import { isAfter } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 /* Libraries */
 import ReactPaginate from 'react-paginate';
@@ -15,7 +16,6 @@ import FilterSelect from '../components/FilterSelect';
 import FilterReactSelect from '../components/FilterReactSelect';
 import FilterButton from '../components/FilterButton';
 import FilterChip from '../components/FilterChip';
-import { TxStatus } from '../components/TxStatus';
 
 /* Helpers */
 import {
@@ -33,13 +33,10 @@ import {
 } from '../api';
 
 // lib
-import { reduceAddress } from '../lib/helpers';
-import { blockscoutLinks } from '../lib/constants';
 import { authClient } from '../auth';
 
 /* Assets */
-import checked from '../images/checked.svg';
-import error from '../images/error.svg';
+import { ReactComponent as EditIcon } from 'images/edit.svg';
 
 /* Schemas */
 import {
@@ -107,23 +104,15 @@ const QrRequests: FC = () => {
   const [isFetchingQrCodes, setIsFetchingQrCodes] = useState<null | boolean>(null);
   const [qrCodes, setQrCodes] = useState<null | QrCode[]>(null);
   const [checkedAllQrs, setCheckedAllQrs] = useState<boolean>(false);
-  const [claimStatus, setClaimStatus] = useState<string>('');
-  const [claimScanned, setClaimScanned] = useState<string>('');
+  const [reviewedStatus, setReviewedStatus] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<number | undefined>(undefined);
-  const [events, setEvents] = useState<PoapEvent[]>([]);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
-  const [selectedQrs, setSelectedQrs] = useState<string[]>([]);
   const [initialFetch, setInitialFetch] = useState<boolean>(true);
-  const [passphrase, setPassphrase] = useState<string>('');
-  const [passphraseError, setPassphraseError] = useState<boolean>(false);
-  const [isAuthenticationModalOpen, setIsAuthenticationModalOpen] = useState<boolean>(true);
   const [isCreationModalOpen, setIsCreationModalOpen] = useState<boolean>(false);
   const [isLinkCreationModalOpen, setIsLinkCreationModalOpen] = useState<boolean>(false);
   const [qrRequests, setQrRequests] = useState<null | QrRequest[]>(null);
 
   const { addToast } = useToasts();
-
-  const isAdmin = authClient.isAuthenticated();
 
   useEffect(() => {
     fetchQrRequests();
@@ -139,19 +128,28 @@ const QrRequests: FC = () => {
 
   useEffect(() => {
     if (!initialFetch) {
-      cleanQrSelection();
+      cleanQrRequestSelection();
       setPage(0);
       fetchQrRequests();
-      setCheckedAllQrs(false);
     }
-  }, [selectedEvent, claimStatus, claimScanned, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
+  }, [selectedEvent, reviewedStatus, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
-  const cleanQrSelection = () => setSelectedQrs([]);
+  const cleanQrRequestSelection = () => setQrRequests([]);
 
   const fetchQrRequests = async () => {
-    const events = await getQrRequests();
-    console.log(events)
-    const { qr_requests } = events
+    setIsFetchingQrCodes(true)
+
+    let event_id = undefined;
+    if (selectedEvent !== undefined) event_id = selectedEvent > -1 ? selectedEvent : undefined;
+
+    let _status = undefined;
+
+    if (reviewedStatus) _status = reviewedStatus === 'reviewed';
+
+    const response = await getQrRequests(limit, page * limit,_status,event_id);
+    const { qr_requests, total } = response
+
+    setTotal(total);
     setQrRequests(qr_requests)
     setIsFetchingQrCodes(false)
   };
@@ -162,45 +160,11 @@ const QrRequests: FC = () => {
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { value } = e.target;
-    setClaimStatus(value);
-  };
-
-  const handleScannedChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
-    const { value } = e.target;
-    setClaimScanned(value);
+    setReviewedStatus(value);
   };
 
   const handlePageChange = (obj: PaginateAction) => {
     setPage(obj.selected);
-  };
-
-  const handleQrCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { id } = e.target;
-    const stringifiedId = String(id);
-
-    return selectedQrs.includes(stringifiedId)
-      ? setSelectedQrs((selectedQrs) => selectedQrs.filter((qrId: string) => qrId !== stringifiedId))
-      : setSelectedQrs((selectedQrs) => [...selectedQrs, stringifiedId]);
-  };
-
-  const handleQrCheckboxChangeAll = () => {
-    if (qrCodes && qrCodes.length > 0) {
-      const unclaimedCodes = qrCodes.filter((code) => !code.claimed);
-      let newSelectedQrs = [...selectedQrs];
-      unclaimedCodes.forEach((code) => {
-        const stringifiedId = String(code.id);
-        const included = selectedQrs.includes(stringifiedId);
-        if (!included && !checkedAllQrs) {
-          newSelectedQrs = [...newSelectedQrs, stringifiedId];
-        }
-
-        if (included && checkedAllQrs) {
-          newSelectedQrs = newSelectedQrs.filter((qrId: string) => qrId !== stringifiedId);
-        }
-      });
-      setSelectedQrs(newSelectedQrs);
-      setCheckedAllQrs(!checkedAllQrs);
-    }
   };
 
   const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
@@ -221,8 +185,9 @@ const QrRequests: FC = () => {
   const handleLinkCreationClose = (): void => setIsLinkCreationModalOpen(false);
 
   let eventOptions: eventOptionType[] = [];
-  if (events) {
-    eventOptions = events.map((event) => {
+
+  if (qrRequests) {
+    eventOptions = qrRequests.map(({event}) => {
       const label = `${event.name ? event.name : 'No name'} (${event.fancy_id}) - ${event.year}`;
       return { value: event.id, label: label, start_date: event.start_date };
     });
@@ -246,14 +211,6 @@ const QrRequests: FC = () => {
             </FilterSelect>
           </div>
         </div>
-        <ReactModal
-          isOpen={false}
-          shouldFocusAfterRender={true}
-          shouldCloseOnEsc={false}
-          shouldCloseOnOverlayClick={false}
-        >
-          <AuthenticationModal setPassphrase={setPassphrase} passphraseError={passphraseError} />
-        </ReactModal>
       </div>
       <div className={'secondary-filters'}>
         <div className={'secondary-filters--pagination'}>
@@ -271,11 +228,12 @@ const QrRequests: FC = () => {
       {qrRequests && qrRequests.length !== 0 && !isFetchingQrCodes && (
         <div className={'qr-table-section'}>
           <div className={'row table-header visible-md'}>
-            <div className={'col-md-1'}>ID</div>
+            <div className={'col-md-1'}>#</div>
             <div className={'col-md-3'}>Event</div>
             <div className={'col-md-2'}>Mail</div>
             <div className={'col-md-2'}>Start Date</div>
             <div className={'col-md-2'}>Code amount</div>
+            <div className={'col-md-2'}>Edit</div>
           </div>
           <div className={'admin-table-row qr-table'}>
             {qrRequests && qrRequests.map((qr, i) => {
@@ -283,33 +241,21 @@ const QrRequests: FC = () => {
                 <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={qr.id}>
 
                   <div className={'col-md-1 col-xs-4 start status'}>
-                    <span className={'visible-sm'}>ID: </span>
-                    <a href={'https://app.poap.xyz/admin/events/' + qr.event.id} target="_blank" rel="noopener noreferrer">
-                        {qr.event.id}
-                    </a>
+                    <span className={'visible-sm'}>#: </span>
+                    {qr.id}
                   </div>
 
-                  <div className={'co l-md-3 ellipsis col-xs-12 event-name'}>
+                  <div className={'col-md-3 ellipsis col-xs-12 event-name'}>
                     <span className={'visible-sm'}>Event: </span>
-                    {(!qr.event || !qr.event.name) && <span>-</span>}
-
-                    {qr.event && qr.event.event_url && qr.event.name && (
-                      <a href={qr.event.event_url} title={qr.event.name} target="_blank" rel="noopener noreferrer">
-                        {qr.event.name}
-                      </a>
-                    )}
-
-                    {qr.event && qr.event.name && !qr.event.event_url && (
-                      <span title={qr.event.name}>{qr.event.name}</span>
-                    )}
+                    <Link to={`/admin/events/${qr.event.fancy_id}`} target="_blank" rel="noopener noreferrer">
+                      {qr.event.name}
+                    </Link>
                   </div>
 
                   <div className={'col-md-2 col-xs-12'}>
                     <span className={'visible-sm'}>Mail: </span>
                     {qr.event.start_date}
                   </div>
-
-
 
                   <div className={'col-md-2 col-xs-4 status'}>
                     <span className={'visible-sm'}>Start Date: </span>
@@ -319,6 +265,12 @@ const QrRequests: FC = () => {
                   <div className={'col-md-2 col-xs-4 status'}>
                     <span className={'visible-sm'}>Code amount: </span>
                     {qr.requested_codes}
+                  </div>
+
+                  <div className={'col-md-1 center event-edit-icon-container'}>
+                    <Link to={"/admin/events/"}>
+                      <EditIcon />
+                    </Link>
                   </div>
                 </div>
               );
@@ -491,466 +443,6 @@ const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, refresh
                 </div>
                 <div className="modal-action-buttons-container">
                   <FilterButton text="Cancel" handleClick={handleCreationModalClosing} />
-                  <FilterButton text="Create" handleClick={handleSubmit} />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }}
-    </Formik>
-  );
-};
-
-const AuthenticationModal: React.FC<AuthenticationModalProps> = ({ setPassphrase, passphraseError }) => {
-  const handleAuthenticationModalSubmit = (values: AuthenticationModalFormikValues, props: any) => {
-    setPassphrase(values.passphrase);
-    props.resetForm();
-  };
-
-  return (
-    <Formik
-      initialValues={{
-        passphrase: '',
-      }}
-      validateOnBlur={false}
-      validateOnChange={false}
-      onSubmit={handleAuthenticationModalSubmit}
-    >
-      {({ values, handleChange }) => {
-        return (
-          <Form className="authentication_modal_container">
-            <input
-              className={passphraseError ? 'modal-input-error' : ''}
-              placeholder={passphraseError ? 'The passphrase you entered is incorrect' : 'Passphrase'}
-              name="passphrase"
-              value={values.passphrase}
-              onChange={handleChange}
-            />
-            <button className="filter-base filter-button" type="submit">
-              Submit passphrase
-            </button>
-          </Form>
-        );
-      }}
-    </Formik>
-  );
-};
-
-const UpdateModal: React.FC<UpdateByRangeModalProps> = ({
-  events,
-  selectedQrs,
-  refreshQrs,
-  onSuccessAction,
-  handleUpdateModalClosing,
-  passphrase,
-}) => {
-  const [isSelectionActive, setIsSelectionActive] = useState<boolean>(false);
-  const [isRangeActive, setIsRangeActive] = useState<boolean>(false);
-  const [isListActive, setIsListActive] = useState<boolean>(false);
-  const [selectedEvent, setSelectedEvent] = useState<number | null | 'unassign'>(null);
-  const [incorrectQrHashes, setIncorrectQrHashes] = useState<string[]>([]);
-  const [isSendingHashList, setIsSendingHashList] = useState<boolean>(false);
-  const [qrHashList, setQrHashList] = useState<string[]>([]);
-  const { addToast } = useToasts();
-
-  const isAdmin = authClient.isAuthenticated();
-
-  const hasSelectedQrs = selectedQrs.length > 0;
-  const hasIncorrectHashes = incorrectQrHashes.length > 0;
-
-  useEffect(() => {
-    hasSelectedQrs ? setIsSelectionActive(true) : setIsRangeActive(true);
-  }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
-
-  useEffect(() => {
-    if (isSendingHashList && !hasIncorrectHashes) {
-      assignHashList();
-    }
-    setIsSendingHashList(false);
-  }, [hasIncorrectHashes, isSendingHashList, selectedEvent]); /* eslint-disable-line react-hooks/exhaustive-deps */
-
-  useEffect(() => {
-    if (isListActive) setIsSendingHashList(true);
-  }, [selectedEvent]); /* eslint-disable-line react-hooks/exhaustive-deps */
-
-  const assignHashList = () => {
-    if (isListActive) {
-      if (!hasIncorrectHashes) {
-        const event = selectedEvent === 'unassign' ? null : selectedEvent;
-        qrCodesListAssign(qrHashList, event)
-          .then((res) => {
-            console.log(res);
-            const hasAlreadyClaimedHashes = res.alreadyclaimedQrs.length > 0;
-
-            if (hasAlreadyClaimedHashes) {
-              addToast(
-                `QR hashes list updated correctly but the following list had already been claimed: ${res.alreadyclaimedQrs.join(
-                  ', ',
-                )}`,
-                {
-                  appearance: 'warning',
-                  autoDismiss: false,
-                },
-              );
-            } else {
-              addToast('QR hashes list updated correctly', {
-                appearance: 'success',
-                autoDismiss: true,
-              });
-            }
-
-            onSuccessAction();
-            refreshQrs();
-            handleUpdateModalClosing();
-          })
-          .catch((e) =>
-            addToast(e.message, {
-              appearance: 'error',
-              autoDismiss: false,
-            }),
-          );
-      }
-    }
-  };
-
-  const handleUpdateModalSubmit = (
-    values: UpdateModalFormikValues,
-    actions: FormikActions<UpdateModalFormikValues>,
-  ) => {
-    const { from, to, event, hashesList, isUnassigning } = values;
-
-    if (!isUnassigning && !event) {
-      actions.setErrors({ event: 'Required' });
-      return false;
-    }
-
-    const _event = isUnassigning ? null : event;
-
-    const hashRegex = /^[a-zA-Z0-9]{6}$/;
-    setIncorrectQrHashes([]);
-
-    const _incorrectQrHashes: string[] = [];
-
-    const _hashesList = hashesList
-      .trim()
-      .split('\n')
-      .map((hash) => hash.trim().toLowerCase())
-      .filter((hash) => {
-        if (!hash.match(hashRegex)) _incorrectQrHashes.push(hash);
-
-        return hash.match(hashRegex);
-      });
-
-    setIncorrectQrHashes(_incorrectQrHashes);
-    setQrHashList(_hashesList);
-
-    if (isRangeActive) {
-      if (typeof from === 'number' && typeof to === 'number') {
-        qrCodesRangeAssign(from, to, _event, passphrase)
-          .then((_) => {
-            addToast('QR codes updated correctly', {
-              appearance: 'success',
-              autoDismiss: true,
-            });
-            onSuccessAction();
-            refreshQrs();
-            handleUpdateModalClosing();
-          })
-          .catch((e) =>
-            addToast(e.message, {
-              appearance: 'error',
-              autoDismiss: false,
-            }),
-          );
-      }
-    }
-
-    if (isSelectionActive) {
-      qrCodesSelectionUpdate(selectedQrs, _event, passphrase)
-        .then((_) => {
-          addToast('QR codes updated correctly', {
-            appearance: 'success',
-            autoDismiss: true,
-          });
-          onSuccessAction();
-          refreshQrs();
-          handleUpdateModalClosing();
-        })
-        .catch((e) => {
-          console.log(e);
-          addToast(e.message, {
-            appearance: 'error',
-            autoDismiss: false,
-          });
-        });
-    }
-
-    if (isListActive) {
-      const event = _event === null ? 'unassign' : _event;
-      // setIsSendingHashList(true);
-      setSelectedEvent(event);
-    }
-  };
-
-  const handleChipClick = (event: React.ChangeEvent, setFieldValue: Function, values: any) => {
-    setFieldValue('isUnassigning', !values.isUnassigning);
-  };
-
-  const handleSelectionChange = () => {
-    if (!hasSelectedQrs) return;
-    setIsRangeActive(false);
-    setIsListActive(false);
-    setIsSelectionActive(true);
-  };
-
-  const handleRangeChange = () => {
-    setIsSelectionActive(false);
-    setIsListActive(false);
-    setIsRangeActive(true);
-  };
-
-  const handleListChange = () => {
-    setIsRangeActive(false);
-    setIsSelectionActive(false);
-    setIsListActive(true);
-  };
-
-  const eventOptions = isAdmin
-    ? events
-    : events.filter((event) => {
-        const todayDate = new Date();
-        const eventDate = new Date(event.start_date);
-        return isAfter(eventDate, todayDate);
-      });
-
-  return (
-    <Formik
-      initialValues={{
-        from: 0,
-        to: 0,
-        event: 0,
-        hashesList: '',
-        isUnassigning: false,
-      }}
-      validationSchema={
-        (isSelectionActive && UpdateModalWithFormikSelectedQrsSchema) ||
-        (isRangeActive && UpdateModalWithFormikRangeSchema) ||
-        (isListActive && UpdateModalWithFormikListSchema)
-      }
-      validateOnBlur={false}
-      validateOnChange={false}
-      onSubmit={handleUpdateModalSubmit}
-    >
-      {({ values, errors, handleChange, handleSubmit, setFieldValue }) => {
-        const { isUnassigning } = values;
-        const isPlaceholderValue = Boolean(values.event);
-
-        const resolveSelectClass = () => {
-          if (isUnassigning) return '';
-          if (errors.event && !values.event) return 'modal-select-error';
-          if (!isPlaceholderValue) return 'placeholder-option';
-          return '';
-        };
-
-        const resolveSelectText = () => {
-          if (values.isUnassigning) return 'You are unassigning the QRs';
-          if (errors.event && !values.event) return 'The selection is required';
-          return 'Select an event';
-        };
-
-        const handleFormSubmitClick = () => {
-          handleSubmit();
-        };
-
-        return (
-          <div className={'update-modal-container'}>
-            <div className={'modal-top-bar'}>
-              <h3>QR Update</h3>
-            </div>
-            <div className="modal-content">
-              <div className="option-container">
-                <div className="radio-container">
-                  <input type="radio" checked={isSelectionActive} onChange={handleSelectionChange} />
-                </div>
-                <div className="label-container">
-                  <span>Selection</span>
-                </div>
-                <div className="content-container">
-                  {hasSelectedQrs ? (
-                    <span>{`You have ${selectedQrs.length} QR's selected`}</span>
-                  ) : (
-                    <span className="grey-text">You have no selected QRs</span>
-                  )}
-                </div>
-              </div>
-              <div className="option-container">
-                <div className="radio-container">
-                  <input type="radio" checked={isRangeActive} onChange={handleRangeChange} />
-                </div>
-                <div className="label-container">
-                  <span>Range</span>
-                </div>
-                <div className="content-container">
-                  <input
-                    className={errors.from && !values.from ? 'modal-input-error' : ''}
-                    type="number"
-                    placeholder={errors.from && !values.from ? 'This field should be a positive number' : 'From'}
-                    name="from"
-                    onChange={handleChange}
-                    disabled={!isRangeActive}
-                  />
-                  <input
-                    className={errors.to && !values.to ? 'modal-input-error' : ''}
-                    type="number"
-                    placeholder={errors.to && !values.to ? 'This field should be a positive number' : 'To'}
-                    name="to"
-                    onChange={handleChange}
-                    disabled={!isRangeActive}
-                  />
-                </div>
-              </div>
-              {isAdmin && (
-                <div className="option-container">
-                  <div className="radio-container">
-                    <input type="radio" checked={isListActive} onChange={handleListChange} />
-                  </div>
-                  <div className="label-container">
-                    <span>List</span>
-                  </div>
-                  <div className="content-container list-container">
-                    <textarea
-                      name="hashesList"
-                      onChange={handleChange}
-                      disabled={!isListActive}
-                      placeholder="List of QRs"
-                      className="modal-textarea"
-                    />
-                    {isListActive && hasIncorrectHashes && (
-                      <span>
-                        The following codes are not valid, please fix them or remove them to submit again:{' '}
-                        {`${incorrectQrHashes.join(', ')}`}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-              {values.isUnassigning && (
-                <select disabled={true} className={resolveSelectClass()}>
-                  <option value="">{resolveSelectText()}</option>
-                </select>
-              )}
-              {!values.isUnassigning && (
-                <div className={'select-container'}>
-                  <Field component={FormSelect} name={'event'} options={eventOptions} placeholder={'Select an event'} />
-                </div>
-              )}
-              <div className="modal-buttons-container">
-                <FilterChip
-                  name="isUnassigning"
-                  text="Unassign QRs"
-                  isActive={values.isUnassigning}
-                  handleOnClick={(e: React.ChangeEvent) => handleChipClick(e, setFieldValue, values)}
-                />
-                <div className="modal-action-buttons-container">
-                  <FilterButton text="Cancel" handleClick={handleUpdateModalClosing} />
-                  <FilterButton text="Confirm update" handleClick={handleFormSubmitClick} />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }}
-    </Formik>
-  );
-};
-
-const LinkCreationModal: React.FC<CreationModalProps> = ({ handleModalClose, refreshQrs, events }) => {
-  const { addToast } = useToasts();
-
-  const handleCreationModalSubmit = (
-    values: LinkCreationModalFormikValues,
-    actions: FormikActions<LinkCreationModalFormikValues>,
-  ) => {
-    const { amount, event } = values;
-
-    if (!event) {
-      actions.setErrors({ event: 'Required' });
-      return false;
-    }
-
-    if (amount <= 0) {
-      actions.setErrors({ amount: 'Required' });
-      return false;
-    }
-
-    generateRandomCodes(parseInt(event, 10), amount, false)
-      .then((_) => {
-        addToast('QRs created & sent successfully', {
-          appearance: 'success',
-          autoDismiss: true,
-        });
-        refreshQrs();
-        handleLinkCreationClosing();
-      })
-      .catch((e) => {
-        console.log(e);
-        addToast(e.message, {
-          appearance: 'error',
-          autoDismiss: false,
-        });
-      });
-  };
-
-  const handleLinkCreationClosing = () => handleModalClose();
-
-  return (
-    <Formik
-      initialValues={{
-        amount: 0,
-        event: '',
-      }}
-      validateOnBlur={false}
-      validateOnChange={false}
-      onSubmit={handleCreationModalSubmit}
-    >
-      {({ handleSubmit }) => {
-        return (
-          <div className={'link-creation-container'}>
-            <div className={'modal-top-bar'}>
-              <h3>Generate redemption links</h3>
-            </div>
-            <div className="select-container">
-              <p>
-                Submit this form to create any amount of unique QR codes and send the claim links to the event
-                organizer.
-              </p>
-              <div className="horizontal-field">
-                <div className="label-container">
-                  <span>Amount</span>
-                </div>
-                <div className="field-container">
-                  <Field
-                    name="amount"
-                    render={({ field, form }: FieldProps) => (
-                      <input
-                        type="number"
-                        autoComplete="off"
-                        placeholder="Amount of QR codes to generate"
-                        className={classNames(!!form.errors[field.name] && 'modal-input-error')}
-                        {...field}
-                      />
-                    )}
-                  />
-                </div>
-              </div>
-              <Field component={FormSelect} name={'event'} options={events} placeholder={'Select an event'} />
-            </div>
-            <div className="modal-content">
-              <div className="modal-buttons-container creation-modal">
-                <div className="modal-action-checkbox-container" />
-                <div className="modal-action-buttons-container">
-                  <FilterButton text="Cancel" handleClick={handleLinkCreationClosing} />
                   <FilterButton text="Create" handleClick={handleSubmit} />
                 </div>
               </div>

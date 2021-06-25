@@ -10,6 +10,7 @@ import { AuthContext, authClient } from 'auth';
 import PoapLogo from 'images/POAP.svg';
 import Calendar from 'images/calendar.svg';
 import Qr from 'images/qr-code.svg';
+import Requests from 'images/request.svg';
 
 /* Constants */
 import { ROUTES, LABELS } from '../lib/constants';
@@ -146,7 +147,7 @@ const Landing = () => {
           </Link>
           <Link to={ROUTES.qrRequest.path} className={'card card-link'}>
             <h3>Manage QR Requests</h3>
-            <img className={'icon'} src={Qr} alt={'Manage QR Requests'} />
+            <img className={'icon'} src={Requests} alt={'Manage QR Requests'} />
           </Link>
         </>
       )}
@@ -157,6 +158,7 @@ const Landing = () => {
 const IssueForEventPageWithAuthentication = withAuthentication(IssueForEventPage);
 const IssueForUserPageWithAuthentication = withAuthentication(IssueForUserPage);
 const TransactionsPageWithAuthentication = withAuthentication(TransactionsPage);
+const QrRequestsWithAuthentication = withAuthentication(QrRequests);
 const MintersPageWithAuthentication = withAuthentication(MintersPage);
 const BurnPageWithAuthentication = withAuthentication(BurnPage);
 const AddressManagementPageWithAuthentication = withAuthentication(AddressManagementPage);
@@ -182,7 +184,7 @@ export const BackOffice: React.FC = () => (
         <Switch>
           <Route exact path={ROUTES.qr.path} render={() => <QrPage />} />
 
-          <Route exact path={ROUTES.qrRequest.path} render={() => <QrRequests />} />
+          <Route exact path={ROUTES.qrRequest.path} render={() => <QrRequestsWithAuthentication />} />
 
           <Route path={ROUTES.events.path} render={() => <EventsPage />} />
 
