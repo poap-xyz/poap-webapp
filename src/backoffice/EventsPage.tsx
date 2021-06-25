@@ -73,7 +73,7 @@ type DatePickerContainerProps = {
   dayToSetup: DatePickerDay;
   handleDayClick: (day: Date, dayToSetup: DatePickerDay, setFieldValue: SetFieldValue) => void;
   setFieldValue: SetFieldValue;
-  disabledDays: RangeModifier | undefined;
+  disabledDays: RangeModifier | RangeModifier[] | undefined;
   placeholder?: string;
   disabled: boolean;
   value: string | Date;
@@ -238,16 +238,25 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     }
   };
 
-  const setExpiryDateValue = (expiry_date: string, end_date: string): Date | string => {
+  const setExpiryDateValue = (expiry_date: string, end_date: string, setFieldValue: SetFieldValue): Date | string => {
     if (expiry_date !== '' && new Date(expiry_date) > new Date(end_date)) {
       return format(new Date(dateFormatterString(expiry_date)), 'yyyy-MM-dd');
     }
     if (end_date !== '') {
       const new_expiry_date = new Date(end_date);
       new_expiry_date.setMonth(new_expiry_date.getMonth() + 1);
+      // Set the expiry date
+      setFieldValue('expiry_date', dateFormatter(new_expiry_date));
       return format(new_expiry_date, 'yyyy-MM-dd');
     }
     return '';
+  };
+
+  const getMaxAllowExpiryDate = (end_date: string): Date => {
+    // Maximum expiration date is one year after the event ended
+    const max_expiry_date = new Date(end_date);
+    max_expiry_date.setMonth(max_expiry_date.getMonth() + 12);
+    return max_expiry_date;
   };
 
   const day = 60 * 60 * 24 * 1000;
@@ -426,14 +435,20 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   handleDayClick={handleDayClick}
                   setFieldValue={setFieldValue}
                   placeholder={values.expiry_date}
-                  value={setExpiryDateValue(values.expiry_date, values.end_date)}
+                  value={setExpiryDateValue(values.expiry_date, values.end_date, setFieldValue)}
                   disabled={!values.end_date}
                   disabledDays={
                     values.end_date !== ''
-                      ? {
-                          from: veryOldDate,
-                          to: new Date(dateFormatterString(values.end_date).getTime()),
-                        }
+                      ? [
+                          {
+                            from: veryOldDate,
+                            to: new Date(dateFormatterString(values.end_date).getTime()),
+                          },
+                          {
+                            from: getMaxAllowExpiryDate(values.end_date),
+                            to: veryFutureDate,
+                          },
+                        ]
                       : undefined
                   }
                 />
