@@ -1,4 +1,5 @@
 import queryString from 'query-string';
+import { StringSchema } from 'yup';
 
 import { authClient } from './auth';
 
@@ -42,6 +43,7 @@ export interface PoapEvent {
   start_date: string;
   end_date: string;
   virtual_event: boolean;
+  email?: string;
 }
 export interface QrRequest {
   event: PoapEvent;
@@ -367,6 +369,20 @@ export async function getQrRequests(
 ): Promise<PaginatedQrRequest> {
   const params = queryString.stringify({ limit, offset, event_id, reviewed }, { sort: false });
   return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests?${params}`) : fetchJson(`${API_BASE}/qr-requests?${params}`);
+}
+
+export async function setQrRequests(
+  id: number,
+  accepted_codes: number
+): Promise<PaginatedQrRequest> {
+  return secureFetch(`${API_BASE}/qr-requests/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      id,
+      accepted_codes
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });;
 }
 
 export type TemplateResponse = TemplatesResponse<Template>;
