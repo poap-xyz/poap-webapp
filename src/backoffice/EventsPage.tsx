@@ -445,6 +445,10 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                             to: new Date(dateFormatterString(values.end_date).getTime()),
                           },
                           {
+                            from: veryOldDate,
+                            to: new Date(),
+                          },
+                          {
                             from: getMaxAllowExpiryDate(values.end_date),
                             to: veryFutureDate,
                           },
