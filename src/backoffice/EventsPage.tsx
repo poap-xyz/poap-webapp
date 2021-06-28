@@ -75,6 +75,7 @@ type DatePickerContainerProps = {
   setFieldValue: SetFieldValue;
   disabledDays: RangeModifier | RangeModifier[] | undefined;
   placeholder?: string;
+  helpText?: string;
   disabled: boolean;
   value: string | Date;
 };
@@ -435,6 +436,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   handleDayClick={handleDayClick}
                   setFieldValue={setFieldValue}
                   placeholder={values.expiry_date}
+                  helpText="After this date, users will no longer be able to mint this event's POAP"
                   value={setExpiryDateValue(values.expiry_date, values.end_date, setFieldValue)}
                   disabled={!values.end_date}
                   disabledDays={
@@ -519,6 +521,7 @@ const DayPickerContainer = ({
   disabledDays,
   disabled,
   value,
+  helpText,
 }: DatePickerContainerProps) => {
   const handleDayChange = (day: Date) => handleDayClick(day, dayToSetup, setFieldValue);
   let _value = value;
@@ -537,6 +540,8 @@ const DayPickerContainer = ({
         value={_value}
         inputProps={{ readOnly: 'readonly', disabled: disabled }}
       />
+      {helpText && <p className="date-picker-help-text">{helpText}</p>}
+
       <ErrorMessage name={dayToSetup} component="p" className="bk-error" />
     </div>
   );
