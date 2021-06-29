@@ -530,9 +530,26 @@ const DayPickerContainer = ({
     const offsetSign = offset < 0 ? -1 : 1;
     _value = new Date(value.valueOf() + offset * 60 * 1000 * offsetSign);
   }
+  let formatText = <></>;
+  if (helpText) {
+    formatText = (
+      <div className={'backoffice-tooltip'}>
+        <span>
+          {helpText}
+        </span>
+      </div>
+    );
+  }
   return (
     <div className={`date-picker-container ${dayToSetup === 'end_date' ? 'end-date-overlay' : ''}`}>
-      <label>{text}</label>
+      <label>
+        {text}
+        {helpText && (
+          <Tooltip content={formatText}>
+            <img alt="Informative message" src={infoButton} className={'info-button'} />
+          </Tooltip>
+        )}
+      </label>
       <DayPickerInput
         placeholder={placeholder}
         dayPickerProps={{ disabledDays }}
@@ -540,8 +557,6 @@ const DayPickerContainer = ({
         value={_value}
         inputProps={{ readOnly: 'readonly', disabled: disabled }}
       />
-      {helpText && <p className="date-picker-help-text">{helpText}</p>}
-
       <ErrorMessage name={dayToSetup} component="p" className="bk-error" />
     </div>
   );
