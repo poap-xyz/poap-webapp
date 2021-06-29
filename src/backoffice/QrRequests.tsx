@@ -1,5 +1,4 @@
 import React, { FC, useState, useEffect } from 'react';
-import { useToasts } from 'react-toast-notifications';
 import { OptionTypeBase } from 'react-select';
 import { Link } from 'react-router-dom';
 
@@ -13,6 +12,7 @@ import { Loading } from '../components/Loading';
 import FilterSelect from '../components/FilterSelect';
 import FilterReactSelect from '../components/FilterReactSelect';
 import FilterButton from '../components/FilterButton';
+import { SubmitButton } from '../components/SubmitButton';
 
 /* Helpers */
 import {
@@ -47,8 +47,6 @@ const QrRequests: FC = () => {
   const [limit, setLimit] = useState<number>(10);
   const [total, setTotal] = useState<number>(0);
   const [isFetchingQrCodes, setIsFetchingQrCodes] = useState<null | boolean>(null);
-  const [qrCodes, setQrCodes] = useState<null | QrCode[]>(null);
-  const [checkedAllQrs, setCheckedAllQrs] = useState<boolean>(false);
   const [reviewedStatus, setReviewedStatus] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<number | undefined>(undefined);
   const [initialFetch, setInitialFetch] = useState<boolean>(true);
@@ -64,7 +62,6 @@ const QrRequests: FC = () => {
   useEffect(() => {
     if (!initialFetch) {
       fetchQrRequests();
-      setCheckedAllQrs(false);
     }
   }, [page]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
@@ -242,18 +239,21 @@ const QrRequests: FC = () => {
         </div>
       )}
 
-      {qrCodes && qrCodes.length === 0 && !isFetchingQrCodes && <div className={'no-results'}>No QR Requests codes found</div>}
+      {qrRequests && qrRequests.length === 0 && !isFetchingQrCodes && <div className={'no-results'}>No QR Requests found</div>}
     </div>
   );
 };
 
 const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrRequest }) => {
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleCreationModalSubmit = async (values: CreationModalFormikValues) => {
+    setIsSubmitting(true)
     const { requested_codes } = values;
     if (qrRequest) {
       await setQrRequests(qrRequest.id,requested_codes);
     }
+    setIsSubmitting(false)
   };
   
   const handleCreationModalClosing = () => handleModalClose();
@@ -269,20 +269,20 @@ const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrReque
     >
       {({ handleSubmit }) => {
         return (
-          <div className={'update-modal-container'}>
+          <div className={'update-modal-container authentication_modal_container'}>
             <div className={'modal-top-bar'}>
               <h3>QR Create</h3>
             </div>
             <div className="select-container">
-              <h4>Requested Codes</h4>
-              <Field type="number" name={'requested_codes'} placeholder={'Requested Codes'} value={qrRequest?.requested_codes} />
+              <div className="bk-form-row">
+                <h4>Requested Codes</h4>
+                <Field type="number" name={'requested_codes'} placeholder={'Requested Codes'} value={qrRequest?.requested_codes} />
+              </div>
             </div>
             <div className="modal-content">
               <div className="modal-buttons-container creation-modal">
-                <div className="modal-action-buttons-container">
-                  <FilterButton text="Cancel" handleClick={handleCreationModalClosing} />
-                  <FilterButton text="Approve" handleClick={handleSubmit} />
-                </div>
+                <SubmitButton text="Cancel" isSubmitting={false} canSubmit={true} onClick={handleCreationModalClosing} />
+                <SubmitButton text="Accept" isSubmitting={isSubmitting} canSubmit={true} onClick={handleSubmit} />
               </div>
             </div>
           </div>
