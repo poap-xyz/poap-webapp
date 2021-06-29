@@ -236,21 +236,11 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     setFieldValue(dayToSetup, dateFormatter(day));
     if (!multiDay && dayToSetup === 'start_date') {
       setFieldValue('end_date', dateFormatter(day));
+      setFieldValue('expiry_date', dateFormatter(day.setMonth(day.getMonth() + 1)));
     }
-  };
-
-  const setExpiryDateValue = (expiry_date: string, end_date: string, setFieldValue: SetFieldValue): Date | string => {
-    if (expiry_date !== '' && new Date(expiry_date) > new Date(end_date)) {
-      return format(new Date(dateFormatterString(expiry_date)), 'yyyy-MM-dd');
+    if (dayToSetup === 'end_date') {
+      setFieldValue('expiry_date', dateFormatter(day.setMonth(day.getMonth() + 1)));
     }
-    if (end_date !== '') {
-      const new_expiry_date = new Date(end_date);
-      new_expiry_date.setMonth(new_expiry_date.getMonth() + 1);
-      // Set the expiry date
-      setFieldValue('expiry_date', dateFormatter(new_expiry_date));
-      return format(new_expiry_date, 'yyyy-MM-dd');
-    }
-    return '';
   };
 
   const getMaxAllowExpiryDate = (end_date: string): Date => {
@@ -437,7 +427,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   setFieldValue={setFieldValue}
                   placeholder={values.expiry_date}
                   helpText="After this date, users will no longer be able to mint this event's POAP"
-                  value={setExpiryDateValue(values.expiry_date, values.end_date, setFieldValue)}
+                  value={values.expiry_date !== '' ? new Date(dateFormatterString(values.expiry_date).getTime()) : ''}
                   disabled={!values.end_date}
                   disabledDays={
                     values.end_date !== ''
