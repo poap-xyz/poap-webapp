@@ -368,21 +368,29 @@ export async function getQrRequests(
   event_id?: number,
 ): Promise<PaginatedQrRequest> {
   const params = queryString.stringify({ limit, offset, event_id, reviewed }, { sort: false });
-  return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests?${params}`) : fetchJson(`${API_BASE}/qr-requests?${params}`);
+  try {
+    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests?${params}`) : fetchJson(`${API_BASE}/qr-requests?${params}`);
+  } catch(e) {
+    return e;
+  }
 }
 
 export async function setQrRequests(
   id: number,
   accepted_codes: number
 ): Promise<PaginatedQrRequest> {
-  return secureFetch(`${API_BASE}/qr-requests/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      id,
-      accepted_codes
-    }),
-    headers: { 'Content-Type': 'application/json' },
-  });;
+  try {
+    return secureFetch(`${API_BASE}/qr-requests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        id,
+        accepted_codes
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch(e) {
+    return e;
+  }
 }
 
 export type TemplateResponse = TemplatesResponse<Template>;

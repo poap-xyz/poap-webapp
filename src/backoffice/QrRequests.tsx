@@ -11,21 +11,22 @@ import { Formik,Field } from 'formik';
 import { Loading } from '../components/Loading';
 import FilterSelect from '../components/FilterSelect';
 import FilterReactSelect from '../components/FilterReactSelect';
-import FilterButton from '../components/FilterButton';
 import { SubmitButton } from '../components/SubmitButton';
 
 /* Helpers */
 import {
   eventOptionType,
   getQrRequests,
-  QrCode,
+  PoapEvent,
+  getEvents,
   setQrRequests,
   QrRequest
 } from '../api';
 
 /* Assets */
 import edit from 'images/edit.svg';
-
+import checked from '../images/checked.svg';
+import error from '../images/error.svg';
 
 type PaginateAction = {
   selected: number;
@@ -53,8 +54,10 @@ const QrRequests: FC = () => {
   const [isCreationModalOpen, setIsCreationModalOpen] = useState<boolean>(false);
   const [qrRequests, setQrRequests] = useState<null | QrRequest[]>(null);
   const [selectedQrRequest, setSelectedQrRequest] = useState<null | QrRequest>(null);
+  const [events, setEvents] = useState<PoapEvent[]>([]);
 
   useEffect(() => {
+    fetchEvents();
     fetchQrRequests();
     setInitialFetch(false);
   }, []); /* eslint-disable-line react-hooks/exhaustive-deps */
@@ -121,10 +124,15 @@ const QrRequests: FC = () => {
     setIsCreationModalOpen(false)
   };
 
+  const fetchEvents = async () => {
+    const events = await getEvents();
+    setEvents(events);
+  };
+
   let eventOptions: eventOptionType[] = [];
 
-  if (qrRequests) {
-    eventOptions = qrRequests.map(({event}) => {
+  if (events) {
+    eventOptions = events.map((event) => {
       const label = `${event.name ? event.name : 'No name'} (${event.fancy_id}) - ${event.year}`;
       return { value: event.id, label: label, start_date: event.start_date };
     });
@@ -178,47 +186,57 @@ const QrRequests: FC = () => {
       {qrRequests && qrRequests.length !== 0 && !isFetchingQrCodes && (
         <div className={'qr-table-section'}>
           <div className={'row table-header visible-md'}>
-            <div className={'col-md-1'}>#</div>
+            <div className={'col-md-1 center'}>#</div>
             <div className={'col-md-3'}>Event</div>
             <div className={'col-md-2'}>Mail</div>
-            <div className={'col-md-2'}>Start Date</div>
-            <div className={'col-md-3'}>Code amount</div>
-            <div className={'col-md-1'}>Edit</div>
+            <div className={'col-md-2 center'}>Start Date</div>
+            <div className={'col-md-2 center'}>Code amount</div>
+            <div className={'col-md-1 center'}>Reviewed</div>
+            <div className={'col-md-1 center'}></div>
           </div>
           <div className={'admin-table-row qr-table'}>
             {qrRequests && qrRequests.map((qr, i) => {
               return (
                 <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={qr.id}>
 
-                  <div className={'col-md-1 col-xs-4 start status'}>
+                  <div className={'col-md-1 col-xs-4 center'}>
                     <span className={'visible-sm'}>#: </span>
                     {qr.id}
                   </div>
 
-                  <div className={'col-md-3 ellipsis col-xs-12 event-name'}>
+                  <div className={'col-md-3 ellipsis col-xs-12'}>
                     <span className={'visible-sm'}>Event: </span>
                     <Link to={`/admin/events/${qr.event.fancy_id}`} target="_blank" rel="noopener noreferrer">
                       {qr.event.name}
                     </Link>
                   </div>
 
-                  <div className={'col-md-2 col-xs-12'}>
+                  <div className={'col-md-2 col-xs-12 ellipsis'}>
                     <span className={'visible-sm'}>Mail: </span>
                     {qr.event.email}
                   </div>
 
-                  <div className={'col-md-2 col-xs-4 status'}>
+                  <div className={'col-md-2 col-xs-4 center'}>
                     <span className={'visible-sm'}>Start Date: </span>
                     {qr.event.start_date}
                   </div>
 
-                  <div className={'col-md-3 col-xs-4 status'}>
+                  <div className={'col-md-2 col-xs-4 center'}>
                     <span className={'visible-sm'}>Code amount: </span>
-                    {qr.requested_codes}
+                    {qr.accepted_codes} / {qr.requested_codes}
                   </div>
 
-                  <div className={'col-md-1'}>
-                    <img src={edit} alt={'Edit'} className={'edit-icon'} onClick={() => handleCreationModalClick(qr)} />
+                  <div className={`col-md-1 col-xs-4 center`}>
+                    <span className={'visible-sm'}>Reviewed: </span>
+                    <img
+                      src={qr.reviewed ? checked : error}
+                      alt={qr.reviewed ? `QR Reviewed` : 'QR not Reviewed'}
+                      className={'status-icon'}
+                    />
+                  </div>
+
+                  <div className={'col-md-1 col-xs-4 center'}>
+                    {!qr.reviewed && <img src={edit} alt={'Edit'} className={'edit-icon'} onClick={() => handleCreationModalClick(qr)} />}
                   </div>
                 </div>
               );
@@ -261,7 +279,7 @@ const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrReque
   return (
     <Formik
       initialValues={{
-        requested_codes: 0
+        requested_codes: qrRequest?.requested_codes ? qrRequest?.requested_codes : 0
       }}
       validateOnBlur={false}
       validateOnChange={false}
@@ -276,7 +294,7 @@ const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrReque
             <div className="select-container">
               <div className="bk-form-row">
                 <h4>Requested Codes</h4>
-                <Field type="number" name={'requested_codes'} placeholder={'Requested Codes'} value={qrRequest?.requested_codes} />
+                <Field type="number" name={'requested_codes'} placeholder={'Requested Codes'} />
               </div>
             </div>
             <div className="modal-content">
