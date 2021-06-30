@@ -33,13 +33,16 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
     <div className={'claim-info'} data-aos="fade-up" data-aos-delay="300">
       <div className={'info-title'}>
         Congratulations! <br />
-        {claim.event.name} badge is now in your wallet <br />
+        {claim.event.name} badge was added to your collection <br />
+      </div>
+      <div className={'text-info'}>
         {
           daysAgo >= 0 ? 
           <span>This POAP was minted {daysAgo === 0 ? 'today' : daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`}</span> : null
         }
+        <br />
+        Keep growing your POAP collection!
       </div>
-      <div className={'text-info'}>Keep growing your POAP collection!</div>
       <LinkButton text={'Check my badges'} link={appLink} extraClass={'link-btn'} />
       <ClaimFooterMessage />
     </div>
