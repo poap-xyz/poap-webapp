@@ -32,7 +32,7 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
   const day = parseInt(claimedDate.toLocaleDateString("en-US", { day: 'numeric' }))
   const claimedDateString = 
     claimedDate.toLocaleDateString("en-US", { month: 'long' }) +
-    ` ${day} ${day === 1 || day === 21 || day === 31 ? 'st' : (day === 2 || day === 22) ? 'nd' : (day === 3 || day === 23) ? 'rd' : 'th'}, ` +
+    ` ${day}${day === 1 || day === 21 || day === 31 ? 'st' : (day === 2 || day === 22) ? 'nd' : (day === 3 || day === 23) ? 'rd' : 'th'}, ` +
     claimedDate.toLocaleDateString("en-US", { year: 'numeric' });
 
   return (
