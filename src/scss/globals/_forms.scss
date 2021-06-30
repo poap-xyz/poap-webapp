@@ -596,8 +596,12 @@ textarea {
   }
 }
 
-.input-field-helper {
+.date-picker-help-text {
   color: $color-primary;
+  margin: 0;
+}
+
+.input-field-helper {
 
   ul {
     li {

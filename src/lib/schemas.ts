@@ -133,9 +133,10 @@ const PoapEventSchema = yup.object().shape({
     .min(1990)
     .max(new Date().getFullYear() + 1),
   id: yup.number(),
-  description: yup.string(),
+  description: yup.string().required('The description is required'),
   start_date: yup.string().required('The start date is required'),
   end_date: yup.string().required('The end date is required'),
+  expiry_date: yup.string().required('The expiry date is required'),
   city: yup.string(),
   country: yup.string(),
   event_url: yup.string().url(),
