@@ -507,6 +507,8 @@
 
   .claim-body {
     padding-top: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
     flex: 1;
 
     @media (min-width: $bp-mw) {
@@ -593,7 +595,7 @@
         color: $color-primary;
         font-size: 26px;
         line-height: 30px;
-        max-width: 300px;
+        min-width: 300px;
         margin: 30px auto;
       }
 
@@ -601,7 +603,7 @@
         color: $color-medium-violet;
         font-size: 16px;
         line-height: 20px;
-        max-width: 300px;
+        min-width: 300px;
         margin: 40px auto;
       }
 

@@ -49,7 +49,7 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
         <br />
         Keep growing your POAP collection!
       </div>
-      <LinkButton text={'Check my badges'} link={appLink} extraClass={'link-btn'} />
+      <LinkButton text={'Browse collection'} link={appLink} extraClass={'link-btn'} />
       <ClaimFooterMessage />
     </div>
   );
