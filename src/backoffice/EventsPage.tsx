@@ -257,7 +257,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const editQrRequestWarning = (
     <div className={'backoffice-tooltip'}>
-      Request the amount of codes you will need fot the event
+      Request the amount of codes you will need for the event
     </div>
   );
 
