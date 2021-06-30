@@ -30,7 +30,7 @@ import infoButton from 'images/info-button.svg';
 
 /* Helpers */
 import { useAsync } from 'react-helpers';
-import { PoapEventSchema } from 'lib/schemas';
+import { PoapEventSchema, PoapEventSchemaEdit } from 'lib/schemas';
 import { generateSecretCode } from 'lib/helpers';
 import {
   Template,
@@ -180,6 +180,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   const initialValues = useMemo(() => {
     if (event) {
       let { virtual_event, secret_code, start_date, end_date, ...eventKeys } = event;
+      console.log(event)
       return {
         ...eventKeys,
         start_date: start_date.replace(dateRegex, '-'),
@@ -253,6 +254,22 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
       )}
     </div>
   );
+
+  const editQrRequestWarning = (
+    <div className={'backoffice-tooltip'}>
+      Request the amount of codes you will need fot the event
+    </div>
+  );
+
+  const editQrRequest = (
+    <>
+      <b>Amount of codes</b>
+      <Tooltip content={editQrRequestWarning}>
+        <img alt="Informative message" src={infoButton} className={'info-button'} />
+      </Tooltip>
+    </>
+  );
+
   const editLabel = (
     <>
       <b>Edit Code</b>
@@ -279,7 +296,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         enableReinitialize
         validateOnBlur={false}
         validateOnChange={false}
-        validationSchema={PoapEventSchema}
+        validationSchema={create ? PoapEventSchema : PoapEventSchemaEdit}
         onSubmit={async (submittedValues: EventEditValues, actions: FormikActions<EventEditValues>) => {
           try {
             actions.setSubmitting(true);
@@ -453,7 +470,10 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   <img alt={event.image_url} className={'image-edit'} src={event.image_url} />
                 </div>
               )}
-              <EventField title="Amount of codes" type="number" name="requested_codes"/>
+              {
+                create &&
+                <EventField title={editQrRequest} type="number" name="requested_codes"/>
+              }
               <SubmitButton text="Save" isSubmitting={isSubmitting} canSubmit={true} />
             </Form>
           );

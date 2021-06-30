@@ -25,6 +25,7 @@ import {
 
 /* Assets */
 import edit from 'images/edit.svg';
+import editDisable from 'images/edit-disable.svg';
 import checked from '../images/checked.svg';
 import error from '../images/error.svg';
 
@@ -216,17 +217,17 @@ const QrRequests: FC = () => {
                     {qr.event.email}
                   </div>
 
-                  <div className={'col-md-2 col-xs-4 center'}>
+                  <div className={'col-md-2 col-xs-12 center'}>
                     <span className={'visible-sm'}>Start Date: </span>
                     {qr.event.start_date}
                   </div>
 
-                  <div className={'col-md-2 col-xs-4 center'}>
+                  <div className={'col-md-2 col-xs-12 center'}>
                     <span className={'visible-sm'}>Code amount: </span>
                     {qr.accepted_codes} / {qr.requested_codes}
                   </div>
 
-                  <div className={`col-md-1 col-xs-4 center`}>
+                  <div className={`col-md-1 col-xs-8 center`}>
                     <span className={'visible-sm'}>Reviewed: </span>
                     <img
                       src={qr.reviewed ? checked : error}
@@ -236,7 +237,11 @@ const QrRequests: FC = () => {
                   </div>
 
                   <div className={'col-md-1 col-xs-4 center'}>
-                    {!qr.reviewed && <img src={edit} alt={'Edit'} className={'edit-icon'} onClick={() => handleCreationModalClick(qr)} />}
+                    {!qr.reviewed ?
+                     <img src={edit} alt={'Edit'} className={'edit-icon'} onClick={() => handleCreationModalClick(qr)} />
+                     :
+                     <img src={editDisable} alt={'Edit'} className={'edit-icon'} />
+                    }
                   </div>
                 </div>
               );
