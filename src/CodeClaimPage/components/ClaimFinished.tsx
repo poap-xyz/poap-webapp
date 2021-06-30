@@ -28,6 +28,12 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
     }
   }
   const daysAgo = calcDaysAgo(claim.claimed_date);
+  const claimedDate = new Date(claim.claimed_date);
+  const day = parseInt(claimedDate.toLocaleDateString("en-US", { day: 'numeric' }))
+  const claimedDateString = 
+    claimedDate.toLocaleDateString("en-US", { month: 'long' }) +
+    ` ${day}` + `${day === 1 || day === 21 || day === 31 ? 'st' : (day === 2 || day === 22) ? 'nd' : (day === 3 || day === 23) ? 'rd' : 'th'}` + ', ' +
+    claimedDate.toLocaleDateString("en-US", { year: 'numeric' });
 
   return (
     <div className={'claim-info'} data-aos="fade-up" data-aos-delay="300">
@@ -38,7 +44,7 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
       <div className={'text-info'}>
         {
           daysAgo >= 0 ? 
-          <span>This POAP was minted {daysAgo === 0 ? 'today' : daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`}</span> : null
+          <span>This POAP was minted {daysAgo === 0 ? 'today' : daysAgo === 1 ? `1 day ago on ${claimedDateString}` : `${daysAgo} days ago on ${claimedDateString}`}</span> : null
         }
         <br />
         Keep growing your POAP collection!
