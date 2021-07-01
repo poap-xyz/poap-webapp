@@ -375,6 +375,37 @@ export async function getQrRequests(
   }
 }
 
+export async function postQrRequests(
+  event_id: number,
+  requested_codes: number,
+  secret_code: number
+): Promise<PaginatedQrRequest> {
+  try {
+    return authClient.isAuthenticated() ? 
+    secureFetch(`${API_BASE}/qr-requests/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        event_id,
+        requested_codes,
+        secret_code
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    :
+    fetchJson(`${API_BASE}/qr-requests/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        event_id,
+        requested_codes,
+        secret_code
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch(e) {
+    return e;
+  }
+}
+
 export async function setQrRequests(
   id: number,
   accepted_codes: number

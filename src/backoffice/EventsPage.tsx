@@ -13,6 +13,7 @@ import { authClient } from 'auth';
 // libraries
 import ReactPaginate from 'react-paginate';
 import { Tooltip } from 'react-lightweight-tooltip';
+import ReactModal from 'react-modal';
 
 /* Components */
 import { SubmitButton } from '../components/SubmitButton';
@@ -41,6 +42,7 @@ import {
   updateEvent,
   createEvent,
   getTemplates,
+  postQrRequests
 } from '../api';
 import FormFilterReactSelect from 'components/FormFilterReactSelect';
 
@@ -60,6 +62,17 @@ type EventEditValues = {
   isFile: boolean;
   secret_code: string;
   email: string;
+};
+
+// creation modal types
+type QrRequestModalProps = {
+  handleModalClose: () => void;
+  event: PoapFullEvent | undefined;
+};
+
+type QrRequestFormikValues = {
+  requested_codes: number;
+  secret_code: number;
 };
 
 type DatePickerDay = 'start_date' | 'end_date';
@@ -153,6 +166,7 @@ type TemplateOptionType = {
 const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ create, event }) => {
   const [virtualEvent, setVirtualEvent] = useState<boolean>(event ? event.virtual_event : false);
   const [templateOptions, setTemplateOptions] = useState<Template[] | null>(null);
+  const [isQrRequestModalOpen, setIsQrRequestModalOpen] = useState<boolean>(false);
 
   const [multiDay, setMultiDay] = useState<boolean>(event ? event.start_date !== event.end_date : false);
   const history = useHistory();
@@ -236,6 +250,14 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     if (!multiDay && dayToSetup === 'start_date') {
       setFieldValue('end_date', dateFormatter(day));
     }
+  };
+
+  const handleQrRequestModalRequestClose = (): void => {
+    setIsQrRequestModalOpen(false)
+  };
+
+  const handleQrRequestModalClick = (): void => {
+    setIsQrRequestModalOpen(true)
   };
 
   const day = 60 * 60 * 24 * 1000;
@@ -350,10 +372,28 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                 </>
               ) : (
                 <>
-                  <h2>
-                    {event!.name} - {event!.year}
-                  </h2>
+                  <div className="event-top-bar-container">
+                    <h2>  
+                      {event!.name} - {event!.year}
+                    </h2>
+                    <div className="right_content">
+                      <FilterButton text="Request more codes" handleClick={handleQrRequestModalClick}/>
+                    </div>
+                  </div>
                   <EventField disabled={false} title="Name" name="name" />
+                  <ReactModal
+                    isOpen={isQrRequestModalOpen}
+                    onRequestClose={handleQrRequestModalRequestClose}
+                    shouldFocusAfterRender={true}
+                    shouldCloseOnEsc={true}
+                    shouldCloseOnOverlayClick={true}
+                    style={{ content: { overflow: 'visible' } }}
+                  >
+                    <QrRequestModal
+                      event={event}
+                      handleModalClose={handleQrRequestModalRequestClose}
+                    />
+                  </ReactModal>
                 </>
               )}
               <EventField disabled={false} title="Description" type="textarea" name="description" />
@@ -480,6 +520,59 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         }}
       </Formik>
     </div>
+  );
+};
+
+const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event }) => {
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const handleQrRequestSubmit = async (values: QrRequestFormikValues) => {
+    setIsSubmitting(true)
+    const { requested_codes, secret_code } = values;
+    if (event) {
+      await postQrRequests(event.id,requested_codes,secret_code);
+    }
+    setIsSubmitting(false)
+  };
+  
+  const handleQrRequestModalClosing = () => handleModalClose();
+
+  return (
+    <Formik
+      initialValues={{
+        requested_codes: 0,
+        secret_code: 0
+      }}
+      validateOnBlur={false}
+      validateOnChange={false}
+      onSubmit={handleQrRequestSubmit}
+    >
+      {({ handleSubmit }) => {
+        return (
+          <div className={'update-modal-container authentication_modal_container'}>
+            <div className={'modal-top-bar'}>
+              <h3>QR Create</h3>
+            </div>
+            <div className="select-container">
+              <div className="bk-form-row">
+                <h4>Requested Codes</h4>
+                <Field type="number" name={'requested_codes'} placeholder={'Requested Codes'} />
+              </div>
+              <div className="bk-form-row">
+                <h4>Secret Code</h4>
+                <Field type="number" name={'secret_code'} placeholder={'Secret Code'} />
+              </div>
+            </div>
+            <div className="modal-content">
+              <div className="modal-buttons-container creation-modal">
+                <SubmitButton text="Cancel" isSubmitting={false} canSubmit={true} onClick={handleQrRequestModalClosing} />
+                <SubmitButton text="Request" isSubmitting={isSubmitting} canSubmit={true} onClick={handleSubmit} />
+              </div>
+            </div>
+          </div>
+        );
+      }}
+    </Formik>
   );
 };
 
