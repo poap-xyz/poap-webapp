@@ -953,11 +953,16 @@ export function getWebsites(
   limit: number,
   offset: number,
   active: boolean | null,
+  timeframe: string | null,
 ): Promise<PaginatedWebsites> {
   let paramsObject: any = { limit, offset };
 
   if (active !== null) {
     paramsObject['active'] = active;
+  }
+
+  if(timeframe !== null){
+    paramsObject['timeframe'] = timeframe;
   }
 
   const params = queryString.stringify(paramsObject);

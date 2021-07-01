@@ -29,6 +29,7 @@ const WebsitesList = () => {
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [activeStatus, setActiveStatus] = useState<boolean | null>(null);
+  const [timeframe, setTimeframe] = useState<string | null>(null);
   const [websites, setWebsites] = useState<Website[]>([]);
   const [isFetching, setIsFetching] = useState<null | boolean>(null);
 
@@ -41,13 +42,13 @@ const WebsitesList = () => {
   useEffect(() => {
     setPage(0);
     fetchWebsites();
-  }, [activeStatus, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
+  }, [activeStatus,timeframe, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   /* Data functions */
   const fetchWebsites = async () => {
     setIsFetching(true);
     try {
-      const response = await getWebsites(limit, page * limit, activeStatus);
+      const response = await getWebsites(limit, page * limit, activeStatus, timeframe);
       if (response) {
         setWebsites(response.websites);
         setTotal(response.total);
@@ -74,6 +75,12 @@ const WebsitesList = () => {
     setActiveStatus(finalValue);
   };
 
+  const handleTimeframe = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const { value } = e.target;
+    let finalValue = value === '' ? null : value;
+    setTimeframe(finalValue);
+  };
+
   const handlePageChange = (obj: PaginateAction) => setPage(obj.selected);
 
   const tableHeaders = (
@@ -94,10 +101,11 @@ const WebsitesList = () => {
       <div className="filters-container websites">
         <div className={'filter col-md-4 col-xs-12'}>
           <div className={'filter-group'}>
-            <FilterSelect handleChange={handleStatusChange}>
-              <option value="">Filter by status</option>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
+            <FilterSelect handleChange={handleTimeframe}>
+              <option value="">Filter by Time Frame</option>
+              <option value="future">Future Events</option>
+              <option value="present">Present Events</option>
+              <option value="past">Past Events</option>
             </FilterSelect>
           </div>
         </div>
