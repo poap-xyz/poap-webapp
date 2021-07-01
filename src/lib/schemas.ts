@@ -228,6 +228,18 @@ const DeliverySchema = yup.object().shape({
   event_ids: yup.string().required('Event IDs comma separated'),
 });
 
+const WebsiteSchema = yup.object().shape({
+  claimName: yup
+    .string()
+    .required('A unique name is required')
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Must be URL friendly. No spaces, only ASCII')
+    .max(100, 'The event name should be less than 100 characters'),
+  from: yup.string(),
+  to: yup.string(),
+  captcha: yup.boolean(),
+  active: yup.boolean(),
+});
+
 export {
   AddressSchema,
   GasPriceSchema,
@@ -244,4 +256,5 @@ export {
   UpdateModalWithFormikListSchema,
   CheckoutSchema,
   DeliverySchema,
+  WebsiteSchema,
 };

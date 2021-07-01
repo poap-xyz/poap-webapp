@@ -25,6 +25,7 @@ import { TemplatePage } from './templates/TemplatePage';
 import { TemplateFormPage } from './templates/TemplateFormPage';
 import { Checkouts } from './Checkouts';
 import { Deliveries } from './Deliveries';
+import { Websites } from './Websites';
 
 export const MintersPage = () => <div> This is a MintersPage </div>;
 
@@ -153,6 +154,7 @@ const BurnPageWithAuthentication = withAuthentication(BurnPage);
 const AddressManagementPageWithAuthentication = withAuthentication(AddressManagementPage);
 const CheckoutsWithAuthentication = withAuthentication(Checkouts);
 const DeliveriesWithAuthentication = withAuthentication(Deliveries);
+const WebsitesWithAuthentication = withAuthentication(Websites);
 
 export const BackOffice: React.FC = () => (
   <>
@@ -202,6 +204,8 @@ export const BackOffice: React.FC = () => (
           <Route path={ROUTES.checkouts.admin.path} render={() => <CheckoutsWithAuthentication />} />
 
           <Route path={ROUTES.deliveries.admin.path} render={() => <DeliveriesWithAuthentication />} />
+
+          <Route path={ROUTES.websites.admin.path} render={() => <WebsitesWithAuthentication />} />
 
           <Route path="*" render={() => <Redirect to="/admin" />} />
         </Switch>
