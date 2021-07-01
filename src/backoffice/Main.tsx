@@ -100,6 +100,8 @@ export const NavigationMenu = withRouter(({ history }) => {
           <SidebarLink route={ROUTES.checkouts.admin} handleClick={closeMenu} />
 
           <SidebarLink route={ROUTES.deliveries.admin} handleClick={closeMenu} />
+
+          <SidebarLink route={ROUTES.websites.admin} handleClick={closeMenu} />
         </>
       )}
 
