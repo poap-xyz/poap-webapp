@@ -25,6 +25,7 @@ import { TemplatePage } from './templates/TemplatePage';
 import { TemplateFormPage } from './templates/TemplateFormPage';
 import { Checkouts } from './Checkouts';
 import { Deliveries } from './Deliveries';
+import { AdminLogsPage } from './AdminLogsPage';
 
 export const MintersPage = () => <div> This is a MintersPage </div>;
 
@@ -99,6 +100,8 @@ export const NavigationMenu = withRouter(({ history }) => {
           <SidebarLink route={ROUTES.checkouts.admin} handleClick={closeMenu} />
 
           <SidebarLink route={ROUTES.deliveries.admin} handleClick={closeMenu} />
+
+          <SidebarLink route={ROUTES.adminLogs} handleClick={closeMenu} />
         </>
       )}
 
@@ -153,6 +156,7 @@ const BurnPageWithAuthentication = withAuthentication(BurnPage);
 const AddressManagementPageWithAuthentication = withAuthentication(AddressManagementPage);
 const CheckoutsWithAuthentication = withAuthentication(Checkouts);
 const DeliveriesWithAuthentication = withAuthentication(Deliveries);
+const AdminLogsPageWithAuthentication = withAuthentication(AdminLogsPage);
 
 export const BackOffice: React.FC = () => (
   <>
@@ -202,6 +206,8 @@ export const BackOffice: React.FC = () => (
           <Route path={ROUTES.checkouts.admin.path} render={() => <CheckoutsWithAuthentication />} />
 
           <Route path={ROUTES.deliveries.admin.path} render={() => <DeliveriesWithAuthentication />} />
+
+          <Route path={ROUTES.adminLogs.path} render={() => <AdminLogsPageWithAuthentication />} />
 
           <Route path="*" render={() => <Redirect to="/admin" />} />
         </Switch>
