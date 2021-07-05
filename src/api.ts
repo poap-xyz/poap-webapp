@@ -248,6 +248,10 @@ export type PaginatedQrRequest = {
   qr_requests: QrRequest[];
 };
 
+export type ActiveQrRequest = {
+  active: number;
+};
+
 export type ENSQueryResult = { valid: false } | { valid: true; ens: string };
 
 export type AddressQueryResult = { valid: false } | { valid: true; ens: string };
@@ -379,28 +383,35 @@ export async function postQrRequests(
   event_id: number,
   requested_codes: number,
   secret_code: number
-): Promise<PaginatedQrRequest> {
-  try {
-    return authClient.isAuthenticated() ? 
-    secureFetch(`${API_BASE}/qr-requests/`, {
+): Promise<void> {
+  return authClient.isAuthenticated() ? 
+    secureFetch(`${API_BASE}/qr-requests`, {
       method: 'POST',
       body: JSON.stringify({
         event_id,
         requested_codes,
-        secret_code
+        secret_code,
       }),
       headers: { 'Content-Type': 'application/json' },
     })
     :
-    fetchJson(`${API_BASE}/qr-requests/`, {
+    fetchJson(`${API_BASE}/qr-requests`, {
       method: 'POST',
       body: JSON.stringify({
         event_id,
         requested_codes,
-        secret_code
+        secret_code,
       }),
       headers: { 'Content-Type': 'application/json' },
     })
+}
+
+export async function getActiveQrRequests(
+  event_id?: number,
+): Promise<ActiveQrRequest> {
+  const params = queryString.stringify({ event_id }, { sort: false });
+  try {
+    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests/active/count?${params}`) : fetchJson(`${API_BASE}/qr-requests/active/count?${params}`);
   } catch(e) {
     return e;
   }
@@ -409,7 +420,7 @@ export async function postQrRequests(
 export async function setQrRequests(
   id: number,
   accepted_codes: number
-): Promise<PaginatedQrRequest> {
+): Promise<void> {
   try {
     return secureFetch(`${API_BASE}/qr-requests/${id}`, {
       method: 'PUT',

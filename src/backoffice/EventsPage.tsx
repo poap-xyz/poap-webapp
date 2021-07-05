@@ -31,7 +31,11 @@ import infoButton from 'images/info-button.svg';
 
 /* Helpers */
 import { useAsync } from 'react-helpers';
-import { PoapEventSchema, PoapEventSchemaEdit } from 'lib/schemas';
+import {
+  PoapEventSchema,
+  PoapEventSchemaEdit,
+  PoapQrRequestSchema
+} from 'lib/schemas';
 import { generateSecretCode } from 'lib/helpers';
 import {
   Template,
@@ -42,9 +46,11 @@ import {
   updateEvent,
   createEvent,
   getTemplates,
-  postQrRequests
+  postQrRequests,
+  getActiveQrRequests
 } from '../api';
 import FormFilterReactSelect from 'components/FormFilterReactSelect';
+import el from 'date-fns/esm/locale/el/index.js';
 
 type EventEditValues = {
   name: string;
@@ -167,7 +173,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   const [virtualEvent, setVirtualEvent] = useState<boolean>(event ? event.virtual_event : false);
   const [templateOptions, setTemplateOptions] = useState<Template[] | null>(null);
   const [isQrRequestModalOpen, setIsQrRequestModalOpen] = useState<boolean>(false);
-
+  const [isActiveQrRequest, setIsActiveQrRequest] = useState<boolean>(true);
   const [multiDay, setMultiDay] = useState<boolean>(event ? event.start_date !== event.end_date : false);
   const history = useHistory();
   const veryOldDate = new Date('1900-01-01');
@@ -191,10 +197,25 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const isAdmin = authClient.isAuthenticated();
 
+  const isActiveQrRecuest = async (id: number)=> {
+    const { active } = await getActiveQrRequests(id);
+    if (active > 0) {
+      setIsActiveQrRequest(true)
+    } else {
+      setIsActiveQrRequest(false)
+    }
+  }
+
+  useEffect(() => {
+    if (event) {
+      isActiveQrRecuest(event.id);
+    }
+  }, [event]); /* eslint-disable-line react-hooks/exhaustive-deps */
+
+
   const initialValues = useMemo(() => {
     if (event) {
       let { virtual_event, secret_code, start_date, end_date, ...eventKeys } = event;
-      console.log(event)
       return {
         ...eventKeys,
         start_date: start_date.replace(dateRegex, '-'),
@@ -373,11 +394,13 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
               ) : (
                 <>
                   <div className="event-top-bar-container">
-                    <h2>  
+                    <h2 className="margin-0">  
                       {event!.name} - {event!.year}
                     </h2>
                     <div className="right_content">
-                      <FilterButton text="Request more codes" handleClick={handleQrRequestModalClick}/>
+                      <button disabled={isActiveQrRequest} type="button" className={`filter-base filter-button ` + (isActiveQrRequest ? 'disabled': '')} onClick={handleQrRequestModalClick}>
+                          Request more codes
+                      </button>
                     </div>
                   </div>
                   <EventField disabled={false} title="Name" name="name" />
@@ -527,22 +550,39 @@ const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleQrRequestSubmit = async (values: QrRequestFormikValues) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     const { requested_codes, secret_code } = values;
     if (event) {
       await postQrRequests(event.id,requested_codes,secret_code);
     }
-    setIsSubmitting(false)
+    setIsSubmitting(false);
+    console.log(isSubmitting)
   };
   
   const handleQrRequestModalClosing = () => handleModalClose();
+
+  const warning = (
+    <div className={'backoffice-tooltip'}>
+      Be sure to complete the 6 digit <b>Edit Code</b> that was originally used
+    </div>
+  );
+
+  const editLabel = (
+    <>
+      <b>Edit Code</b>
+      <Tooltip content={warning}>
+        <img alt="Informative message" src={infoButton} className={'info-button'} />
+      </Tooltip>
+    </>
+  );
 
   return (
     <Formik
       initialValues={{
         requested_codes: 0,
-        secret_code: 0
+        secret_code: event?.secret_code ? event?.secret_code : 0
       }}
+      validationSchema={PoapQrRequestSchema}
       validateOnBlur={false}
       validateOnChange={false}
       onSubmit={handleQrRequestSubmit}
@@ -555,12 +595,10 @@ const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event
             </div>
             <div className="select-container">
               <div className="bk-form-row">
-                <h4>Requested Codes</h4>
-                <Field type="number" name={'requested_codes'} placeholder={'Requested Codes'} />
+                <EventField type="number" disabled={false} title={'Requested Codes'} name="requested_codes" />
               </div>
               <div className="bk-form-row">
-                <h4>Secret Code</h4>
-                <Field type="number" name={'secret_code'} placeholder={'Secret Code'} />
+                <EventField disabled={false} title={editLabel} name="secret_code" />
               </div>
             </div>
             <div className="modal-content">

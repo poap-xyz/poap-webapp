@@ -184,6 +184,17 @@ const PoapEventSchemaEdit = yup.object().shape({
   email: yup.string().email('An email is required'),
 });
 
+const PoapQrRequestSchema = yup.object().shape({
+  secret_code: yup
+    .string()
+    .required('The secret code is required')
+    .matches(/^[0-9]{6}$/, 'Must be exactly 6 digits'),
+  requested_codes: yup
+  .number()
+  .required('Amount of codes is required')
+  .min(1, 'The minimum amount of codes is 1'),
+});
+
 const IssueForEventFormValueSchema = yup.object().shape({
   eventId: yup.number().required().min(1),
   addressList: yup.string().required(),
@@ -277,4 +288,5 @@ export {
   UpdateModalWithFormikListSchema,
   CheckoutSchema,
   DeliverySchema,
+  PoapQrRequestSchema
 };
