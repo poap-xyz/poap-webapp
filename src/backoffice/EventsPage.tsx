@@ -59,6 +59,7 @@ type EventEditValues = {
   description: string;
   start_date: string;
   end_date: string;
+  expiry_date: string;
   city: string;
   country: string;
   event_url: string;
@@ -81,7 +82,7 @@ type QrRequestFormikValues = {
   secret_code: number;
 };
 
-type DatePickerDay = 'start_date' | 'end_date';
+type DatePickerDay = 'start_date' | 'end_date' | 'expiry_date';
 
 type SetFieldValue = (field: string, value: any) => void;
 
@@ -92,8 +93,9 @@ type DatePickerContainerProps = {
   dayToSetup: DatePickerDay;
   handleDayClick: (day: Date, dayToSetup: DatePickerDay, setFieldValue: SetFieldValue) => void;
   setFieldValue: SetFieldValue;
-  disabledDays: RangeModifier | undefined;
+  disabledDays: RangeModifier | RangeModifier[] | undefined;
   placeholder?: string;
+  helpText?: string;
   disabled: boolean;
   value: string | Date;
 };
@@ -215,11 +217,12 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const initialValues = useMemo(() => {
     if (event) {
-      let { virtual_event, secret_code, start_date, end_date, ...eventKeys } = event;
+      let { virtual_event, secret_code, start_date, end_date, expiry_date, ...eventKeys } = event;
       return {
         ...eventKeys,
         start_date: start_date.replace(dateRegex, '-'),
         end_date: end_date.replace(dateRegex, '-'),
+        expiry_date: expiry_date.replace(dateRegex, '-'),
         isFile: false,
         secret_code: secret_code ? secret_code.toString().padStart(6, '0') : '',
         email: '',
@@ -234,6 +237,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         description: '',
         start_date: '',
         end_date: '',
+        expiry_date: '',
         city: '',
         event_template_id: 0,
         requested_codes: 0,
@@ -270,7 +274,18 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     setFieldValue(dayToSetup, dateFormatter(day));
     if (!multiDay && dayToSetup === 'start_date') {
       setFieldValue('end_date', dateFormatter(day));
+      setFieldValue('expiry_date', dateFormatter(day.setMonth(day.getMonth() + 1)));
     }
+    if (dayToSetup === 'end_date') {
+      setFieldValue('expiry_date', dateFormatter(day.setMonth(day.getMonth() + 1)));
+    }
+  };
+
+  const getMaxAllowExpiryDate = (end_date: string): Date => {
+    // Maximum expiration date is one year after the event ended
+    const max_expiry_date = new Date(end_date);
+    max_expiry_date.setMonth(max_expiry_date.getMonth() + 12);
+    return max_expiry_date;
   };
 
   const handleQrRequestModalRequestClose = (): void => {
@@ -331,7 +346,6 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   };
 
   const templateSelectOptions = templateOptions ? parseTemplateToOptions(templateOptions) : [];
-
   return (
     <div className={'bk-container'}>
       <Formik
@@ -488,6 +502,34 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                       : undefined
                   }
                 />
+                <DayPickerContainer
+                  text="Expiry Date"
+                  dayToSetup="expiry_date"
+                  handleDayClick={handleDayClick}
+                  setFieldValue={setFieldValue}
+                  placeholder={values.expiry_date}
+                  helpText="After this date, users will no longer be able to mint this event's POAP"
+                  value={values.expiry_date !== '' ? new Date(dateFormatterString(values.expiry_date).getTime()) : ''}
+                  disabled={!values.end_date}
+                  disabledDays={
+                    values.end_date !== ''
+                      ? [
+                          {
+                            from: veryOldDate,
+                            to: new Date(dateFormatterString(values.end_date).getTime()),
+                          },
+                          {
+                            from: veryOldDate,
+                            to: new Date(),
+                          },
+                          {
+                            from: getMaxAllowExpiryDate(values.end_date),
+                            to: veryFutureDate,
+                          },
+                        ]
+                      : undefined
+                  }
+                />
               </div>
               <div className="bk-group">
                 <EventField title="Website" name="event_url" />
@@ -623,6 +665,7 @@ const DayPickerContainer = ({
   disabledDays,
   disabled,
   value,
+  helpText,
 }: DatePickerContainerProps) => {
   const handleDayChange = (day: Date) => handleDayClick(day, dayToSetup, setFieldValue);
   let _value = value;
@@ -631,9 +674,26 @@ const DayPickerContainer = ({
     const offsetSign = offset < 0 ? -1 : 1;
     _value = new Date(value.valueOf() + offset * 60 * 1000 * offsetSign);
   }
+  let formatText = <></>;
+  if (helpText) {
+    formatText = (
+      <div className={'backoffice-tooltip'}>
+        <span>
+          {helpText}
+        </span>
+      </div>
+    );
+  }
   return (
     <div className={`date-picker-container ${dayToSetup === 'end_date' ? 'end-date-overlay' : ''}`}>
-      <label>{text}</label>
+      <label>
+        {text}
+        {helpText && (
+          <Tooltip content={formatText}>
+            <img alt="Informative message" src={infoButton} className={'info-button'} />
+          </Tooltip>
+        )}
+      </label>
       <DayPickerInput
         placeholder={placeholder}
         dayPickerProps={{ disabledDays }}

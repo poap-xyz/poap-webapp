@@ -217,10 +217,20 @@ const ClaimForm: React.FC<{
   const migrationText = (
     <div className={'backoffice-tooltip'}>
       All POAPs are minted in xDAI, but should you want your POAP in mainnet, un-check this checkbox so that you can
-      submit the transaction to migrate the badge to mainnet. You'll need to pay for the transaction cost.
-      Not available for claims with email.
+      submit the transaction to migrate the badge to mainnet. You'll need to pay for the transaction cost. Not available
+      for claims with email.
     </div>
   );
+
+  if (claim && new Date(claim.event.expiry_date) < new Date()) {
+    return (
+      <div className={'container claim-info'} data-aos="fade-up" data-aos-delay="300">
+        This POAP can’t be minted because it’s been too long since the event finished
+        <br/>
+        If you think this is a mistake, try using Chrome or Safari
+      </div>
+    );
+  }
 
   return (
     <div className={'container claim-info'} data-aos="fade-up" data-aos-delay="300">
