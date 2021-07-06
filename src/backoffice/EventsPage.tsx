@@ -50,7 +50,6 @@ import {
   getActiveQrRequests
 } from '../api';
 import FormFilterReactSelect from 'components/FormFilterReactSelect';
-import el from 'date-fns/esm/locale/el/index.js';
 
 type EventEditValues = {
   name: string;

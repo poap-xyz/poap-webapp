@@ -1,5 +1,4 @@
 import queryString from 'query-string';
-import { StringSchema } from 'yup';
 
 import { authClient } from './auth';
 
