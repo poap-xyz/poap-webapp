@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import ReactModal from 'react-modal';
 import { Formik,Field } from 'formik';
+import { useToasts } from 'react-toast-notifications';
 
 /* Components */
 import { Loading } from '../components/Loading';
@@ -37,6 +38,7 @@ type PaginateAction = {
 // creation modal types
 type CreationModalProps = {
   handleModalClose: () => void;
+  fetchQrRequests: () => void;
   qrRequest: QrRequest | null;
 };
 
@@ -168,6 +170,7 @@ const QrRequests: FC = () => {
           <CreationModal
             qrRequest={selectedQrRequest}
             handleModalClose={handleCreationModalRequestClose}
+            fetchQrRequests={fetchQrRequests}
           />
         </ReactModal>
       </div>
@@ -267,14 +270,31 @@ const QrRequests: FC = () => {
   );
 };
 
-const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrRequest }) => {
+const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrRequest,fetchQrRequests }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { addToast } = useToasts();
 
   const handleCreationModalSubmit = async (values: CreationModalFormikValues) => {
     setIsSubmitting(true)
     const { requested_codes } = values;
     if (qrRequest) {
-      await setQrRequests(qrRequest.id,requested_codes);
+      await setQrRequests(qrRequest.id,requested_codes)
+      .then((_) => {
+        setIsSubmitting(false);
+        addToast('QR Request approved correctly', {
+          appearance: 'success',
+          autoDismiss: true,
+        });
+        fetchQrRequests();
+        handleModalClose();
+      })
+      .catch((e) => {
+        console.log(e);
+        addToast(e.message, {
+          appearance: 'error',
+          autoDismiss: false,
+        });
+      });
     }
     setIsSubmitting(false)
   };

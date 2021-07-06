@@ -74,6 +74,7 @@ type EventEditValues = {
 // creation modal types
 type QrRequestModalProps = {
   handleModalClose: () => void;
+  setIsActiveQrRequest: (id: number) => void;
   event: PoapFullEvent | undefined;
 };
 
@@ -176,6 +177,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   const [templateOptions, setTemplateOptions] = useState<Template[] | null>(null);
   const [isQrRequestModalOpen, setIsQrRequestModalOpen] = useState<boolean>(false);
   const [isActiveQrRequest, setIsActiveQrRequest] = useState<boolean>(true);
+  const [isExpiryEvent, setIsExpiryEvent] = useState<boolean>(true);
   const [multiDay, setMultiDay] = useState<boolean>(event ? event.start_date !== event.end_date : false);
   const history = useHistory();
   const veryOldDate = new Date('1900-01-01');
@@ -199,7 +201,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const isAdmin = authClient.isAuthenticated();
 
-  const isActiveQrRecuest = async (id: number)=> {
+  const checkActiveQrRequest = async (id: number)=> {
     const { active } = await getActiveQrRequests(id);
     if (active > 0) {
       setIsActiveQrRequest(true)
@@ -208,9 +210,21 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     }
   }
 
+  const checkExpiryEvent = async (expiry_date: string)=> {
+    const today = new Date();
+    const expiry = new Date(expiry_date);
+
+    if (today > expiry) {
+      setIsExpiryEvent(true)
+    } else {
+      setIsExpiryEvent(false)
+    }
+  }
+
   useEffect(() => {
     if (event) {
-      isActiveQrRecuest(event.id);
+      checkActiveQrRequest(event.id);
+      checkExpiryEvent(event.expiry_date)
     }
   }, [event]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
@@ -319,6 +333,22 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     </div>
   );
 
+  
+  const activeQrRequestWarning = (
+    <div className={'backoffice-tooltip'}>
+      {' '}
+      {!isExpiryEvent ? (
+        <>
+          A requests for this event is being processed
+        </>
+      ) : (
+        <>
+          You can't requests codes on an expired event
+        </>
+      )}
+    </div>
+  );
+
   const editQrRequest = (
     <>
       <b>Amount of codes</b>
@@ -412,9 +442,19 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                       {event!.name} - {event!.year}
                     </h2>
                     <div className="right_content">
-                      <button disabled={isActiveQrRequest} type="button" className={`filter-base filter-button ` + (isActiveQrRequest ? 'disabled': '')} onClick={handleQrRequestModalClick}>
+                      {
+                        (isActiveQrRequest || isExpiryEvent) ?
+                        <Tooltip content={activeQrRequestWarning}>
+                          <button disabled={(isActiveQrRequest || isExpiryEvent)} type="button" className={`filter-base filter-button ` + ((isActiveQrRequest || isExpiryEvent) ? 'disabled': '')}>
+                            Request more codes
+                          </button>
+                        </Tooltip>
+                        :
+                        <button type="button" className={`filter-base filter-button`} onClick={handleQrRequestModalClick}>
                           Request more codes
-                      </button>
+                        </button>
+                      }
+
                     </div>
                   </div>
                   <EventField disabled={false} title="Name" name="name" />
@@ -429,6 +469,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                     <QrRequestModal
                       event={event}
                       handleModalClose={handleQrRequestModalRequestClose}
+                      setIsActiveQrRequest={checkActiveQrRequest}
                     />
                   </ReactModal>
                 </>
@@ -588,17 +629,32 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   );
 };
 
-const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event }) => {
+const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event, setIsActiveQrRequest }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { addToast } = useToasts();
 
   const handleQrRequestSubmit = async (values: QrRequestFormikValues) => {
     setIsSubmitting(true);
     const { requested_codes, secret_code } = values;
     if (event) {
-      await postQrRequests(event.id,requested_codes,secret_code);
+      await postQrRequests(event.id,requested_codes,secret_code)
+      .then((_) => {
+        setIsSubmitting(false);
+        addToast('QR Request created correctly', {
+          appearance: 'success',
+          autoDismiss: true,
+        });
+        setIsActiveQrRequest(event.id)
+        handleModalClose();
+      })
+      .catch((e) => {
+        console.log(e);
+        addToast(e.message, {
+          appearance: 'error',
+          autoDismiss: false,
+        });
+      });
     }
-    setIsSubmitting(false);
-    console.log(isSubmitting)
   };
   
   const handleQrRequestModalClosing = () => handleModalClose();
