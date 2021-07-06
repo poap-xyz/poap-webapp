@@ -207,7 +207,7 @@ export const BackOffice: React.FC = () => (
 
           <Route path={ROUTES.deliveries.admin.path} render={() => <DeliveriesWithAuthentication />} />
 
-          <Route path={ROUTES.adminLogs.path} render={() => <AdminLogsPageWithAuthentication />} />
+          <Route exact path={ROUTES.adminLogs.path} render={() => <AdminLogsPageWithAuthentication />} />
 
           <Route path="*" render={() => <Redirect to="/admin" />} />
         </Switch>
