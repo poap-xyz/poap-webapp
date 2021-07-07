@@ -687,12 +687,12 @@ export function bumpTransaction(tx_hash: string, gasPrice: string): Promise<any>
 export function getAdminLogs(
   limit: number,
   offset: number,
-  email: null | string,
-  action: null | string,
-  response_status: null | number,
-  created_from: null | string,
-  created_to: null | string,
-  event_id: null | number,
+  email: string,
+  action: string,
+  created_from: string,
+  created_to: string,
+  response_status?: number,
+  event_id?: number,
 ): Promise<PaginatedAdminLogs> {
   const params = queryString.stringify(
     { limit, offset, email, action, response_status, created_from, created_to, event_id },

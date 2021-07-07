@@ -460,7 +460,8 @@
     &.qr,
     &.templates,
     &.checkouts,
-    &.deliveries {
+    &.deliveries,
+    &.admin-logs {
       &.space-between {
         display: flex;
         justify-content: space-between;
