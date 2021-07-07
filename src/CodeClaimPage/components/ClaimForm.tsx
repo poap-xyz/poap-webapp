@@ -24,6 +24,7 @@ import { COLORS, STYLES, TX_STATUS } from 'lib/constants';
 
 /* ABI */
 import abi from 'abis/PoapDelegatedMint.json';
+import { useWindowWidth } from '@react-hook/window-size';
 
 type QRFormValues = {
   address: string;
@@ -53,6 +54,7 @@ const ClaimForm: React.FC<{
   const mobileImageUrl = useImageSrc(mobileImageUrlRaw);
 
   const { addToast } = useToasts();
+  const width = useWindowWidth()
 
   useEffect(() => {
     if (migrateInProcess && !token) {
@@ -254,7 +256,7 @@ const ClaimForm: React.FC<{
                         autoComplete="off"
                         style={{ borderColor: mainColor ?? COLORS.primaryColor }}
                         className={classNames(!!form.errors[field.name] && 'error')}
-                        placeholder={'Input your Ethereum address or ENS name or email'}
+                        placeholder={(width > 440 ? 'Input your ':'') + (width > 380 ? 'Ethereum': 'Eth') + ' address, ENS name or email'}
                         {...field}
                         disabled={claimed}
                       />
@@ -280,7 +282,8 @@ const ClaimForm: React.FC<{
                       </div>
                     </div>
                     <SubmitButton
-                      text="Claim POAP token"
+                      text="Mint POAP token"
+                      className='mint-button'
                       style={{
                         backgroundColor: mainColor ?? COLORS.primaryColor,
                         boxShadow: mainColor ? STYLES.boxShadow(mainColor) : '',

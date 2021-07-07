@@ -507,3 +507,9 @@
 .web3modal-modal-lightbox {
   z-index: 150 !important;
 }
+
+.mint-button {
+  @media (max-width: $bp-sw) {
+    min-width: auto;
+  }
+}
