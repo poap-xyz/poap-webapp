@@ -280,7 +280,7 @@ const ClaimForm: React.FC<{
                 >
                   {
                     claim ? 
-                      <>This POAP can be minted for the next {daysExpired === 1 ? 'day' : `${daysExpired} days`}. <br />
+                      <><br />This POAP can be minted for the next {daysExpired === 1 ? 'day' : `${daysExpired} days`}. <br />
                       It will expire on {dateString(new Date(claim.event.expiry_date))} <br /><br /></> : null
                   }
                   <CheckboxIcon color={mainColor ?? COLORS.primaryColor} /> Free minting in xDAI{' '}
