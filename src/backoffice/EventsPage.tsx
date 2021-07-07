@@ -13,6 +13,7 @@ import { authClient } from 'auth';
 // libraries
 import ReactPaginate from 'react-paginate';
 import { Tooltip } from 'react-lightweight-tooltip';
+import ReactModal from 'react-modal';
 
 /* Components */
 import { SubmitButton } from '../components/SubmitButton';
@@ -30,7 +31,11 @@ import infoButton from 'images/info-button.svg';
 
 /* Helpers */
 import { useAsync } from 'react-helpers';
-import { PoapEventSchema } from 'lib/schemas';
+import {
+  PoapEventSchema,
+  PoapEventSchemaEdit,
+  PoapQrRequestSchema
+} from 'lib/schemas';
 import { generateSecretCode } from 'lib/helpers';
 import {
   Template,
@@ -41,6 +46,8 @@ import {
   updateEvent,
   createEvent,
   getTemplates,
+  postQrRequests,
+  getActiveQrRequests
 } from '../api';
 import FormFilterReactSelect from 'components/FormFilterReactSelect';
 
@@ -56,10 +63,23 @@ type EventEditValues = {
   country: string;
   event_url: string;
   event_template_id: number;
+  requested_codes?: number;
   image?: Blob;
   isFile: boolean;
   secret_code: string;
   email: string;
+};
+
+// creation modal types
+type QrRequestModalProps = {
+  handleModalClose: () => void;
+  setIsActiveQrRequest: (id: number) => void;
+  event: PoapFullEvent | undefined;
+};
+
+type QrRequestFormikValues = {
+  requested_codes: number;
+  secret_code: number;
 };
 
 type DatePickerDay = 'start_date' | 'end_date' | 'expiry_date';
@@ -154,7 +174,9 @@ type TemplateOptionType = {
 const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ create, event }) => {
   const [virtualEvent, setVirtualEvent] = useState<boolean>(event ? event.virtual_event : false);
   const [templateOptions, setTemplateOptions] = useState<Template[] | null>(null);
-
+  const [isQrRequestModalOpen, setIsQrRequestModalOpen] = useState<boolean>(false);
+  const [isActiveQrRequest, setIsActiveQrRequest] = useState<boolean>(true);
+  const [isExpiryEvent, setIsExpiryEvent] = useState<boolean>(true);
   const [multiDay, setMultiDay] = useState<boolean>(event ? event.start_date !== event.end_date : false);
   const history = useHistory();
   const veryOldDate = new Date('1900-01-01');
@@ -177,6 +199,34 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   const dateRegex = /\//gi;
 
   const isAdmin = authClient.isAuthenticated();
+
+  const checkActiveQrRequest = async (id: number)=> {
+    const { active } = await getActiveQrRequests(id);
+    if (active > 0) {
+      setIsActiveQrRequest(true)
+    } else {
+      setIsActiveQrRequest(false)
+    }
+  }
+
+  const checkExpiryEvent = async (expiry_date: string)=> {
+    const today = new Date();
+    const expiry = new Date(expiry_date);
+
+    if (today > expiry) {
+      setIsExpiryEvent(true)
+    } else {
+      setIsExpiryEvent(false)
+    }
+  }
+
+  useEffect(() => {
+    if (event) {
+      checkActiveQrRequest(event.id);
+      checkExpiryEvent(event.expiry_date)
+    }
+  }, [event]); /* eslint-disable-line react-hooks/exhaustive-deps */
+
 
   const initialValues = useMemo(() => {
     if (event) {
@@ -203,6 +253,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         expiry_date: '',
         city: '',
         event_template_id: 0,
+        requested_codes: 0,
         country: '',
         event_url: '',
         image: new Blob(),
@@ -250,6 +301,14 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
     return max_expiry_date;
   };
 
+  const handleQrRequestModalRequestClose = (): void => {
+    setIsQrRequestModalOpen(false)
+  };
+
+  const handleQrRequestModalClick = (): void => {
+    setIsQrRequestModalOpen(true)
+  };
+
   const day = 60 * 60 * 24 * 1000;
 
   const warning = (
@@ -266,6 +325,38 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
       )}
     </div>
   );
+
+  const editQrRequestWarning = (
+    <div className={'backoffice-tooltip'}>
+      Request the amount of codes you will need for the event
+    </div>
+  );
+
+  
+  const activeQrRequestWarning = (
+    <div className={'backoffice-tooltip'}>
+      {' '}
+      {!isExpiryEvent ? (
+        <>
+          A requests for this event is being processed
+        </>
+      ) : (
+        <>
+          You can't requests codes on an expired event
+        </>
+      )}
+    </div>
+  );
+
+  const editQrRequest = (
+    <>
+      <b>Amount of codes</b>
+      <Tooltip content={editQrRequestWarning}>
+        <img alt="Informative message" src={infoButton} className={'info-button'} />
+      </Tooltip>
+    </>
+  );
+
   const editLabel = (
     <>
       <b>Edit Code</b>
@@ -291,7 +382,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
         enableReinitialize
         validateOnBlur={false}
         validateOnChange={false}
-        validationSchema={PoapEventSchema}
+        validationSchema={create ? PoapEventSchema : PoapEventSchemaEdit}
         onSubmit={async (submittedValues: EventEditValues, actions: FormikActions<EventEditValues>) => {
           try {
             actions.setSubmitting(true);
@@ -345,10 +436,41 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                 </>
               ) : (
                 <>
-                  <h2>
-                    {event!.name} - {event!.year}
-                  </h2>
+                  <div className="event-top-bar-container">
+                    <h2 className="margin-0">  
+                      {event!.name} - {event!.year}
+                    </h2>
+                    <div className="right_content">
+                      {
+                        (isActiveQrRequest || isExpiryEvent) ?
+                        <Tooltip content={activeQrRequestWarning}>
+                          <button disabled={(isActiveQrRequest || isExpiryEvent)} type="button" className={`filter-base filter-button ` + ((isActiveQrRequest || isExpiryEvent) ? 'disabled': '')}>
+                            Request more codes
+                          </button>
+                        </Tooltip>
+                        :
+                        <button type="button" className={`filter-base filter-button`} onClick={handleQrRequestModalClick}>
+                          Request more codes
+                        </button>
+                      }
+
+                    </div>
+                  </div>
                   <EventField disabled={false} title="Name" name="name" />
+                  <ReactModal
+                    isOpen={isQrRequestModalOpen}
+                    onRequestClose={handleQrRequestModalRequestClose}
+                    shouldFocusAfterRender={true}
+                    shouldCloseOnEsc={true}
+                    shouldCloseOnOverlayClick={true}
+                    style={{ content: { overflow: 'visible' } }}
+                  >
+                    <QrRequestModal
+                      event={event}
+                      handleModalClose={handleQrRequestModalRequestClose}
+                      setIsActiveQrRequest={checkActiveQrRequest}
+                    />
+                  </ReactModal>
                 </>
               )}
               <EventField disabled={false} title="Description" type="textarea" name="description" />
@@ -493,12 +615,99 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   <img alt={event.image_url} className={'image-edit'} src={event.image_url} />
                 </div>
               )}
+              {
+                create &&
+                <EventField title={editQrRequest} type="number" name="requested_codes"/>
+              }
               <SubmitButton text="Save" isSubmitting={isSubmitting} canSubmit={true} />
             </Form>
           );
         }}
       </Formik>
     </div>
+  );
+};
+
+const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event, setIsActiveQrRequest }) => {
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { addToast } = useToasts();
+
+  const handleQrRequestSubmit = async (values: QrRequestFormikValues) => {
+    setIsSubmitting(true);
+    const { requested_codes, secret_code } = values;
+    if (event) {
+      await postQrRequests(event.id,requested_codes,secret_code)
+      .then((_) => {
+        setIsSubmitting(false);
+        addToast('QR Request created correctly', {
+          appearance: 'success',
+          autoDismiss: true,
+        });
+        setIsActiveQrRequest(event.id)
+        handleModalClose();
+      })
+      .catch((e) => {
+        console.log(e);
+        addToast(e.message, {
+          appearance: 'error',
+          autoDismiss: false,
+        });
+      });
+    }
+  };
+  
+  const handleQrRequestModalClosing = () => handleModalClose();
+
+  const warning = (
+    <div className={'backoffice-tooltip'}>
+      Be sure to complete the 6 digit <b>Edit Code</b> that was originally used
+    </div>
+  );
+
+  const editLabel = (
+    <>
+      <b>Edit Code</b>
+      <Tooltip content={warning}>
+        <img alt="Informative message" src={infoButton} className={'info-button'} />
+      </Tooltip>
+    </>
+  );
+
+  return (
+    <Formik
+      initialValues={{
+        requested_codes: 0,
+        secret_code: event?.secret_code ? event?.secret_code : 0
+      }}
+      validationSchema={PoapQrRequestSchema}
+      validateOnBlur={false}
+      validateOnChange={false}
+      onSubmit={handleQrRequestSubmit}
+    >
+      {({ handleSubmit }) => {
+        return (
+          <div className={'update-modal-container authentication_modal_container'}>
+            <div className={'modal-top-bar'}>
+              <h3>QR Create</h3>
+            </div>
+            <div className="select-container">
+              <div className="bk-form-row">
+                <EventField type="number" disabled={false} title={'Requested Codes'} name="requested_codes" />
+              </div>
+              <div className="bk-form-row">
+                <EventField disabled={false} title={editLabel} name="secret_code" />
+              </div>
+            </div>
+            <div className="modal-content">
+              <div className="modal-buttons-container creation-modal">
+                <SubmitButton text="Cancel" isSubmitting={false} canSubmit={true} onClick={handleQrRequestModalClosing} />
+                <SubmitButton text="Request" isSubmitting={isSubmitting} canSubmit={true} onClick={handleSubmit} />
+              </div>
+            </div>
+          </div>
+        );
+      }}
+    </Formik>
   );
 };
 

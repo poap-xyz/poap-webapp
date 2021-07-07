@@ -743,6 +743,10 @@
   background-color: $color-primary;
   width: 100%;
 
+  &.disabled {
+    background-color: $color-grey;
+  }
+
   @media (min-width: $bp-l) {
     width: auto;
   }
@@ -1186,5 +1190,18 @@
       width: 20px;
     }
   }
+}
+
+.display-row {
+  display: flex;
+  flex-direction: row;
+
+  &.space-between {
+    justify-content: space-between;
+  }
+}
+
+.margin-0 {
+  margin: 0;
 }
 
