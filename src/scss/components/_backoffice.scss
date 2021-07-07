@@ -451,7 +451,7 @@
     }
 
     &.checkouts,
-    &.deliveries {
+    &.deliveries, &.websites {
       .new-button {
         text-align: right;
       }
@@ -460,7 +460,7 @@
     &.qr,
     &.templates,
     &.checkouts,
-    &.deliveries {
+    &.deliveries, &.websites {
       &.space-between {
         display: flex;
         justify-content: space-between;
@@ -603,7 +603,7 @@
   &.templates,
   &.addresses,
   &.checkouts,
-  &.deliveries{
+  &.deliveries, &.websites{
     .no-results {
       text-align: center;
       padding: 50px 0;
@@ -742,6 +742,10 @@
   color: white;
   background-color: $color-primary;
   width: 100%;
+
+  &.disabled {
+    background-color: $color-grey;
+  }
 
   @media (min-width: $bp-l) {
     width: auto;
@@ -1109,7 +1113,7 @@
   }
 }
 
-.delivery-admin-form {
+.website-admin-form, .delivery-admin-form {
   display: flex;
   flex-direction: column;
   h3 {
@@ -1127,30 +1131,77 @@
     }
   }
 
-  .delivery-address-list {
-    margin-top: 50px;
+  .date-row {
+    .col-md-4, .col-xs-4 {
+      display: flex;
+      flex-direction: row;
+      padding-right: 15px;
 
-    .center {
-      text-align: center;
-    }
-
-    &-title {
-      font-weight: bold;
-      font-size: 16px;
-    }
-    &-row {
-      padding: 10px 5px;
-      &.even {
-        background: white;
+      @media (max-width: $bp-mw) {
+        padding-right: 1px;
       }
 
-      .poap-badge,
-      .status-icon {
-        width: 20px;
-        height: 20px;
-        border-radius: 20px;
-        object-fit: cover;
+      .bk-form-row {
+        margin: 10px 5px;
       }
+
+      &:last-of-type {
+        padding-right: 0;
+        flex-direction: column;
+
+        label {
+          margin: 0 0 10px;
+        }
+      }
+
     }
   }
 }
+
+.website-claimurl-list, .delivery-address-list {
+  margin-top: 50px;
+
+  .center {
+    text-align: center;
+  }
+
+  &-title {
+    font-weight: bold;
+    font-size: 16px;
+  }
+  &-row {
+    padding: 10px 5px;
+    &.even {
+      background: white;
+    }
+
+    .poap-badge,
+    .status-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      object-fit: cover;
+    }
+
+    .edit-icon {
+      position: absolute;
+      right: 10px;
+      cursor: pointer;
+      width: 20px;
+    }
+  }
+}
+
+.display-row {
+  display: flex;
+  flex-direction: row;
+
+  &.space-between {
+    justify-content: space-between;
+  }
+}
+
+.margin-0 {
+  margin: 0;
+}
+
