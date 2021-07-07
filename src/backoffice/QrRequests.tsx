@@ -155,7 +155,7 @@ const QrRequests: FC = () => {
             <FilterSelect handleChange={handleStatusChange}>
               <option value="">Filter by reviewed</option>
               <option value="reviewed">Reviewed</option>
-              <option value="">Not Reviewed</option>
+              <option value="false">Not Reviewed</option>
             </FilterSelect>
           </div>
         </div>
