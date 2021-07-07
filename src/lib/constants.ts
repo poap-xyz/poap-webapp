@@ -169,6 +169,25 @@ const ROUTES = {
       title: 'Edit Delivery',
     },
   },
+
+  websites: {
+    admin: {
+      path: '/admin/websites',
+      roles: [ROLES.administrator],
+      title: 'Websites',
+    },
+    newForm: {
+      path: '/admin/websites/new',
+      roles: [ROLES.administrator],
+      title: 'New Website',
+    },
+    editForm: {
+      path: '/admin/websites/edit/:claimName',
+      roles: [ROLES.administrator],
+      title: 'Edit Website',
+    }
+  },
+
 };
 
 const IMAGE_SUPPORTED_FORMATS = ['image/png'];
