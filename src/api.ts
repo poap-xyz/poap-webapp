@@ -43,6 +43,18 @@ export interface PoapEvent {
   end_date: string;
   expiry_date: string;
   virtual_event: boolean;
+  email?: string;
+}
+export interface QrRequest {
+  event: PoapEvent;
+  accepted_codes: number;
+  created_date: string;
+  event_id: number;
+  id: number;
+  requested_codes: number;
+  reviewed: boolean;
+  reviewed_by: string;
+  reviewed_date: string;
 }
 export interface PoapFullEvent extends PoapEvent {
   secret_code?: number;
@@ -229,6 +241,17 @@ export type PaginatedQrCodes = {
   qr_claims: QrCode[];
 };
 
+export type PaginatedQrRequest = {
+  limit: number;
+  offset: number;
+  total: number;
+  qr_requests: QrRequest[];
+};
+
+export type ActiveQrRequest = {
+  active: number;
+};
+
 export type ENSQueryResult = { valid: false } | { valid: true; ens: string };
 
 export type AddressQueryResult = { valid: false } | { valid: true; ens: string };
@@ -340,6 +363,76 @@ export function getTokenInfo(tokenId: string): Promise<TokenInfo> {
 
 export async function getEvents(): Promise<PoapEvent[]> {
   return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/events`) : fetchJson(`${API_BASE}/events`);
+}
+
+export async function getQrRequests(
+  limit: number,
+  offset: number,
+  reviewed?: boolean,
+  event_id?: number,
+): Promise<PaginatedQrRequest> {
+  const params = queryString.stringify({ limit, offset, event_id, reviewed }, { sort: false });
+  try {
+    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests?${params}`) : fetchJson(`${API_BASE}/qr-requests?${params}`);
+  } catch(e) {
+    return e;
+  }
+}
+
+export async function postQrRequests(
+  event_id: number,
+  requested_codes: number,
+  secret_code: number
+): Promise<void> {
+  return authClient.isAuthenticated() ? 
+    secureFetch(`${API_BASE}/qr-requests`, {
+      method: 'POST',
+      body: JSON.stringify({
+        event_id,
+        requested_codes,
+        secret_code,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    :
+    fetchJson(`${API_BASE}/qr-requests`, {
+      method: 'POST',
+      body: JSON.stringify({
+        event_id,
+        requested_codes,
+        secret_code,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+}
+
+export async function getActiveQrRequests(
+  event_id?: number,
+): Promise<ActiveQrRequest> {
+  const params = queryString.stringify({ event_id }, { sort: false });
+  try {
+    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests/active/count?${params}`) : fetchJson(`${API_BASE}/qr-requests/active/count?${params}`);
+  } catch(e) {
+    return e;
+  }
+}
+
+export async function setQrRequests(
+  id: number,
+  accepted_codes: number
+): Promise<void> {
+  try {
+    return secureFetch(`${API_BASE}/qr-requests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        id,
+        accepted_codes
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch(e) {
+    return e;
+  }
 }
 
 export type TemplateResponse = TemplatesResponse<Template>;

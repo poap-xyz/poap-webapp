@@ -150,6 +150,50 @@ const PoapEventSchema = yup.object().shape({
     .required('The secret code is required')
     .matches(/^[0-9]{6}$/, 'Must be exactly 6 digits'),
   email: yup.string().email('An email is required'),
+  requested_codes: yup
+  .number()
+  .required('Amount of codes is required')
+  .min(1, 'The minimum amount of codes is 1'),
+});
+
+const PoapEventSchemaEdit = yup.object().shape({
+  name: yup
+    .string()
+    .required('A unique name is required')
+    .max(150, 'The event name should be less than 150 characters'),
+  year: yup
+    .number()
+    .required()
+    .min(1990)
+    .max(new Date().getFullYear() + 1),
+  id: yup.number(),
+  description: yup.string(),
+  start_date: yup.string().required('The start date is required'),
+  end_date: yup.string().required('The end date is required'),
+  city: yup.string(),
+  country: yup.string(),
+  event_url: yup.string().url(),
+  image: yup.mixed().when('isFile', {
+    is: (value) => value,
+    then: fileSchema,
+    otherwise: yup.string(),
+  }),
+  secret_code: yup
+    .string()
+    .required('The secret code is required')
+    .matches(/^[0-9]{6}$/, 'Must be exactly 6 digits'),
+  email: yup.string().email('An email is required'),
+});
+
+const PoapQrRequestSchema = yup.object().shape({
+  secret_code: yup
+    .string()
+    .required('The secret code is required')
+    .matches(/^[0-9]{6}$/, 'Must be exactly 6 digits'),
+  requested_codes: yup
+  .number()
+  .required('Amount of codes is required')
+  .min(1, 'The minimum amount of codes is 1'),
 });
 
 const IssueForEventFormValueSchema = yup.object().shape({
@@ -233,6 +277,7 @@ export {
   GasPriceSchema,
   BurnFormSchema,
   PoapEventSchema,
+  PoapEventSchemaEdit,
   ClaimHashSchema,
   RedeemSchema,
   AddressOrEmailSchema,
@@ -244,4 +289,5 @@ export {
   UpdateModalWithFormikListSchema,
   CheckoutSchema,
   DeliverySchema,
+  PoapQrRequestSchema
 };

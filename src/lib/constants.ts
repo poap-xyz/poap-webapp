@@ -146,6 +146,11 @@ const ROUTES = {
     roles: [ROLES.administrator, ROLES.eventHost],
     title: 'Manage QR Codes',
   },
+  qrRequest: {
+    path: '/admin/qr-requests',
+    roles: [ROLES.administrator],
+    title: 'Manage QR Requests',
+  },
 
   deliveries: {
     admin: {
