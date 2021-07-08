@@ -221,10 +221,6 @@ export interface PaginatedAdminLogs {
   admin_logs: AdminLog[];
 }
 
-export interface AdminLogActionList {
-  actions: AdminLogAction;
-}
-
 export interface AdminLogAction {
   action: string;
   description: string;
@@ -698,13 +694,11 @@ export function getAdminLogs(
     { limit, offset, email, action, response_status, created_from, created_to, event_id },
     { sort: false },
   );
-  //todo: change to real endpoint
-  return secureFetch(`https://run.mocky.io/v3/cf3a4b6e-5c82-4b36-9ccd-3cf26f72ba6d?${params}`);
+  return secureFetch(`${API_BASE}/admin-logs?${params}`);
 }
 
-export function getAdminActions(): Promise<AdminLogActionList> {
-  //todo: change to real endpoint
-  return fetchJson(`https://run.mocky.io/v3/07ea62c9-0d05-4cb6-8704-fea0756c81b5`);
+export function getAdminActions(): Promise<AdminLogAction[]> {
+  return fetchJson(`${API_BASE}/admin-logs/actions`);
 }
 
 export async function getClaimHash(hash: string): Promise<HashClaim> {

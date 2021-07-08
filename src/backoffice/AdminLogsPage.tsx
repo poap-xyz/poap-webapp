@@ -42,6 +42,8 @@ const AdminLogsPage: FC = () => {
   }, [page]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   useEffect(() => {
+    setPage(0);
+    fetchLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [action, dateFrom, dateTo, action, limit]);
 
@@ -79,7 +81,9 @@ const AdminLogsPage: FC = () => {
         if (!response) {
           return;
         }
-        setActions(actions.concat(response.actions));
+
+        const actionsNew = [...actions, ...response];
+        setActions(actionsNew);
       })
       .catch((e) => console.log(e));
   };
