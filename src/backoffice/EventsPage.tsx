@@ -740,7 +740,7 @@ const DayPickerContainer = ({
   }
   return (
     <div className={`date-picker-container ${dayToSetup === 'end_date' ? 'end-date-overlay' : ''}`}>
-      <label>
+      <label className={'backoffice-tooltip-label'}>
         <span>{text}</span>
         {helpText && (
           <span>
