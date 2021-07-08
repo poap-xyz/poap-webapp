@@ -50,7 +50,7 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
     <div className={'claim-info'} data-aos="fade-up" data-aos-delay="300">
       <div className={'info-title'}>
         Congratulations! <br />
-        {claim.event.name} badge was added to your collection <br />
+        {claim.event.name} POAP was added to your collection <br />
       </div>
       <div className={'text-info'}>
         {daysAgo >= 0 ? (
