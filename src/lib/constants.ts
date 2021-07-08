@@ -147,9 +147,9 @@ const ROUTES = {
     title: 'Manage QR Codes',
   },
   adminLogs: {
-    path: '/admin/admin-logs',
+    path: '/admin/logs',
     roles: [ROLES.administrator],
-    title: 'Admin Logs',
+    title: 'Logs',
   },
 
   deliveries: {

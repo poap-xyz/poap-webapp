@@ -8,6 +8,8 @@ import FilterSelect from '../components/FilterSelect';
 import { Loading } from '../components/Loading';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import ReactPaginate from 'react-paginate';
+import { ROUTES } from '../lib/constants';
+import { format } from 'date-fns';
 
 type PaginateAction = {
   selected: number;
@@ -15,6 +17,7 @@ type PaginateAction = {
 
 const AdminLogsPage: FC = () => {
   const ACTION_ALL = { action: 'ALL', description: 'All Actions' };
+  const dateFormat = (dateString: string) => format(new Date(dateString), 'dd-MMM-yyyy hh:mm');
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [total, setTotal] = useState<number>(0);
@@ -39,10 +42,18 @@ const AdminLogsPage: FC = () => {
   }, [page]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   useEffect(() => {
-    setPage(0);
-    fetchLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action, dateFrom, dateTo, email, action, responseStatus, eventId, limit]);
+  }, [action, dateFrom, dateTo, action, limit]);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      setPage(0);
+      fetchLogs();
+    }, 1500);
+
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, responseStatus, eventId]);
 
   const fetchLogs = () => {
     setIsFetchingLogs(true);
@@ -113,7 +124,7 @@ const AdminLogsPage: FC = () => {
 
   return (
     <div className="admin-table admin-logs">
-      <h2>Admin Logs</h2>
+      <h2>{ROUTES.adminLogs.title}</h2>
       <div>
         <div className={'filters-container admin-logs'}>
           <div className={'filter col-md-4'}>
@@ -167,10 +178,10 @@ const AdminLogsPage: FC = () => {
       <div className={'row table-header visible-md'}>
         <div className={'col-md-3'}>Email</div>
         <div className={'col-md-3'}>Action</div>
-        <div className={'col-md-3'}>Created Date</div>
-        <div className={'col-md-1'}>Event ID</div>
-        <div className={'col-md-1'}>Response</div>
-        <div className={'col-md-1 center'}>IP</div>
+        <div className={'col-md-2 center'}>Created Date</div>
+        <div className={'col-md-1 center'}>Event ID</div>
+        <div className={'col-md-1 center'}>Response</div>
+        <div className={'col-md-2 center'}>IP</div>
       </div>
       <div className={'admin-table-row'}>
         {isFetchingLogs && <Loading />}
@@ -189,19 +200,19 @@ const AdminLogsPage: FC = () => {
                   <span className={'visible-sm'}>Action: </span>
                   {actionDesc}
                 </div>
-                <div className={'col-md-3'}>
+                <div className={'col-md-2 center'}>
                   <span className={'visible-sm'}>Created Date: </span>
-                  {log.created_date}
+                  {dateFormat(log.created_date)}
                 </div>
-                <div className={'col-md-1'}>
+                <div className={'col-md-1 center'}>
                   <span className={'visible-sm'}>Event ID: </span>
                   {log.event_id}
                 </div>
-                <div className={'col-md-1'}>
+                <div className={'col-md-1 center'}>
                   <span className={'visible-sm'}>Response: </span>
                   {log.response_code}
                 </div>
-                <div className={'col-md-1 center'}>
+                <div className={'col-md-2 center'}>
                   <span className={'visible-sm'}>IP: </span>
                   {log.ip}
                 </div>
