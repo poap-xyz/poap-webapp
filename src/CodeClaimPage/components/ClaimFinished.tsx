@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 /* Helpers */
-import { HashClaim } from '../../api';
+import { getTokensFor, HashClaim, TokenInfo } from '../../api';
 import { isValidEmail } from '../../lib/helpers';
 
 /* Components */
@@ -13,6 +13,13 @@ import ClaimFooterMessage from './ClaimFooterMessage';
  * */
 const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
   const claimedWithEmail = !!(claim && claim.claimed && claim.user_input && isValidEmail(claim.user_input));
+
+  const [tokens, setTokens] = useState<TokenInfo[] | null>(null);
+
+  useEffect(() => {
+    getEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const appLink = claimedWithEmail ? `/scan/${claim.user_input}` : `/scan/${claim.beneficiary}`;
   const calcDaysAgo = (date: string) => {
@@ -46,6 +53,30 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
     }, ` +
     claimedDate.toLocaleDateString('en-US', { year: 'numeric' });
 
+  const getEvents = async () => {
+    try {
+      const tokens = await getTokensFor(claim.beneficiary);
+      setTokens(tokens);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const tokensMessage = () => {
+    if (tokens) {
+      if (tokens.length === 0) {
+        return 'This is your first POAP';
+      } else {
+        return `After this minting, this collection has ${tokens.length + 1} POAP tokens`;
+      }
+    }
+    return null;
+  };
+
+  const poapGalleryUrl = () => {
+    return `https://poap.gallery/event/${claim.event_id}`;
+  };
+
   return (
     <div className={'claim-info'} data-aos="fade-up" data-aos-delay="300">
       <div className={'info-title'}>
@@ -64,7 +95,11 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
           </span>
         ) : null}
         <br />
+        {tokensMessage()}
+        <br />
         Keep growing your POAP collection!
+        <br />
+        See who else got it at <a href={poapGalleryUrl()}>POAP Gallery</a>
       </div>
       <LinkButton text={'Browse collection'} link={appLink} extraClass={'link-btn'} />
       <ClaimFooterMessage />
