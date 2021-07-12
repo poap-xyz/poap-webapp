@@ -796,7 +796,7 @@ export function getAdminLogs(
 }
 
 export function getAdminActions(): Promise<AdminLogAction[]> {
-  return fetchJson(`${API_BASE}/admin-logs/actions`);
+  return secureFetch(`${API_BASE}/admin-logs/actions`);
 }
 
 export async function getClaimHash(hash: string): Promise<HashClaim> {
