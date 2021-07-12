@@ -43,6 +43,18 @@ export interface PoapEvent {
   end_date: string;
   expiry_date: string;
   virtual_event: boolean;
+  email?: string;
+}
+export interface QrRequest {
+  event: PoapEvent;
+  accepted_codes: number;
+  created_date: string;
+  event_id: number;
+  id: number;
+  requested_codes: number;
+  reviewed: boolean;
+  reviewed_by: string;
+  reviewed_date: string;
 }
 export interface PoapFullEvent extends PoapEvent {
   secret_code?: number;
@@ -253,6 +265,17 @@ export type PaginatedQrCodes = {
   qr_claims: QrCode[];
 };
 
+export type PaginatedQrRequest = {
+  limit: number;
+  offset: number;
+  total: number;
+  qr_requests: QrRequest[];
+};
+
+export type ActiveQrRequest = {
+  active: number;
+};
+
 export type ENSQueryResult = { valid: false } | { valid: true; ens: string };
 
 export type AddressQueryResult = { valid: false } | { valid: true; ens: string };
@@ -293,6 +316,11 @@ const API_BASE =
   process.env.NODE_ENV === 'development'
     ? `${process.env.REACT_APP_TEST_API_ROOT}`
     : `${process.env.REACT_APP_API_ROOT}`;
+
+const API_WEBSITES =
+  process.env.NODE_ENV === 'development'
+  ? `${process.env.REACT_APP_TEST_API_WEBSITES}`
+  : `${process.env.REACT_APP_API_WEBSITES}`;
 
 async function fetchJson<A>(input: RequestInfo, init?: RequestInit): Promise<A> {
   const res = await fetch(input, init);
@@ -364,6 +392,76 @@ export function getTokenInfo(tokenId: string): Promise<TokenInfo> {
 
 export async function getEvents(): Promise<PoapEvent[]> {
   return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/events`) : fetchJson(`${API_BASE}/events`);
+}
+
+export async function getQrRequests(
+  limit: number,
+  offset: number,
+  reviewed?: boolean,
+  event_id?: number,
+): Promise<PaginatedQrRequest> {
+  const params = queryString.stringify({ limit, offset, event_id, reviewed }, { sort: false });
+  try {
+    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests?${params}`) : fetchJson(`${API_BASE}/qr-requests?${params}`);
+  } catch(e) {
+    return e;
+  }
+}
+
+export async function postQrRequests(
+  event_id: number,
+  requested_codes: number,
+  secret_code: number
+): Promise<void> {
+  return authClient.isAuthenticated() ? 
+    secureFetch(`${API_BASE}/qr-requests`, {
+      method: 'POST',
+      body: JSON.stringify({
+        event_id,
+        requested_codes,
+        secret_code,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    :
+    fetchJson(`${API_BASE}/qr-requests`, {
+      method: 'POST',
+      body: JSON.stringify({
+        event_id,
+        requested_codes,
+        secret_code,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+}
+
+export async function getActiveQrRequests(
+  event_id?: number,
+): Promise<ActiveQrRequest> {
+  const params = queryString.stringify({ event_id }, { sort: false });
+  try {
+    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests/active/count?${params}`) : fetchJson(`${API_BASE}/qr-requests/active/count?${params}`);
+  } catch(e) {
+    return e;
+  }
+}
+
+export async function setQrRequests(
+  id: number,
+  accepted_codes: number
+): Promise<void> {
+  try {
+    return secureFetch(`${API_BASE}/qr-requests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        id,
+        accepted_codes
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch(e) {
+    return e;
+  }
 }
 
 export type TemplateResponse = TemplatesResponse<Template>;
@@ -958,6 +1056,143 @@ export function updateDelivery(
       image,
       page_title_image,
       active,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+/* Websites */
+export type Website = {
+  claimName: string;
+  active: boolean;
+  captcha: boolean;
+  created: string;
+  from?: string;
+  to?: string;
+  deliveriesCount?: {total: number, claimed: number};
+};
+
+export interface PaginatedWebsites {
+  limit: number;
+  offset: number;
+  total: number;
+  websites: Website[];
+}
+
+export type WebsiteClaimUrl = {
+  claimName: string;
+  claimUrl: string;
+  ip: string;
+  claimed: boolean;
+  claimedTime: Date;
+  time: Date;
+};
+
+export function getWebsites(
+  limit: number,
+  offset: number,
+  active: boolean | null,
+  timeframe: string | null,
+): Promise<PaginatedWebsites> {
+  let paramsObject: any = { limit, offset };
+
+  if (active !== null) {
+    paramsObject['active'] = active;
+  }
+
+  if(timeframe !== null){
+    paramsObject['timeframe'] = timeframe;
+  }
+
+  const params = queryString.stringify(paramsObject);
+  return secureFetch(`${API_WEBSITES}/admin/claimName/all?${params}`);
+}
+
+export function getWebsite(claimName: string ): Promise<Website> {
+  return secureFetch(`${API_WEBSITES}/admin/claimName/${claimName}`);
+}
+
+export function getWebsiteClaimUrls(claimName: string, claimed?: boolean): Promise<WebsiteClaimUrl[]> {
+  if(claimed === true){
+    return secureFetch(`${API_WEBSITES}/admin/delivery/claimed/${claimName}`);
+  }
+
+  return secureFetch(`${API_WEBSITES}/admin/delivery/${claimName}`);
+}
+
+export async function createWebsite(
+  claimName: string,
+  claimUrls: string[],
+  from?: string,
+  to?: string,
+  captcha?: boolean,
+  active?: boolean,
+): Promise<Website> {
+
+  const createClaimName: Website = await secureFetch(`${API_WEBSITES}/admin/claimName`, {
+    method: 'POST',
+    body: JSON.stringify({
+      claimName,
+      from,
+      to,
+      captcha,
+      active,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if(claimUrls && claimUrls.length > 0)
+    await addURLsToWebsite(claimName, claimUrls);
+
+  return createClaimName;
+}
+
+function addURLsToWebsite(
+  claimName: string,
+  claimUrls?: string[],
+): Promise<WebsiteClaimUrl[]> {
+  return secureFetch(`${API_WEBSITES}/admin/delivery/add/${claimName}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      claimUrl: claimUrls,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export async function updateWebsite(
+  prevClaimName: string,
+  claimName: string,
+  claimUrls: string[],
+  from?: string,
+  to?: string,
+  captcha?: boolean,
+  active?: boolean,
+): Promise<Website> {
+  const updatedWebsite: Website = await secureFetch(`${API_WEBSITES}/admin/claimName/${prevClaimName}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      claimName,
+      from,
+      to,
+      captcha,
+      active,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if(claimUrls && claimUrls.length > 0)
+    await addURLsToWebsite(claimName, claimUrls);
+
+  return updatedWebsite;
+}
+
+export async function deleteClaimUrl(
+  claimUrl: string,
+): Promise<Website> {
+  return secureFetch(`${API_WEBSITES}/admin/delivery/`, {
+    method: 'DELETE',
+    body: JSON.stringify({
+      claimUrl: claimUrl,
     }),
     headers: { 'Content-Type': 'application/json' },
   });
