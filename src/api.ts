@@ -18,7 +18,7 @@ export interface TokenInfo {
   event: PoapEvent;
   ownerText?: string;
   layer: string;
-  ens?: any
+  ens?: any;
 }
 
 export type QrCodesListAssignResponse = {
@@ -213,6 +213,30 @@ export interface PaginatedNotifications {
   notifications: Notification[];
 }
 
+export interface AdminLog {
+  id: number;
+  event_id: number;
+  action: string;
+  created_date: string;
+  request_params: string;
+  response_code: number;
+  response: string;
+  auth0_email: string;
+  agent_vars: string;
+  ip: string;
+}
+
+export interface PaginatedAdminLogs {
+  limit: number;
+  offset: number;
+  total: number;
+  admin_logs: AdminLog[];
+}
+
+export interface AdminLogAction {
+  action: string;
+  description: string;
+}
 
 export type QrCode = {
   beneficiary: string;
@@ -297,6 +321,10 @@ const API_WEBSITES =
   process.env.NODE_ENV === 'development'
   ? `${process.env.REACT_APP_TEST_API_WEBSITES}`
   : `${process.env.REACT_APP_API_WEBSITES}`;
+
+
+const ETH_THE_GRAPH_URL = process.env.REACT_APP_ETH_THE_GRAPH_URL;
+const L2_THE_GRAPH_URL = process.env.REACT_APP_L2_THE_GRAPH_URL;
 
 async function fetchJson<A>(input: RequestInfo, init?: RequestInit): Promise<A> {
   const res = await fetch(input, init);
@@ -754,6 +782,27 @@ export function bumpTransaction(tx_hash: string, gasPrice: string): Promise<any>
   });
 }
 
+export function getAdminLogs(
+  limit: number,
+  offset: number,
+  email: string,
+  action: string,
+  created_from: string,
+  created_to: string,
+  response_status?: number,
+  event_id?: number,
+): Promise<PaginatedAdminLogs> {
+  const params = queryString.stringify(
+    { limit, offset, email, action, response_status, created_from, created_to, event_id },
+    { sort: false },
+  );
+  return secureFetch(`${API_BASE}/admin-logs?${params}`);
+}
+
+export function getAdminActions(): Promise<AdminLogAction[]> {
+  return secureFetch(`${API_BASE}/admin-logs/actions`);
+}
+
 export async function getClaimHash(hash: string): Promise<HashClaim> {
   return fetchJson(`${API_BASE}/actions/claim-qr?qr_hash=${hash}`);
 }
@@ -1151,4 +1200,41 @@ export async function deleteClaimUrl(
     }),
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+interface TheGraphResponse<T> {
+  data: T;
+}
+
+interface TheGraphDataTokensQuantity {
+  event?: TheGraphEventTokensQuantity;
+}
+
+interface TheGraphEventTokensQuantity {
+  id: string;
+  tokenCount: string;
+}
+
+export async function tokensQuantityByEventId(eventId: number): Promise<number> {
+  let promises: Array<Promise<number>> = [];
+
+  if (L2_THE_GRAPH_URL) {
+    promises = promises.concat(tokensQuantityByEventIdAndSubgraphUrl(eventId, L2_THE_GRAPH_URL));
+  }
+
+  if (ETH_THE_GRAPH_URL) {
+    promises = promises.concat(tokensQuantityByEventIdAndSubgraphUrl(eventId, ETH_THE_GRAPH_URL));
+  }
+
+  const results = await Promise.all(promises);
+
+  return results.reduce((acc, value) => acc + value, 0);
+}
+
+async function tokensQuantityByEventIdAndSubgraphUrl(eventId: number, subgraphUrl: string): Promise<number> {
+  const query = `{"query":"{event(id: ${eventId}){id tokenCount}}"}`;
+  const request = { body: query, method: 'POST' };
+  const count = (await fetchJson<TheGraphResponse<TheGraphDataTokensQuantity>>(subgraphUrl, request)).data.event
+    ?.tokenCount;
+  return count ? parseInt(count) : 0;
 }

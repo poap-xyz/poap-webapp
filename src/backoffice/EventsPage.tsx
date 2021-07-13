@@ -31,11 +31,7 @@ import infoButton from 'images/info-button.svg';
 
 /* Helpers */
 import { useAsync } from 'react-helpers';
-import {
-  PoapEventSchema,
-  PoapEventSchemaEdit,
-  PoapQrRequestSchema
-} from 'lib/schemas';
+import { PoapEventSchema, PoapEventSchemaEdit, PoapQrRequestSchema } from 'lib/schemas';
 import { generateSecretCode } from 'lib/helpers';
 import {
   Template,
@@ -47,7 +43,7 @@ import {
   createEvent,
   getTemplates,
   postQrRequests,
-  getActiveQrRequests
+  getActiveQrRequests,
 } from '../api';
 import FormFilterReactSelect from 'components/FormFilterReactSelect';
 
@@ -129,6 +125,7 @@ export type ImageContainerProps = {
   shouldShowInfo?: boolean;
   customLabel?: ReactElement;
 };
+
 export interface RangeModifier {
   from: Date;
   to: Date;
@@ -200,33 +197,32 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
 
   const isAdmin = authClient.isAuthenticated();
 
-  const checkActiveQrRequest = async (id: number)=> {
+  const checkActiveQrRequest = async (id: number) => {
     const { active } = await getActiveQrRequests(id);
     if (active > 0) {
-      setIsActiveQrRequest(true)
+      setIsActiveQrRequest(true);
     } else {
-      setIsActiveQrRequest(false)
+      setIsActiveQrRequest(false);
     }
-  }
+  };
 
-  const checkExpiryEvent = async (expiry_date: string)=> {
+  const checkExpiryEvent = async (expiry_date: string) => {
     const today = new Date();
     const expiry = new Date(expiry_date);
 
     if (today > expiry) {
-      setIsExpiryEvent(true)
+      setIsExpiryEvent(true);
     } else {
-      setIsExpiryEvent(false)
+      setIsExpiryEvent(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (event) {
       checkActiveQrRequest(event.id);
-      checkExpiryEvent(event.expiry_date)
+      checkExpiryEvent(event.expiry_date);
     }
   }, [event]); /* eslint-disable-line react-hooks/exhaustive-deps */
-
 
   const initialValues = useMemo(() => {
     if (event) {
@@ -302,17 +298,17 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   };
 
   const handleQrRequestModalRequestClose = (): void => {
-    setIsQrRequestModalOpen(false)
+    setIsQrRequestModalOpen(false);
   };
 
   const handleQrRequestModalClick = (): void => {
-    setIsQrRequestModalOpen(true)
+    setIsQrRequestModalOpen(true);
   };
 
   const day = 60 * 60 * 24 * 1000;
 
   const warning = (
-    <div className={'backoffice-tooltip'}>
+    <div key={''} className={'backoffice-tooltip'}>
       {' '}
       {create ? (
         <>
@@ -327,23 +323,18 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   );
 
   const editQrRequestWarning = (
-    <div className={'backoffice-tooltip'}>
+    <div key={''} className={'backoffice-tooltip'}>
       Request the amount of codes you will need for the event
     </div>
   );
 
-  
   const activeQrRequestWarning = (
-    <div className={'backoffice-tooltip'}>
+    <div key={''} className={'backoffice-tooltip'}>
       {' '}
       {!isExpiryEvent ? (
-        <>
-          A requests for this event is being processed
-        </>
+        <>A requests for this event is being processed</>
       ) : (
-        <>
-          You can't requests codes on an expired event
-        </>
+        <>You can't requests codes on an expired event</>
       )}
     </div>
   );
@@ -351,7 +342,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   const editQrRequest = (
     <>
       <b>Amount of codes</b>
-      <Tooltip content={editQrRequestWarning}>
+      <Tooltip content={[editQrRequestWarning]}>
         <img alt="Informative message" src={infoButton} className={'info-button'} />
       </Tooltip>
     </>
@@ -360,7 +351,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
   const editLabel = (
     <>
       <b>Edit Code</b>
-      <Tooltip content={warning}>
+      <Tooltip content={[warning]}>
         <img alt="Informative message" src={infoButton} className={'info-button'} />
       </Tooltip>
     </>
@@ -438,22 +429,30 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                 <>
                   <div className="event-top-bar-container">
                     <h2 className="margin-0">  
-                      {event!.name} - {event!.year}
+                      #{event!.id} - {event!.name} - {event!.year}
                     </h2>
                     <div className="right_content">
-                      {
-                        (isActiveQrRequest || isExpiryEvent) ?
-                        <Tooltip content={activeQrRequestWarning}>
-                          <button disabled={(isActiveQrRequest || isExpiryEvent)} type="button" className={`filter-base filter-button ` + ((isActiveQrRequest || isExpiryEvent) ? 'disabled': '')}>
+                      {isActiveQrRequest || isExpiryEvent ? (
+                        <Tooltip content={[activeQrRequestWarning]}>
+                          <button
+                            disabled={isActiveQrRequest || isExpiryEvent}
+                            type="button"
+                            className={
+                              `filter-base filter-button ` + (isActiveQrRequest || isExpiryEvent ? 'disabled' : '')
+                            }
+                          >
                             Request more codes
                           </button>
                         </Tooltip>
-                        :
-                        <button type="button" className={`filter-base filter-button`} onClick={handleQrRequestModalClick}>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`filter-base filter-button`}
+                          onClick={handleQrRequestModalClick}
+                        >
                           Request more codes
                         </button>
-                      }
-
+                      )}
                     </div>
                   </div>
                   <EventField disabled={false} title="Name" name="name" />
@@ -615,10 +614,7 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
                   <img alt={event.image_url} className={'image-edit'} src={event.image_url} />
                 </div>
               )}
-              {
-                create &&
-                <EventField title={editQrRequest} type="number" name="requested_codes"/>
-              }
+              {create && <EventField title={editQrRequest} type="number" name="requested_codes" />}
               <SubmitButton text="Save" isSubmitting={isSubmitting} canSubmit={true} />
             </Form>
           );
@@ -636,26 +632,26 @@ const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event
     setIsSubmitting(true);
     const { requested_codes, secret_code } = values;
     if (event) {
-      await postQrRequests(event.id,requested_codes,secret_code)
-      .then((_) => {
-        setIsSubmitting(false);
-        addToast('QR Request created correctly', {
-          appearance: 'success',
-          autoDismiss: true,
+      await postQrRequests(event.id, requested_codes, secret_code)
+        .then((_) => {
+          setIsSubmitting(false);
+          addToast('QR Request created correctly', {
+            appearance: 'success',
+            autoDismiss: true,
+          });
+          setIsActiveQrRequest(event.id);
+          handleModalClose();
+        })
+        .catch((e) => {
+          console.log(e);
+          addToast(e.message, {
+            appearance: 'error',
+            autoDismiss: false,
+          });
         });
-        setIsActiveQrRequest(event.id)
-        handleModalClose();
-      })
-      .catch((e) => {
-        console.log(e);
-        addToast(e.message, {
-          appearance: 'error',
-          autoDismiss: false,
-        });
-      });
     }
   };
-  
+
   const handleQrRequestModalClosing = () => handleModalClose();
 
   const warning = (
@@ -677,7 +673,7 @@ const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event
     <Formik
       initialValues={{
         requested_codes: 0,
-        secret_code: event?.secret_code ? event?.secret_code : 0
+        secret_code: event?.secret_code ? event?.secret_code : 0,
       }}
       validationSchema={PoapQrRequestSchema}
       validateOnBlur={false}
@@ -700,7 +696,12 @@ const QrRequestModal: React.FC<QrRequestModalProps> = ({ handleModalClose, event
             </div>
             <div className="modal-content">
               <div className="modal-buttons-container creation-modal">
-                <SubmitButton text="Cancel" isSubmitting={false} canSubmit={true} onClick={handleQrRequestModalClosing} />
+                <SubmitButton
+                  text="Cancel"
+                  isSubmitting={false}
+                  canSubmit={true}
+                  onClick={handleQrRequestModalClosing}
+                />
                 <SubmitButton text="Request" isSubmitting={isSubmitting} canSubmit={true} onClick={handleSubmit} />
               </div>
             </div>
@@ -729,24 +730,24 @@ const DayPickerContainer = ({
     const offsetSign = offset < 0 ? -1 : 1;
     _value = new Date(value.valueOf() + offset * 60 * 1000 * offsetSign);
   }
-  let formatText = <></>;
+  let formatText = [<></>];
   if (helpText) {
-    formatText = (
-      <div className={'backoffice-tooltip'}>
-        <span>
-          {helpText}
-        </span>
-      </div>
-    );
+    formatText = [
+      <div key={''} className={'backoffice-tooltip'}>
+        <span>{helpText}</span>
+      </div>,
+    ];
   }
   return (
     <div className={`date-picker-container ${dayToSetup === 'end_date' ? 'end-date-overlay' : ''}`}>
-      <label>
-        {text}
+      <label className={'backoffice-tooltip-label'}>
+        <span>{text}</span>
         {helpText && (
-          <Tooltip content={formatText}>
-            <img alt="Informative message" src={infoButton} className={'info-button'} />
-          </Tooltip>
+          <span>
+            <Tooltip content={formatText}>
+              <img alt="Informative message" src={infoButton} className={'info-button'} />
+            </Tooltip>
+          </span>
         )}
       </label>
       <DayPickerInput
@@ -978,8 +979,7 @@ const EventTable: React.FC<EventTableProps> = ({ initialEvents, criteria, limit 
               <div className={'col-md-2 center '}>
                 <Tooltip
                   content={[
-                    // eslint-disable-next-line
-                    <div className={'event-table-tooltip'}>
+                    <div key={''} className={'event-table-tooltip'}>
                       <img alt={event.image_url} src={event.image_url} className={'tooltipped'} />
                     </div>,
                   ]}
