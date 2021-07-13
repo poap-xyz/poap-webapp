@@ -1171,17 +1171,19 @@ interface TheGraphEventTokensQuantity {
 }
 
 export async function tokensQuantityByEventId(eventId: number): Promise<number> {
-  let result = 0;
+  let promises: Array<Promise<number>> = [];
 
   if (L2_THE_GRAPH_URL) {
-    result += await tokensQuantityByEventIdAndSubgraphUrl(eventId, L2_THE_GRAPH_URL);
+    promises = promises.concat(tokensQuantityByEventIdAndSubgraphUrl(eventId, L2_THE_GRAPH_URL));
   }
 
   if (ETH_THE_GRAPH_URL) {
-    result += await tokensQuantityByEventIdAndSubgraphUrl(eventId, ETH_THE_GRAPH_URL);
+    promises = promises.concat(tokensQuantityByEventIdAndSubgraphUrl(eventId, ETH_THE_GRAPH_URL));
   }
 
-  return result;
+  const results = await Promise.all(promises);
+
+  return results.reduce((acc, value) => acc + value, 0);
 }
 
 async function tokensQuantityByEventIdAndSubgraphUrl(eventId: number, subgraphUrl: string): Promise<number> {
