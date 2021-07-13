@@ -18,7 +18,7 @@ export interface TokenInfo {
   event: PoapEvent;
   ownerText?: string;
   layer: string;
-  ens?: any
+  ens?: any;
 }
 
 export type QrCodesListAssignResponse = {
@@ -213,6 +213,30 @@ export interface PaginatedNotifications {
   notifications: Notification[];
 }
 
+export interface AdminLog {
+  id: number;
+  event_id: number;
+  action: string;
+  created_date: string;
+  request_params: string;
+  response_code: number;
+  response: string;
+  auth0_email: string;
+  agent_vars: string;
+  ip: string;
+}
+
+export interface PaginatedAdminLogs {
+  limit: number;
+  offset: number;
+  total: number;
+  admin_logs: AdminLog[];
+}
+
+export interface AdminLogAction {
+  action: string;
+  description: string;
+}
 
 export type QrCode = {
   beneficiary: string;
@@ -756,6 +780,27 @@ export function bumpTransaction(tx_hash: string, gasPrice: string): Promise<any>
     body: JSON.stringify({ txHash: tx_hash, gasPrice: gasPrice }),
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+export function getAdminLogs(
+  limit: number,
+  offset: number,
+  email: string,
+  action: string,
+  created_from: string,
+  created_to: string,
+  response_status?: number,
+  event_id?: number,
+): Promise<PaginatedAdminLogs> {
+  const params = queryString.stringify(
+    { limit, offset, email, action, response_status, created_from, created_to, event_id },
+    { sort: false },
+  );
+  return secureFetch(`${API_BASE}/admin-logs?${params}`);
+}
+
+export function getAdminActions(): Promise<AdminLogAction[]> {
+  return secureFetch(`${API_BASE}/admin-logs/actions`);
 }
 
 export async function getClaimHash(hash: string): Promise<HashClaim> {

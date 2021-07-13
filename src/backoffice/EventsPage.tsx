@@ -428,8 +428,8 @@ const EventForm: React.FC<{ create?: boolean; event?: PoapFullEvent }> = ({ crea
               ) : (
                 <>
                   <div className="event-top-bar-container">
-                    <h2 className="margin-0">
-                      {event!.name} - {event!.year}
+                    <h2 className="margin-0">  
+                      #{event!.id} - {event!.name} - {event!.year}
                     </h2>
                     <div className="right_content">
                       {isActiveQrRequest || isExpiryEvent ? (

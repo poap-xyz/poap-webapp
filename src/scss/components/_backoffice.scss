@@ -460,7 +460,9 @@
     &.qr,
     &.templates,
     &.checkouts,
-    &.deliveries, &.websites {
+    &.deliveries,
+    &.websites,
+    &.admin-logs {
       &.space-between {
         display: flex;
         justify-content: space-between;
@@ -603,7 +605,9 @@
   &.templates,
   &.addresses,
   &.checkouts,
-  &.deliveries, &.websites{
+  &.deliveries,
+  &.websites,
+  &.admin-logs{
     .no-results {
       text-align: center;
       padding: 50px 0;
