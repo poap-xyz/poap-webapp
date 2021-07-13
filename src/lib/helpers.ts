@@ -70,6 +70,12 @@ const getBase64 = (img: File | Blob, callback: (outputFile: string | undefined) 
   reader.readAsDataURL(img);
 };
 
+function getNumberWithOrdinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'],
+    v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 export {
   getBase64,
   isValidAddress,
@@ -80,4 +86,5 @@ export {
   reduceAddress,
   generateSecretCode,
   isValidEmail,
+  getNumberWithOrdinal,
 };

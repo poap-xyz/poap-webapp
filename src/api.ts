@@ -322,6 +322,10 @@ const API_WEBSITES =
   ? `${process.env.REACT_APP_TEST_API_WEBSITES}`
   : `${process.env.REACT_APP_API_WEBSITES}`;
 
+
+const ETH_THE_GRAPH_URL = process.env.REACT_APP_ETH_THE_GRAPH_URL;
+const L2_THE_GRAPH_URL = process.env.REACT_APP_L2_THE_GRAPH_URL;
+
 async function fetchJson<A>(input: RequestInfo, init?: RequestInit): Promise<A> {
   const res = await fetch(input, init);
 
@@ -1196,4 +1200,41 @@ export async function deleteClaimUrl(
     }),
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+interface TheGraphResponse<T> {
+  data: T;
+}
+
+interface TheGraphDataTokensQuantity {
+  event?: TheGraphEventTokensQuantity;
+}
+
+interface TheGraphEventTokensQuantity {
+  id: string;
+  tokenCount: string;
+}
+
+export async function tokensQuantityByEventId(eventId: number): Promise<number> {
+  let promises: Array<Promise<number>> = [];
+
+  if (L2_THE_GRAPH_URL) {
+    promises = promises.concat(tokensQuantityByEventIdAndSubgraphUrl(eventId, L2_THE_GRAPH_URL));
+  }
+
+  if (ETH_THE_GRAPH_URL) {
+    promises = promises.concat(tokensQuantityByEventIdAndSubgraphUrl(eventId, ETH_THE_GRAPH_URL));
+  }
+
+  const results = await Promise.all(promises);
+
+  return results.reduce((acc, value) => acc + value, 0);
+}
+
+async function tokensQuantityByEventIdAndSubgraphUrl(eventId: number, subgraphUrl: string): Promise<number> {
+  const query = `{"query":"{event(id: ${eventId}){id tokenCount}}"}`;
+  const request = { body: query, method: 'POST' };
+  const count = (await fetchJson<TheGraphResponse<TheGraphDataTokensQuantity>>(subgraphUrl, request)).data.event
+    ?.tokenCount;
+  return count ? parseInt(count) : 0;
 }
