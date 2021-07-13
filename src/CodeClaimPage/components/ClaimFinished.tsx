@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 /* Helpers */
-import { getTokensFor, HashClaim, TokenInfo } from '../../api';
-import { isValidEmail } from '../../lib/helpers';
+import { getTokensFor, HashClaim, TokenInfo, tokensQuantityByEventId } from '../../api';
+import { getNumberWithOrdinal, isValidEmail } from '../../lib/helpers';
 
 /* Components */
 import { LinkButton } from '../../components/LinkButton';
@@ -15,9 +15,11 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
   const claimedWithEmail = !!(claim && claim.claimed && claim.user_input && isValidEmail(claim.user_input));
 
   const [tokens, setTokens] = useState<TokenInfo[] | null>(null);
+  const [collectorNumber, setCollectorNumber] = useState<string | null>(null);
 
   useEffect(() => {
-    getEvents();
+    getEvents().then();
+    getCollectorNumber().then();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -62,6 +64,15 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
     }
   };
 
+  const getCollectorNumber = async () => {
+    try {
+      const number = await tokensQuantityByEventId(claim.event_id);
+      setCollectorNumber(getNumberWithOrdinal(number + 1));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const tokensMessage = () => {
     if (tokens) {
       if (tokens.length === 0) {
@@ -97,11 +108,13 @@ const ClaimFinished: React.FC<{ claim: HashClaim }> = ({ claim }) => {
         <br />
         {tokensMessage()}
         <br />
-        Keep growing your POAP collection!
-        <br />
-        See who else got it at <a href={poapGalleryUrl()}>POAP Gallery</a>
       </div>
       <LinkButton text={'Browse collection'} link={appLink} extraClass={'link-btn'} />
+      <div>
+        {collectorNumber && <span> You are the {collectorNumber} collector that minted this POAP</span>}
+        {collectorNumber && <br />}
+        See who else got it at <a href={poapGalleryUrl()}>POAP Gallery</a>
+      </div>
       <ClaimFooterMessage />
     </div>
   );
