@@ -152,8 +152,6 @@ const PoapEventSchema = yup.object().shape({
   email: yup.string().email('An email is required'),
   requested_codes: yup
   .number()
-  .required('Amount of codes is required')
-  .min(1, 'The minimum amount of codes is 1'),
 });
 
 const PoapEventSchemaEdit = yup.object().shape({
@@ -192,8 +190,6 @@ const PoapQrRequestSchema = yup.object().shape({
     .matches(/^[0-9]{6}$/, 'Must be exactly 6 digits'),
   requested_codes: yup
   .number()
-  .required('Amount of codes is required')
-  .min(1, 'The minimum amount of codes is 1'),
 });
 
 const IssueForEventFormValueSchema = yup.object().shape({
