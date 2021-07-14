@@ -27,6 +27,7 @@
 
   h1 {
     margin-bottom: 40px;
+    font-family: $font-family-title;
   }
 
   .logo-event {
@@ -234,8 +235,13 @@
       }
 
       h2 {
+        font-family: $font-family-title;
         margin-bottom: 5px;
         @include x-rem(font-size, 30px);
+
+        &.collection {
+          padding-top: 10px;
+        }
       }
 
       .wallet-number {
@@ -420,7 +426,7 @@
       color: $color-primary;
       font-weight: bold;
       padding: 80px 0 20px;
-      font-family: $font-family-narrow;
+      font-family: $font-family-title;
     }
 
     .template-title {
@@ -594,7 +600,7 @@
       }
 
       .info-title {
-        font-family: $font-family-narrow;
+        font-family: $font-family-title;
         font-weight: bold;
         color: $color-primary;
         font-size: 26px;

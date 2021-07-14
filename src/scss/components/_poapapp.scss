@@ -92,7 +92,7 @@
       @include x-rem(font-size, 40px);
       font-weight: $fontWeight-bold;
       color: $color-primary;
-      font-family: $font-family-narrow;
+      font-family: $font-family-title;
       padding: 30px 30px 0;
 
       @media (max-width: $bp-m) {
@@ -165,7 +165,7 @@
         h2 {
           color: $color-fourth;
           @include x-rem(font-size, 30px);
-          font-family: $font-family-narrow;
+          font-family: $font-family-title;
           margin-bottom: 12px;
         }
 
@@ -251,6 +251,7 @@
       @media (max-width: $bp-m) {
         display: none;
       }
+      font-family: $font-family-title;
     }
     .greetings-mobile {
       display: none;

@@ -222,7 +222,7 @@ export const TokenDetailPage: React.FC<RouteComponentProps<{
         <div className="main-content">
           <div className="container claim-info">
             <div className="content-event">
-              <h2>Collection</h2>
+              <h2 className="collection">Collection</h2>
               <p className={`wallet-number ${(ens && ens.valid) ? "ens":""}`}>
                 <Link to={`/scan/${address}`}>{address}</Link>
               </p>
