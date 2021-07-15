@@ -90,8 +90,8 @@
     .page-title {
       text-align: right;
       @include x-rem(font-size, 40px);
-      font-weight: $fontWeight-bold;
-      color: $color-primary;
+      font-weight: $fontWeight-medium;
+      color: #8076FA;
       font-family: $font-family-title;
       padding: 30px 30px 0;
 

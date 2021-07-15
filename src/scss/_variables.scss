@@ -6,7 +6,7 @@
 $color-base: #4b4b4b; //Black
 $color-invert: #fff;
 $color-disabled-field: #f2f2f2;
-$bg-color: #e9edf5; //light blue
+$bg-color: #F1F5FD; //light blue
 $color-primary: #6534ff; //violet
 $color-secondary: #bbc4ef; //light violet
 $color-third: #52d2bd; // green
@@ -27,6 +27,7 @@ $violet-select-arrow: linear-gradient(45deg, transparent 50%, $color-primary 50%
 $red-select-arrow: linear-gradient(45deg, transparent 50%, $color-error 50%),
   linear-gradient(135deg, $color-error 50%, transparent 50%);
 
+$color-btn-primary: #9289FF;
 // Transactions
 $tx-success-background: rgba(0, 201, 167, 0.1);
 $tx-success-color: #3bb54a;

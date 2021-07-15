@@ -2,9 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { Formik, Form } from 'formik';
 import classNames from 'classnames';
 
-/* Hooks */
-import { useToggleState } from '../react-helpers';
-
 /* Helpers */
 import { connectWallet } from '../poap-eth';
 import { resolveENS, getENSFromAddress } from '../api';
@@ -54,7 +51,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ onAddress }) => {
 
   return (
     <button className="btn" onClick={doLogin}>
-      <span>Show me my Badges</span>
+      <span>Browse Collection</span>
     </button>
   );
 };
@@ -119,36 +116,18 @@ const AddressInput: React.FC<AddressInputProps> = ({ onAddress }) => {
 };
 
 export const ChooseAddressPage: React.FC<ChooseAddressPageProps> = ({ onAccountDetails }) => {
-  const [enterByHand, toggleEnterByHand] = useToggleState(false);
-
   return (
     <main id="site-main" role="main" className="app-content">
       <div className="container">
         <div className="content-event" data-aos="fade-up" data-aos-delay="300">
           <p>
-            The <span>Proof of attendance protocol</span> (POAP) reminds you off the <span>cool places</span> you’ve
-            been to.
+            Welcome to <span> POAP scan</span>, your gateway to the <span>POAP ecosystem</span>.
+            <br />
+            Enter an address below to explore a collection.
           </p>
           <br />
-          {enterByHand ? (
-            <AddressInput onAddress={onAccountDetails} />
-          ) : (
-            <>
-              <LoginButton onAddress={onAccountDetails} />
-              <p>
-                or{' '}
-                <a
-                  href="/"
-                  onClick={(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-                    event.preventDefault();
-                    toggleEnterByHand();
-                  }}
-                >
-                  enter an address by hand
-                </a>
-              </p>
-            </>
-          )}
+          <AddressInput onAddress={onAccountDetails} />
+          <LoginButton onAddress={onAccountDetails} />
         </div>
       </div>
     </main>
