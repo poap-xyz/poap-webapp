@@ -12,11 +12,7 @@ type ChooseAddressPageProps = {
   onAccountDetails: (addressOrENS: string, address: string) => void;
 };
 
-type LoginButtonProps = {
-  onAddress: (addressOrENS: string, address: string) => void;
-};
-
-type AddressInputProps = {
+type LoginFormProps = {
   onAddress: (addressOrENS: string, address: string) => void;
 };
 
@@ -28,13 +24,51 @@ const initialValues: AddressFormValues = {
   address: '',
 };
 
-const LoginButton: React.FC<LoginButtonProps> = ({ onAddress }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onAddress }) => {
+  const [ensError, setEnsError] = useState(false);
+  const [working, setWorking] = useState(false);
+
+  const onSubmit = async ({ address }: AddressFormValues) => {
+    setWorking(true);
+
+    if (address) {
+      if (isValidAddress(address)) {
+        try {
+          const addressResponse = await getENSFromAddress(address);
+          onAddress(addressResponse.valid ? addressResponse.ens : address, address);
+          return;
+        } catch (e) {
+          onAddress(address, address);
+          return;
+        }
+      } else if (isValidEmail(address)) {
+        onAddress(address, address);
+        return;
+      } else {
+        setEnsError(false);
+        const ensResponse = await resolveENS(address);
+
+        if (ensResponse.valid) {
+          onAddress(address, ensResponse.ens);
+          return;
+        } else {
+          setEnsError(true);
+        }
+      }
+    } else {
+      await doLogin();
+    }
+
+    setWorking(false);
+  };
+
   const doLogin = useCallback(async () => {
     let { web3 } = await connectWallet();
 
     if (!web3) {
       return;
     }
+
     const accounts = await web3.eth.getAccounts();
     if (accounts.length === 0) return null;
     const account = accounts[0];
@@ -48,43 +82,6 @@ const LoginButton: React.FC<LoginButtonProps> = ({ onAddress }) => {
       }
     }
   }, [onAddress]);
-
-  return (
-    <button className="btn" onClick={doLogin}>
-      <span>Browse Collection</span>
-    </button>
-  );
-};
-
-const AddressInput: React.FC<AddressInputProps> = ({ onAddress }) => {
-  const [ensError, setEnsError] = useState(false);
-  const [working, setWorking] = useState(false);
-
-  const onSubmit = async ({ address }: AddressFormValues) => {
-    setWorking(true);
-
-    if (isValidAddress(address)) {
-      try {
-        const addressResponse = await getENSFromAddress(address);
-        onAddress(addressResponse.valid ? addressResponse.ens : address, address);
-      } catch (e) {
-        onAddress(address, address);
-      }
-    } else if (isValidEmail(address)) {
-      onAddress(address, address);
-    } else {
-      setEnsError(false);
-      const ensResponse = await resolveENS(address);
-
-      if (ensResponse.valid) {
-        onAddress(address, ensResponse.ens);
-      } else {
-        setEnsError(true);
-      }
-    }
-
-    setWorking(false);
-  };
 
   return (
     <Formik onSubmit={onSubmit} initialValues={initialValues} validationSchema={AddressOrEmailSchema}>
@@ -104,9 +101,9 @@ const AddressInput: React.FC<AddressInputProps> = ({ onAddress }) => {
           <input
             type="submit"
             id="submit"
-            value={working ? '' : 'Display Badges'}
-            disabled={Boolean(errors.address) || !values.address}
-            className={classNames(working && 'loading')}
+            value={working ? '' : 'Show my Collection'}
+            disabled={Boolean(errors.address)}
+            className={classNames((working && 'loading') || (!working && 'btn'))}
             name="submit"
           />
         </Form>
@@ -126,8 +123,7 @@ export const ChooseAddressPage: React.FC<ChooseAddressPageProps> = ({ onAccountD
             Enter an address below to explore a collection.
           </p>
           <br />
-          <AddressInput onAddress={onAccountDetails} />
-          <LoginButton onAddress={onAccountDetails} />
+          <LoginForm onAddress={onAccountDetails} />
         </div>
       </div>
     </main>

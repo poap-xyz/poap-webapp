@@ -21,18 +21,15 @@ const RedeemSchema = yup.object().shape({
 });
 
 const AddressOrEmailSchema = yup.object().shape({
-  address: yup
-    .mixed()
-    .test({
-      test: async (value) => {
-        let validAddressOrENS = await isValidAddressOrENS(value);
-        if (emailRegex({ exact: true }).test(value) || validAddressOrENS) {
-          return true;
-        }
-        return false;
-      },
-    })
-    .required(),
+  address: yup.mixed().test({
+    test: async (value) => {
+      if (!value) {
+        return true;
+      }
+      let validAddressOrENS = await isValidAddressOrENS(value);
+      return validAddressOrENS || emailRegex({ exact: true }).test(value);
+    },
+  }),
 });
 
 const GasPriceSchema = yup.object().shape({
