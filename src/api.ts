@@ -56,6 +56,17 @@ export interface QrRequest {
   reviewed_by: string;
   reviewed_date: string;
 }
+
+export interface SortCondition {
+  sort_by: string;
+  sort_direction: SortDirection;
+}
+
+export enum SortDirection {
+  ascending = 'asc',
+  descending = 'desc',
+}
+
 export interface PoapFullEvent extends PoapEvent {
   secret_code?: number;
   email?: string;
@@ -403,11 +414,17 @@ export async function getQrRequests(
   offset: number,
   reviewed?: boolean,
   event_id?: number,
+  sort_condition?: SortCondition,
 ): Promise<PaginatedQrRequest> {
-  const params = queryString.stringify({ limit, offset, event_id, reviewed }, { sort: false });
+  const sort_by = sort_condition?.sort_by;
+  const sort_direction = sort_condition?.sort_direction;
+
+  const params = queryString.stringify({ limit, offset, event_id, reviewed, sort_by, sort_direction }, { sort: false });
   try {
-    return authClient.isAuthenticated() ? secureFetch(`${API_BASE}/qr-requests?${params}`) : fetchJson(`${API_BASE}/qr-requests?${params}`);
-  } catch(e) {
+    return authClient.isAuthenticated()
+      ? secureFetch(`${API_BASE}/qr-requests?${params}`)
+      : fetchJson(`${API_BASE}/qr-requests?${params}`);
+  } catch (e) {
     return e;
   }
 }
