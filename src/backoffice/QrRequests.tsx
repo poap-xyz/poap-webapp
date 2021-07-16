@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 /* Libraries */
 import ReactPaginate from 'react-paginate';
 import ReactModal from 'react-modal';
-import { Formik,Field } from 'formik';
+import { Formik, Field } from 'formik';
 import { useToasts } from 'react-toast-notifications';
 
 /* Components */
@@ -15,14 +15,7 @@ import FilterReactSelect from '../components/FilterReactSelect';
 import { SubmitButton } from '../components/SubmitButton';
 
 /* Helpers */
-import {
-  eventOptionType,
-  getQrRequests,
-  PoapEvent,
-  getEvents,
-  setQrRequests,
-  QrRequest
-} from '../api';
+import { eventOptionType, getQrRequests, PoapEvent, getEvents, setQrRequests, QrRequest } from '../api';
 
 /* Assets */
 import edit from 'images/edit.svg';
@@ -33,7 +26,6 @@ import error from '../images/error.svg';
 type PaginateAction = {
   selected: number;
 };
-
 
 // creation modal types
 type CreationModalProps = {
@@ -82,7 +74,7 @@ const QrRequests: FC = () => {
   const cleanQrRequestSelection = () => setQrRequests([]);
 
   const fetchQrRequests = async () => {
-    setIsFetchingQrCodes(true)
+    setIsFetchingQrCodes(true);
 
     let event_id = undefined;
     if (selectedEvent !== undefined) event_id = selectedEvent > -1 ? selectedEvent : undefined;
@@ -91,12 +83,12 @@ const QrRequests: FC = () => {
 
     if (reviewedStatus) _status = reviewedStatus === 'reviewed';
 
-    const response = await getQrRequests(limit, page * limit,_status,event_id);
-    const { qr_requests, total } = response
+    const response = await getQrRequests(limit, page * limit, _status, event_id);
+    const { qr_requests, total } = response;
 
     setTotal(total);
-    setQrRequests(qr_requests)
-    setIsFetchingQrCodes(false)
+    setQrRequests(qr_requests);
+    setIsFetchingQrCodes(false);
   };
 
   const handleSelectChange = (option: OptionTypeBase): void => {
@@ -118,13 +110,13 @@ const QrRequests: FC = () => {
   };
 
   const handleCreationModalClick = (qr: QrRequest): void => {
-    setSelectedQrRequest(qr)
-    setIsCreationModalOpen(true)
+    setSelectedQrRequest(qr);
+    setIsCreationModalOpen(true);
   };
 
   const handleCreationModalRequestClose = (): void => {
-    setSelectedQrRequest(null)
-    setIsCreationModalOpen(false)
+    setSelectedQrRequest(null);
+    setIsCreationModalOpen(false);
   };
 
   const fetchEvents = async () => {
@@ -199,56 +191,61 @@ const QrRequests: FC = () => {
             <div className={'col-md-1 center'}></div>
           </div>
           <div className={'admin-table-row qr-table'}>
-            {qrRequests && qrRequests.map((qr, i) => {
-              return (
-                <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={qr.id}>
+            {qrRequests &&
+              qrRequests.map((qr, i) => {
+                return (
+                  <div className={`row ${i % 2 === 0 ? 'even' : 'odd'}`} key={qr.id}>
+                    <div className={'col-md-1 col-xs-4 center'}>
+                      <span className={'visible-sm'}>#: </span>
+                      {qr.id}
+                    </div>
 
-                  <div className={'col-md-1 col-xs-4 center'}>
-                    <span className={'visible-sm'}>#: </span>
-                    {qr.id}
-                  </div>
+                    <div className={'col-md-3 ellipsis col-xs-12'}>
+                      <span className={'visible-sm'}>Event: </span>
+                      <Link to={`/admin/events/${qr.event.fancy_id}`} target="_blank" rel="noopener noreferrer">
+                        {qr.event.name}
+                      </Link>
+                    </div>
 
-                  <div className={'col-md-3 ellipsis col-xs-12'}>
-                    <span className={'visible-sm'}>Event: </span>
-                    <Link to={`/admin/events/${qr.event.fancy_id}`} target="_blank" rel="noopener noreferrer">
-                      {qr.event.name}
-                    </Link>
-                  </div>
+                    <div className={'col-md-2 col-xs-12 ellipsis'}>
+                      <span className={'visible-sm'}>Mail: </span>
+                      {qr.event.email}
+                    </div>
 
-                  <div className={'col-md-2 col-xs-12 ellipsis'}>
-                    <span className={'visible-sm'}>Mail: </span>
-                    {qr.event.email}
-                  </div>
+                    <div className={'col-md-2 col-xs-12 center'}>
+                      <span className={'visible-sm'}>Start Date: </span>
+                      {qr.event.start_date}
+                    </div>
 
-                  <div className={'col-md-2 col-xs-12 center'}>
-                    <span className={'visible-sm'}>Start Date: </span>
-                    {qr.event.start_date}
-                  </div>
+                    <div className={'col-md-2 col-xs-12 center'}>
+                      <span className={'visible-sm'}>Code amount: </span>
+                      {qr.accepted_codes} / {qr.requested_codes}
+                    </div>
 
-                  <div className={'col-md-2 col-xs-12 center'}>
-                    <span className={'visible-sm'}>Code amount: </span>
-                    {qr.accepted_codes} / {qr.requested_codes}
-                  </div>
+                    <div className={`col-md-1 col-xs-8 center`}>
+                      <span className={'visible-sm'}>Reviewed: </span>
+                      <img
+                        src={qr.reviewed ? checked : error}
+                        alt={qr.reviewed ? `QR Reviewed` : 'QR not Reviewed'}
+                        className={'status-icon'}
+                      />
+                    </div>
 
-                  <div className={`col-md-1 col-xs-8 center`}>
-                    <span className={'visible-sm'}>Reviewed: </span>
-                    <img
-                      src={qr.reviewed ? checked : error}
-                      alt={qr.reviewed ? `QR Reviewed` : 'QR not Reviewed'}
-                      className={'status-icon'}
-                    />
+                    <div className={'col-md-1 col-xs-4 center'}>
+                      {!qr.reviewed ? (
+                        <img
+                          src={edit}
+                          alt={'Edit'}
+                          className={'edit-icon'}
+                          onClick={() => handleCreationModalClick(qr)}
+                        />
+                      ) : (
+                        <img src={editDisable} alt={'Edit'} className={'edit-icon'} />
+                      )}
+                    </div>
                   </div>
-
-                  <div className={'col-md-1 col-xs-4 center'}>
-                    {!qr.reviewed ?
-                     <img src={edit} alt={'Edit'} className={'edit-icon'} onClick={() => handleCreationModalClick(qr)} />
-                     :
-                     <img src={editDisable} alt={'Edit'} className={'edit-icon'} />
-                    }
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
           {total > limit && (
             <div className={'pagination'}>
@@ -265,46 +262,48 @@ const QrRequests: FC = () => {
         </div>
       )}
 
-      {qrRequests && qrRequests.length === 0 && !isFetchingQrCodes && <div className={'no-results'}>No QR Requests found</div>}
+      {qrRequests && qrRequests.length === 0 && !isFetchingQrCodes && (
+        <div className={'no-results'}>No QR Requests found</div>
+      )}
     </div>
   );
 };
 
-const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrRequest,fetchQrRequests }) => {
+const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrRequest, fetchQrRequests }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { addToast } = useToasts();
 
   const handleCreationModalSubmit = async (values: CreationModalFormikValues) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     const { requested_codes } = values;
     if (qrRequest) {
-      await setQrRequests(qrRequest.id,requested_codes)
-      .then((_) => {
-        setIsSubmitting(false);
-        addToast('QR Request approved correctly', {
-          appearance: 'success',
-          autoDismiss: true,
+      await setQrRequests(qrRequest.id, requested_codes)
+        .then((_) => {
+          setIsSubmitting(false);
+          addToast('QR Request approved correctly', {
+            appearance: 'success',
+            autoDismiss: true,
+          });
+          fetchQrRequests();
+          handleModalClose();
+        })
+        .catch((e) => {
+          console.log(e);
+          addToast(e.message, {
+            appearance: 'error',
+            autoDismiss: false,
+          });
         });
-        fetchQrRequests();
-        handleModalClose();
-      })
-      .catch((e) => {
-        console.log(e);
-        addToast(e.message, {
-          appearance: 'error',
-          autoDismiss: false,
-        });
-      });
     }
-    setIsSubmitting(false)
+    setIsSubmitting(false);
   };
-  
+
   const handleCreationModalClosing = () => handleModalClose();
 
   return (
     <Formik
       initialValues={{
-        requested_codes: qrRequest?.requested_codes ? qrRequest?.requested_codes : 0
+        requested_codes: qrRequest?.requested_codes ? qrRequest?.requested_codes : 0,
       }}
       validateOnBlur={false}
       validateOnChange={false}
@@ -324,7 +323,12 @@ const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrReque
             </div>
             <div className="modal-content">
               <div className="modal-buttons-container creation-modal">
-                <SubmitButton text="Cancel" isSubmitting={false} canSubmit={true} onClick={handleCreationModalClosing} />
+                <SubmitButton
+                  text="Cancel"
+                  isSubmitting={false}
+                  canSubmit={true}
+                  onClick={handleCreationModalClosing}
+                />
                 <SubmitButton text="Accept" isSubmitting={isSubmitting} canSubmit={true} onClick={handleSubmit} />
               </div>
             </div>
