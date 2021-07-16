@@ -1,11 +1,11 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { OptionTypeBase } from 'react-select';
 import { Link } from 'react-router-dom';
 
 /* Libraries */
 import ReactPaginate from 'react-paginate';
 import ReactModal from 'react-modal';
-import { Formik, Field } from 'formik';
+import { Field, Formik } from 'formik';
 import { useToasts } from 'react-toast-notifications';
 
 /* Components */
@@ -15,7 +15,19 @@ import FilterReactSelect from '../components/FilterReactSelect';
 import { SubmitButton } from '../components/SubmitButton';
 
 /* Helpers */
-import { eventOptionType, getQrRequests, PoapEvent, getEvents, setQrRequests, QrRequest } from '../api';
+import {
+  eventOptionType,
+  getEvents,
+  getQrRequests,
+  PoapEvent,
+  QrRequest,
+  setQrRequests,
+  SortCondition,
+  SortDirection,
+} from '../api';
+import { useToggleState } from '../react-helpers';
+import { format } from 'date-fns';
+import { timeSince } from '../lib/helpers';
 
 /* Assets */
 import edit from 'images/edit.svg';
@@ -23,9 +35,8 @@ import editDisable from 'images/edit-disable.svg';
 import checked from '../images/checked.svg';
 import error from '../images/error.svg';
 import dot from '../images/dot.svg';
-import { timeSince } from '../lib/helpers';
-import { useToggleState } from '../react-helpers';
-import { format } from 'date-fns';
+import sortDown from 'images/sort-down.png';
+import sortUp from 'images/sort-up.png';
 
 type PaginateAction = {
   selected: number;
@@ -42,6 +53,12 @@ type CreationModalFormikValues = {
   requested_codes: number;
 };
 
+type SortIconProps = {
+  field: string;
+  onClick: (field: string) => void;
+  direction?: SortDirection;
+};
+
 const QrRequests: FC = () => {
   const dateFormatter = (dateString: string) => format(new Date(dateString), 'dd-MMM-yyyy');
   const [page, setPage] = useState<number>(0);
@@ -56,6 +73,7 @@ const QrRequests: FC = () => {
   const [selectedQrRequest, setSelectedQrRequest] = useState<null | QrRequest>(null);
   const [events, setEvents] = useState<PoapEvent[]>([]);
   const [dateFormatToggle, toggleDateFormat] = useToggleState(true);
+  const [sortCondition, setSortCondition] = useState<undefined | SortCondition>(undefined);
 
   useEffect(() => {
     fetchEvents();
@@ -75,7 +93,7 @@ const QrRequests: FC = () => {
       setPage(0);
       fetchQrRequests();
     }
-  }, [selectedEvent, reviewedStatus, limit]); /* eslint-disable-line react-hooks/exhaustive-deps */
+  }, [selectedEvent, reviewedStatus, limit, sortCondition]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   const cleanQrRequestSelection = () => setQrRequests([]);
 
@@ -89,7 +107,7 @@ const QrRequests: FC = () => {
 
     if (reviewedStatus) _status = reviewedStatus === 'reviewed';
 
-    const response = await getQrRequests(limit, page * limit, _status, event_id);
+    const response = await getQrRequests(limit, page * limit, _status, event_id, sortCondition);
     const { qr_requests, total } = response;
 
     setTotal(total);
@@ -147,6 +165,20 @@ const QrRequests: FC = () => {
     return dateFormatter(dateString);
   };
 
+  const handleSortClick = (field: string) => {
+    if (sortCondition) {
+      if (sortCondition.sort_by !== field) {
+        setSortCondition({ sort_by: field, sort_direction: SortDirection.ascending });
+      } else {
+        const direction =
+          sortCondition.sort_direction === SortDirection.ascending ? SortDirection.descending : SortDirection.ascending;
+        setSortCondition({ sort_by: field, sort_direction: direction });
+      }
+    } else {
+      setSortCondition({ sort_by: field, sort_direction: SortDirection.ascending });
+    }
+  };
+
   return (
     <div className={'admin-table qr'}>
       <h2>Manage QR Requests</h2>
@@ -202,6 +234,7 @@ const QrRequests: FC = () => {
               Created date
               <span onClick={toggleDateFormat}>
                 <img src={dot} alt={'toggle format'} className={'toggle-icon'} />
+                <SortIcon field={'created_date'} onClick={handleSortClick} direction={sortCondition?.sort_direction} />
               </span>
             </div>
             <div className={'col-md-1 center'}>Amount</div>
@@ -210,10 +243,11 @@ const QrRequests: FC = () => {
               Review date
               <span onClick={toggleDateFormat}>
                 <img src={dot} alt={'toggle format'} className={'toggle-icon'} />
+                <SortIcon field={'reviewed_date'} onClick={handleSortClick} direction={sortCondition?.sort_direction} />
               </span>
             </div>
             <div className={'col-md-1 center'}>Reviewed</div>
-            <div className={'col-md-1 center'}></div>
+            <div className={'col-md-1 center'} />
           </div>
           <div className={'admin-table-row qr-table'}>
             {qrRequests &&
@@ -297,6 +331,22 @@ const QrRequests: FC = () => {
       )}
     </div>
   );
+};
+
+const SortIcon: React.FC<SortIconProps> = ({ field, direction, onClick }) => {
+  const icon = (): string => {
+    return direction === SortDirection.ascending ? sortUp : sortDown;
+  };
+
+  const alt = (): string => {
+    return direction === SortDirection.ascending ? 'sort up' : 'sort down';
+  };
+
+  const handleOnClick = () => {
+    onClick(field);
+  };
+
+  return <img src={icon()} alt={alt()} className={'sort-icon'} onClick={handleOnClick} />;
 };
 
 const CreationModal: React.FC<CreationModalProps> = ({ handleModalClose, qrRequest, fetchQrRequests }) => {
