@@ -234,6 +234,12 @@
 
     &.table-header {
       font-weight: bold;
+
+      .toggle-icon {
+        cursor: pointer;
+        width: 15px;
+        padding-left: 2px;
+      }
     }
 
     .center {

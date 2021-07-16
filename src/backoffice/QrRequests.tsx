@@ -22,6 +22,10 @@ import edit from 'images/edit.svg';
 import editDisable from 'images/edit-disable.svg';
 import checked from '../images/checked.svg';
 import error from '../images/error.svg';
+import dot from '../images/dot.svg';
+import { timeSince } from '../lib/helpers';
+import { useToggleState } from '../react-helpers';
+import { format } from 'date-fns';
 
 type PaginateAction = {
   selected: number;
@@ -39,6 +43,7 @@ type CreationModalFormikValues = {
 };
 
 const QrRequests: FC = () => {
+  const dateFormatter = (dateString: string) => format(new Date(dateString), 'dd-MMM-yyyy');
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [total, setTotal] = useState<number>(0);
@@ -50,6 +55,7 @@ const QrRequests: FC = () => {
   const [qrRequests, setQrRequests] = useState<null | QrRequest[]>(null);
   const [selectedQrRequest, setSelectedQrRequest] = useState<null | QrRequest>(null);
   const [events, setEvents] = useState<PoapEvent[]>([]);
+  const [dateFormatToggle, toggleDateFormat] = useToggleState(true);
 
   useEffect(() => {
     fetchEvents();
@@ -133,6 +139,14 @@ const QrRequests: FC = () => {
     });
   }
 
+  const formatDate = (dateString: string): string => {
+    if (dateFormatToggle) {
+      const date = new Date(dateString);
+      return `${timeSince(date)} ago`;
+    }
+    return dateFormatter(dateString);
+  };
+
   return (
     <div className={'admin-table qr'}>
       <h2>Manage QR Requests</h2>
@@ -183,10 +197,21 @@ const QrRequests: FC = () => {
         <div className={'qr-table-section'}>
           <div className={'row table-header visible-md'}>
             <div className={'col-md-1 center'}>#</div>
-            <div className={'col-md-3'}>Event</div>
-            <div className={'col-md-2'}>Mail</div>
-            <div className={'col-md-2 center'}>Start Date</div>
-            <div className={'col-md-2 center'}>Code amount</div>
+            <div className={'col-md-2'}>Event</div>
+            <div className={'col-md-2 center'}>
+              Created date
+              <span onClick={toggleDateFormat}>
+                <img src={dot} alt={'toggle format'} className={'toggle-icon'} />
+              </span>
+            </div>
+            <div className={'col-md-1 center'}>Amount</div>
+            <div className={'col-md-2'}>Review by</div>
+            <div className={'col-md-2 center'}>
+              Review date
+              <span onClick={toggleDateFormat}>
+                <img src={dot} alt={'toggle format'} className={'toggle-icon'} />
+              </span>
+            </div>
             <div className={'col-md-1 center'}>Reviewed</div>
             <div className={'col-md-1 center'}></div>
           </div>
@@ -200,26 +225,31 @@ const QrRequests: FC = () => {
                       {qr.id}
                     </div>
 
-                    <div className={'col-md-3 ellipsis col-xs-12'}>
+                    <div className={'col-md-2 ellipsis col-xs-12'}>
                       <span className={'visible-sm'}>Event: </span>
                       <Link to={`/admin/events/${qr.event.fancy_id}`} target="_blank" rel="noopener noreferrer">
                         {qr.event.name}
                       </Link>
                     </div>
 
-                    <div className={'col-md-2 col-xs-12 ellipsis'}>
-                      <span className={'visible-sm'}>Mail: </span>
-                      {qr.event.email}
+                    <div className={'col-md-2 col-xs-12 center'}>
+                      <span className={'visible-sm'}>Created Date: </span>
+                      {formatDate(qr.created_date)}
                     </div>
 
-                    <div className={'col-md-2 col-xs-12 center'}>
-                      <span className={'visible-sm'}>Start Date: </span>
-                      {qr.event.start_date}
-                    </div>
-
-                    <div className={'col-md-2 col-xs-12 center'}>
-                      <span className={'visible-sm'}>Code amount: </span>
+                    <div className={'col-md-1 col-xs-12 center'}>
+                      <span className={'visible-sm'}>Amount: </span>
                       {qr.accepted_codes} / {qr.requested_codes}
+                    </div>
+
+                    <div className={'col-md-2 col-xs-12 ellipsis'}>
+                      <span className={'visible-sm'}>Review By: </span>
+                      {qr.reviewed ? qr.reviewed_by : '-'}
+                    </div>
+
+                    <div className={'col-md-2 col-xs-12 center'}>
+                      <span className={'visible-sm'}>Review Date:</span>
+                      {qr.reviewed ? formatDate(qr.reviewed_date) : '-'}
                     </div>
 
                     <div className={`col-md-1 col-xs-8 center`}>

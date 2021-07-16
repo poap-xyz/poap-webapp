@@ -29,7 +29,7 @@ async function resolveName(name: string): Promise<string> {
   const mainnetProvider = getDefaultProvider('homestead');
   const resolvedAddress = await mainnetProvider.resolveName(name);
   return resolvedAddress;
-};
+}
 
 const isValidEmail = (email: string) => {
   return yup.string().email().isValidSync(email);
@@ -76,6 +76,34 @@ function getNumberWithOrdinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
+function timeSince(date: Date): string {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+
+  let interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + ' years';
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + ' months';
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + ' days';
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + ' hours';
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + ' minutes';
+  }
+
+  return Math.floor(seconds) + ' seconds';
+}
+
 export {
   getBase64,
   isValidAddress,
@@ -87,4 +115,5 @@ export {
   generateSecretCode,
   isValidEmail,
   getNumberWithOrdinal,
+  timeSince,
 };
