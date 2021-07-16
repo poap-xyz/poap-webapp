@@ -258,12 +258,12 @@ input[type='submit'] {
   color: $color-invert;
   text-decoration: none;
 
-  background: $color-primary;
+  background: $color-btn-primary;
   transition: all 0.2s ease-out;
 
-  -webkit-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
-  -moz-box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
-  box-shadow: 0px 10px 30px -5px rgba($color-primary, 0.5);
+  -webkit-box-shadow: 0px 10px 30px -5px rgba($color-btn-primary, 0.5);
+  -moz-box-shadow: 0px 10px 30px -5px rgba($color-btn-primary, 0.5);
+  box-shadow: 0px 10px 30px -5px rgba($color-btn-primary, 0.5);
 
   &:hover,
   &:focus {
